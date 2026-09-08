@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "WIW",
+    "I I",
+    "WWW"
+  ],
+  "key": {
+    "W": { "item": "minecraft:oak_planks" },
+    "I": { "item": "minecraft:iron_bars" }
+  },
+  "result": { "item": "fishingmadebetter:baitbox" }
+}

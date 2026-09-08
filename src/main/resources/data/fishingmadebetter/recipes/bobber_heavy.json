@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "III",
+    "IBI",
+    "III"
+  ],
+  "key": {
+    "I": { "item": "minecraft:iron_ingot" },
+    "B": { "item": "fishingmadebetter:bobber_basic" }
+  },
+  "result": { "item": "fishingmadebetter:bobber_heavy" }
+}

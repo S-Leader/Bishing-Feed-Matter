@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SIS",
+    "IWI",
+    "SIS"
+  ],
+  "key": {
+    "S": { "item": "minecraft:redstone" },
+    "I": { "item": "minecraft:gold_ingot" },
+    "W": { "item": "fishingmadebetter:reel_basic" }
+  },
+  "result": { "item": "fishingmadebetter:reel_fast" }
+}

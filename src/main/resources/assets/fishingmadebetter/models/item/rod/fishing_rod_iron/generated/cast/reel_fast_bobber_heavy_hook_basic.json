@@ -1,0 +1,7 @@
+{
+  "parent": "fishingmadebetter:item/rod_base",
+  "textures": {
+    "layer0": "fishingmadebetter:item/rod/fishing_rod_iron/rod_cast",
+    "layer1": "fishingmadebetter:item/mesh/reel/reel_fast"
+  }
+}

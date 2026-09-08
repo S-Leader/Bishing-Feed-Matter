@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  S",
+    " SB",
+    "SRH"
+  ],
+  "key": {
+    "S": { "item": "minecraft:stick" },
+    "B": { "item": "fishingmadebetter:bobber_basic" },
+    "R": { "item": "fishingmadebetter:reel_basic" },
+    "H": { "item": "fishingmadebetter:hook_basic" }
+  },
+  "result": { "item": "fishingmadebetter:fishing_rod_wood" }
+}

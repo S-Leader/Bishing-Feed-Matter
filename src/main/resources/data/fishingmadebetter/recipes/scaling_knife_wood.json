@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " FF",
+    "SII",
+    "   "
+  ],
+  "key": {
+    "I": { "item": "minecraft:oak_planks" },
+    "F": { "item": "minecraft:flint" },
+    "S": { "item": "minecraft:stick" }
+  },
+  "result": { "item": "fishingmadebetter:scaling_knife_wood" }
+}

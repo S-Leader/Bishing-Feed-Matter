@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " S ",
+    " S ",
+    "HIH"
+  ],
+  "key": {
+    "S": { "item": "minecraft:iron_nugget" },
+    "I": { "item": "minecraft:iron_ingot" },
+    "H": { "item": "fishingmadebetter:hook_basic" }
+  },
+  "result": { "item": "fishingmadebetter:hook_barbed" }
+}

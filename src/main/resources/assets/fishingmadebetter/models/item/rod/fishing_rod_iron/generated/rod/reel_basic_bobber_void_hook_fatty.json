@@ -1,0 +1,9 @@
+﻿{
+    "parent":  "fishingmadebetter:item/rod_base",
+    "textures":  {
+                     "layer0":  "fishingmadebetter:item/rod/fishing_rod_iron/rod",
+                     "layer1":  "fishingmadebetter:item/mesh/reel/reel_basic",
+                     "layer2":  "fishingmadebetter:item/mesh/bobber/bobber_void",
+                     "layer3":  "fishingmadebetter:item/mesh/hook/hook_fatty"
+                 }
+}

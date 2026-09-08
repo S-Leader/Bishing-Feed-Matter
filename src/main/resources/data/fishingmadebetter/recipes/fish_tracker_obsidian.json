@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " O ",
+    "ODO",
+    " O "
+  ],
+  "key": {
+    "O": { "item": "minecraft:obsidian" },
+    "D": { "item": "fishingmadebetter:fish_tracker_diamond" }
+  },
+  "result": { "item": "fishingmadebetter:fish_tracker_obsidian" }
+}

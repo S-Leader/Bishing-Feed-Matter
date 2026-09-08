@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "OSO",
+    "OBO",
+    "OSO"
+  ],
+  "key": {
+    "S": { "item": "minecraft:string" },
+    "O": { "item": "minecraft:ender_pearl" },
+    "B": { "item": "fishingmadebetter:bobber_basic" }
+  },
+  "result": { "item": "fishingmadebetter:bobber_void" }
+}

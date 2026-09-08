@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "fishingmadebetter:item/fillet_knife/fillet_knife_netherite"
+  }
+}

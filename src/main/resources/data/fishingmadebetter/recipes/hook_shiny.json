@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " S ",
+    "SHS",
+    " S "
+  ],
+  "key": {
+    "S": { "item": "minecraft:diamond" },
+    "H": { "item": "fishingmadebetter:hook_basic" }
+  },
+  "result": { "item": "fishingmadebetter:hook_shiny" }
+}

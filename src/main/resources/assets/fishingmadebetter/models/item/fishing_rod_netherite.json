@@ -1,0 +1,1280 @@
+{
+    "parent":  "fishingmadebetter:item/rod/fishing_rod_netherite/rod",
+    "overrides":  [
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_basic_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.2
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_basic_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.3
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_basic_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.4
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_basic_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.5
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_basic_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_obsidian_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.2
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_obsidian_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.3
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_obsidian_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.4
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_obsidian_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.5
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_obsidian_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_void_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.2
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_void_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.3
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_void_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.4
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_void_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.5
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_void_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_heavy_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.2
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_heavy_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.3
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_heavy_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.4
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_heavy_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.5
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_heavy_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_lightweight_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.2
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_lightweight_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.3
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_lightweight_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.4
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_lightweight_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.5
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_basic_bobber_lightweight_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_basic_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.2
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_basic_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.3
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_basic_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.4
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_basic_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.5
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_basic_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_obsidian_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.2
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_obsidian_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.3
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_obsidian_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.4
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_obsidian_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.5
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_obsidian_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_void_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.2
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_void_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.3
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_void_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.4
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_void_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.5
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_void_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_heavy_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.2
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_heavy_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.3
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_heavy_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.4
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_heavy_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.5
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_heavy_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_lightweight_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.2
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_lightweight_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.3
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_lightweight_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.4
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_lightweight_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.5
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_fast_bobber_lightweight_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_basic_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.2
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_basic_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.3
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_basic_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.4
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_basic_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.5
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_basic_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_obsidian_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.2
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_obsidian_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.3
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_obsidian_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.4
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_obsidian_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.5
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_obsidian_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_void_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.2
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_void_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.3
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_void_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.4
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_void_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.5
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_void_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_heavy_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.2
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_heavy_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.3
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_heavy_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.4
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_heavy_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.5
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_heavy_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_lightweight_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.2
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_lightweight_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.3
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_lightweight_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.4
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_lightweight_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.5
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/rod/reel_long_bobber_lightweight_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.1,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_basic_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.2,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_basic_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.3,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_basic_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.4,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_basic_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.5,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_basic_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.1,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_obsidian_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.2,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_obsidian_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.3,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_obsidian_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.4,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_obsidian_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.5,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_obsidian_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.1,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_void_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.2,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_void_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.3,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_void_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.4,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_void_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.5,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_void_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.1,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_heavy_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.2,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_heavy_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.3,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_heavy_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.4,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_heavy_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.5,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_heavy_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.1,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_lightweight_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.2,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_lightweight_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.3,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_lightweight_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.4,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_lightweight_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.1,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.5,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_basic_bobber_lightweight_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.1,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_basic_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.2,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_basic_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.3,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_basic_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.4,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_basic_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.5,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_basic_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.1,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_obsidian_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.2,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_obsidian_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.3,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_obsidian_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.4,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_obsidian_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.5,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_obsidian_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.1,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_void_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.2,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_void_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.3,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_void_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.4,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_void_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.5,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_void_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.1,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_heavy_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.2,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_heavy_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.3,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_heavy_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.4,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_heavy_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.5,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_heavy_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.1,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_lightweight_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.2,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_lightweight_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.3,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_lightweight_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.4,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_lightweight_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.2,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.5,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_fast_bobber_lightweight_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.1,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_basic_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.2,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_basic_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.3,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_basic_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.4,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_basic_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.1,
+                                            "fishingmadebetter:hook":  0.5,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_basic_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.1,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_obsidian_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.2,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_obsidian_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.3,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_obsidian_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.4,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_obsidian_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.2,
+                                            "fishingmadebetter:hook":  0.5,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_obsidian_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.1,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_void_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.2,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_void_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.3,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_void_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.4,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_void_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.3,
+                                            "fishingmadebetter:hook":  0.5,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_void_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.1,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_heavy_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.2,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_heavy_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.3,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_heavy_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.4,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_heavy_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.4,
+                                            "fishingmadebetter:hook":  0.5,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_heavy_hook_magnetic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.1,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_lightweight_hook_basic"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.2,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_lightweight_hook_barbed"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.3,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_lightweight_hook_fatty"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.4,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_lightweight_hook_shiny"
+                      },
+                      {
+                          "predicate":  {
+                                            "fishingmadebetter:reel":  0.3,
+                                            "fishingmadebetter:bobber":  0.5,
+                                            "fishingmadebetter:hook":  0.5,
+                                            "fishingmadebetter:cast":  1
+                                        },
+                          "model":  "fishingmadebetter:item/rod/fishing_rod_netherite/generated/cast/reel_long_bobber_lightweight_hook_magnetic"
+                      }
+                  ]
+}

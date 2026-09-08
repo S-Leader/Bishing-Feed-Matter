@@ -1,0 +1,43 @@
+# Gradle
+.gradle/
+build/
+**/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Minecraft/dev runtime output
+run/
+runs/
+eclipse/
+logs/
+crash-reports/
+debug.log
+latest.log
+*.log
+hs_err_pid*
+replay_pid*
+
+# Compiled output
+bin/
+out/
+*.class
+
+# Eclipse
+*.launch
+.settings/
+.metadata/
+.classpath
+.project
+
+# IntelliJ IDEA
+.idea/
+*.ipr
+*.iws
+*.iml
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini

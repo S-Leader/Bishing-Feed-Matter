@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smoking",
+  "category": "food",
+  "ingredient": {
+    "item": "fishingmadebetter:whale_steak"
+  },
+  "result": "fishingmadebetter:whale_burger",
+  "experience": 0.3,
+  "cookingtime": 100
+}

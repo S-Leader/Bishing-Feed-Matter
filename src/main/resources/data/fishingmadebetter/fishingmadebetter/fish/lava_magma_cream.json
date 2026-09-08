@@ -1,0 +1,15 @@
+{
+  "fish_id": "Lava Magma Cream",
+  "item": "minecraft:magma_cream",
+  "liquid": "lava",
+  "rarity": 8,
+  "min_y": -64,
+  "max_y": 320,
+  "reproduction_ticks": 20,
+  "eating_frequency_minutes": 7,
+  "allow_scaling": false,
+  "allow_fillet": true,
+  "default_fillet": false,
+  "fillet_item": "minecraft:magma_cream",
+  "fillet_use_weight": true
+}

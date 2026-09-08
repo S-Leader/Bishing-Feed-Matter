@@ -1,0 +1,19 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "net.theawesomegem.fishingmadebetter.mixins.aquaculture",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "AquacultureRodSlotMixin",
+    "AquacultureTackleBoxHandlerMixin",
+    "AquacultureHookSlotMixin",
+    "AquacultureBaitSlotMixin",
+    "AquacultureReelSlotMixin",
+    "AquacultureBobberSlotMixin",
+    "AquacultureStorageSlotMixin"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

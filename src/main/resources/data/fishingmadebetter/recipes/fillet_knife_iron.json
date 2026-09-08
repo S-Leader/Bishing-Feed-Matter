@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  I",
+    " IF",
+    "S  "
+  ],
+  "key": {
+    "I": { "item": "minecraft:iron_ingot" },
+    "F": { "item": "minecraft:flint" },
+    "S": { "item": "minecraft:stick" }
+  },
+  "result": { "item": "fishingmadebetter:fillet_knife_iron" }
+}
