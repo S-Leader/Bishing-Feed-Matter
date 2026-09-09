@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "w",
+    "W",
+    "w"
+  ],
+  "key": {
+    "w": {
+      "item": "minecraft:bread"
+    },
+    "W": {
+      "item": "fishingmadebetter:whale_steak_cooked"
+    }
+  },
+  "result": {
+    "item": "fishingmadebetter:whale_burger"
+  }
+}

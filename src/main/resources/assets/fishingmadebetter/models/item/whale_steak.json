@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "fishingmadebetter:item/fish_slice/whale_fillet_raw"
+    "layer0": "fishingmadebetter:item/fish_slice/whale_steak_raw"
   }
 }

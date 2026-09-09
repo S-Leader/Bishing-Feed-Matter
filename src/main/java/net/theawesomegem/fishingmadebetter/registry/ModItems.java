@@ -111,7 +111,7 @@ public final class ModItems {
             case "bait_bucket" -> new BaitBucketItem();
             case "whale" -> new Item(new Item.Properties());
             case "whale_steak" -> new Item(new Item.Properties().food(new FoodProperties.Builder().nutrition(2).saturationMod(0.3F).meat().build()));
-            case "cooked_whale_steak" -> new Item(new Item.Properties().food(new FoodProperties.Builder().nutrition(10).saturationMod(0.8F).meat().build()));
+            case "whale_steak_cooked" -> new Item(new Item.Properties().food(new FoodProperties.Builder().nutrition(10).saturationMod(0.8F).meat().build()));
             case "whale_burger" -> new Item(new Item.Properties().food(new FoodProperties.Builder().nutrition(20).saturationMod(0.8F).meat().build()));
             default -> new Item(new Item.Properties());
         };
