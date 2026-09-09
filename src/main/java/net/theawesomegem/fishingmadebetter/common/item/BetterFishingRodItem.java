@@ -1,37 +1,28 @@
 package net.theawesomegem.fishingmadebetter.common.item;
 
-import java.util.List;
-import javax.annotation.Nullable;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
-import net.minecraft.world.item.FishingRodItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Tier;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentCategory;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemStackHandler;
 import net.theawesomegem.fishingmadebetter.Constants;
 import net.theawesomegem.fishingmadebetter.common.entity.LavaFishingHook;
@@ -41,6 +32,9 @@ import net.theawesomegem.fishingmadebetter.common.item.attachment.BobberItem;
 import net.theawesomegem.fishingmadebetter.common.item.attachment.HookItem;
 import net.theawesomegem.fishingmadebetter.common.item.attachment.ReelItem;
 import net.theawesomegem.fishingmadebetter.common.util.BaitUtil;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 public class BetterFishingRodItem extends FishingRodItem {
     private static final String BAIT_ITEM = "BaitItem";
@@ -89,26 +83,23 @@ public class BetterFishingRodItem extends FishingRodItem {
     }
 
     @Override
-    public int getEnchantmentValue(ItemStack stack) {
-        // Match the vanilla fishing rod enchantability while explicitly keeping
-        // the Forge ItemStack-sensitive path enabled for every FMB rod tier.
+    public int getEnchantmentValue() {
         return 1;
     }
 
     @Override
+    public int getEnchantmentValue(ItemStack stack) {
+        return getEnchantmentValue();
+    }
+
+    @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        return isSupportedRodEnchantment(enchantment);
+        return enchantment.category.canEnchant(this);
     }
 
     @Override
     public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
-        return EnchantmentHelper.getEnchantments(book).keySet().stream().anyMatch(BetterFishingRodItem::isSupportedRodEnchantment);
-    }
-
-    private static boolean isSupportedRodEnchantment(Enchantment enchantment) {
-        return enchantment == Enchantments.UNBREAKING
-                || enchantment == Enchantments.MENDING
-                || enchantment.category == EnchantmentCategory.FISHING_ROD;
+        return true;
     }
 
     @Override
@@ -459,7 +450,9 @@ public class BetterFishingRodItem extends FishingRodItem {
         });
     }
 
-    /** Four-slot view used by Aquaculture's tackle box: hook, bait, reel, bobber. */
+    /**
+     * Four-slot view used by Aquaculture's tackle box: hook, bait, reel, bobber.
+     */
     private static final class RodItemStackHandler extends ItemStackHandler {
         private final ItemStack rod;
         private boolean synchronizing;

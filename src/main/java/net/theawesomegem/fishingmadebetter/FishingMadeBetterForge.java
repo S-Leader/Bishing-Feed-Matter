@@ -1,54 +1,51 @@
 package net.theawesomegem.fishingmadebetter;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.lang.reflect.Method;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.FishingHookRenderer;
-import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.client.renderer.item.ItemPropertyFunction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RenderGuiEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import net.theawesomegem.fishingmadebetter.common.block.BaitBoxBlock;
-import net.theawesomegem.fishingmadebetter.common.block.BaitBoxBlockEntity;
 import net.theawesomegem.fishingmadebetter.client.FmbClientConfig;
-import net.theawesomegem.fishingmadebetter.client.RodModelProperties;
 import net.theawesomegem.fishingmadebetter.client.ReelingHudRenderer;
 import net.theawesomegem.fishingmadebetter.client.ReelingKeyMappings;
+import net.theawesomegem.fishingmadebetter.client.RodModelProperties;
+import net.theawesomegem.fishingmadebetter.common.block.BaitBoxBlock;
+import net.theawesomegem.fishingmadebetter.common.block.BaitBoxBlockEntity;
 import net.theawesomegem.fishingmadebetter.common.data.FishDataReloadListener;
 import net.theawesomegem.fishingmadebetter.common.entity.LavaFishingHook;
 import net.theawesomegem.fishingmadebetter.common.entity.VoidFishingHook;
@@ -57,13 +54,12 @@ import net.theawesomegem.fishingmadebetter.common.item.BaitBoxItem;
 import net.theawesomegem.fishingmadebetter.common.network.ReelingInput;
 import net.theawesomegem.fishingmadebetter.common.network.ReelingInputHandler;
 import net.theawesomegem.fishingmadebetter.common.util.FishStackUtil;
-import net.theawesomegem.fishingmadebetter.registry.ModBlockEntities;
-import net.theawesomegem.fishingmadebetter.registry.ModBlocks;
-import net.theawesomegem.fishingmadebetter.registry.ModEntities;
-import net.theawesomegem.fishingmadebetter.registry.ModItems;
-import net.theawesomegem.fishingmadebetter.registry.ModRecipeSerializers;
 import net.theawesomegem.fishingmadebetter.compat.AquacultureCompat;
 import net.theawesomegem.fishingmadebetter.compat.LegacyFishConfigBootstrap;
+import net.theawesomegem.fishingmadebetter.registry.*;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Mod(Constants.MOD_ID)
 public class FishingMadeBetterForge {
@@ -211,7 +207,11 @@ public class FishingMadeBetterForge {
             event.register(ReelingKeyMappings.REEL_IN);
             event.register(ReelingKeyMappings.REEL_OUT);
             event.register(ReelingKeyMappings.OPEN_CONFIG);
-            registerRodModelProperties();
+        }
+
+        @SubscribeEvent
+        public static void clientSetup(FMLClientSetupEvent event) {
+            event.enqueueWork(ClientEvents::registerRodModelProperties);
         }
 
         private static void registerRodModelProperties() {
@@ -223,14 +223,8 @@ public class FishingMadeBetterForge {
             });
         }
 
-        private static void registerItemProperty(Item item, ResourceLocation id, ClampedItemPropertyFunction function) {
-            try {
-                Method register = ItemProperties.class.getDeclaredMethod("register", Item.class, ResourceLocation.class, ClampedItemPropertyFunction.class);
-                register.setAccessible(true);
-                register.invoke(null, item, id, function);
-            } catch (ReflectiveOperationException exception) {
-                Constants.LOG.error("Failed to register rod item model property {}", id, exception);
-            }
+        private static void registerItemProperty(Item item, ResourceLocation id, ItemPropertyFunction function) {
+            ItemProperties.register(item, id, function);
         }
 
         private static net.minecraft.client.gui.screens.Screen openConfigScreen(net.minecraft.client.gui.screens.Screen parent) {
