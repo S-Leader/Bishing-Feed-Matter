@@ -60,6 +60,7 @@ public final class ModItems {
             item("bait_bucket"),
             item("whale"),
             item("whale_steak"),
+            item("whale_steak_cooked"),
             item("whale_burger")
     );
 
