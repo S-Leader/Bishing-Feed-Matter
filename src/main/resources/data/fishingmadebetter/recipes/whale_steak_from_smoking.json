@@ -4,7 +4,7 @@
   "ingredient": {
     "item": "fishingmadebetter:whale_steak"
   },
-  "result": "fishingmadebetter:cooked_whale_staek",
+  "result": "fishingmadebetter:whale_steak_cooked",
   "experience": 0.3,
   "cookingtime": 100
 }
