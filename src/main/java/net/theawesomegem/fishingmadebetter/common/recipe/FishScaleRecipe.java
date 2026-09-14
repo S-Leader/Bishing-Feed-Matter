@@ -1,10 +1,8 @@
 package net.theawesomegem.fishingmadebetter.common.recipe;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Nullable;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
@@ -18,6 +16,10 @@ import net.theawesomegem.fishingmadebetter.common.data.FishDataRegistry;
 import net.theawesomegem.fishingmadebetter.common.item.KnifeItem;
 import net.theawesomegem.fishingmadebetter.common.util.FishStackUtil;
 import net.theawesomegem.fishingmadebetter.registry.ModRecipeSerializers;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FishScaleRecipe extends CustomRecipe {
     public FishScaleRecipe(ResourceLocation id, CraftingBookCategory category) {
@@ -72,6 +74,9 @@ public class FishScaleRecipe extends CustomRecipe {
 
         ItemStack scaledFish = fish.copy();
         scaledFish.setCount(1);
+        if (fishData != null && !FishStackUtil.isBetterFish(scaledFish)) {
+            FishStackUtil.attachFishData(scaledFish, fishData);
+        }
         FishStackUtil.setHasScale(scaledFish, false);
         remaining.set(slots.fish(), scaledFish);
 
@@ -104,7 +109,15 @@ public class FishScaleRecipe extends CustomRecipe {
     @Nullable
     private static FishData getFishData(ItemStack stack) {
         String fishId = FishStackUtil.getFishId(stack);
-        return fishId == null ? null : FishDataRegistry.get(fishId);
+        if (fishId != null) {
+            return FishDataRegistry.get(fishId);
+        }
+
+        ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
+        return FishDataRegistry.all().stream()
+                .filter(data -> data.itemId().equals(itemId.toString()))
+                .findFirst()
+                .orElse(null);
     }
 
     @Nullable
@@ -125,14 +138,13 @@ public class FishScaleRecipe extends CustomRecipe {
             ItemStack stack = container.getItem(slot);
             if (stack.getItem() instanceof KnifeItem knifeItem && knifeItem.isScalingKnife() && stack.getDamageValue() < stack.getMaxDamage()) {
                 knifeSlot = slot;
-            } else if (FishStackUtil.isBetterFish(stack) && FishStackUtil.hasScale(stack)) {
+            } else {
                 FishData fishData = getFishData(stack);
-                if (fishData == null || !fishData.allowScaling() || fishData.scalingItem().isEmpty()) {
+                if (fishData == null || !fishData.allowScaling() || fishData.scalingItem().isEmpty()
+                        || (FishStackUtil.isBetterFish(stack) && !FishStackUtil.hasScale(stack))) {
                     return null;
                 }
                 fishSlot = slot;
-            } else {
-                return null;
             }
         }
         return knifeSlot != -1 && fishSlot != -1 ? new Slots(knifeSlot, fishSlot) : null;

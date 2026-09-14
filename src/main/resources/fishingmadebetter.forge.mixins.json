@@ -1,16 +1,19 @@
 {
   "required": false,
   "minVersion": "0.8",
-  "package": "net.theawesomegem.fishingmadebetter.mixins.aquaculture",
+  "package": "net.theawesomegem.fishingmadebetter.mixins",
+  "refmap": "fishingmadebetter.refmap.json",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "AquacultureRodSlotMixin",
-    "AquacultureTackleBoxHandlerMixin",
-    "AquacultureHookSlotMixin",
-    "AquacultureBaitSlotMixin",
-    "AquacultureReelSlotMixin",
-    "AquacultureBobberSlotMixin",
-    "AquacultureStorageSlotMixin"
+    "AquacultureRecipeCompatMixin",
+    "FishingHookReplacementMixin",
+    "aquaculture.AquacultureBaitSlotMixin",
+    "aquaculture.AquacultureBobberSlotMixin",
+    "aquaculture.AquacultureHookSlotMixin",
+    "aquaculture.AquacultureReelSlotMixin",
+    "aquaculture.AquacultureRodSlotMixin",
+    "aquaculture.AquacultureStorageSlotMixin",
+    "aquaculture.AquacultureTackleBoxHandlerMixin"
   ],
   "client": [],
   "injectors": {

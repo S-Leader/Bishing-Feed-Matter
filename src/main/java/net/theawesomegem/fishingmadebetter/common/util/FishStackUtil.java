@@ -1,6 +1,5 @@
 package net.theawesomegem.fishingmadebetter.common.util;
 
-import javax.annotation.Nullable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -11,6 +10,8 @@ import net.minecraft.world.item.ItemStack;
 import net.theawesomegem.fishingmadebetter.common.data.FishData;
 import net.theawesomegem.fishingmadebetter.common.data.FishDataRegistry;
 import net.theawesomegem.fishingmadebetter.common.item.FishBucketItem;
+
+import javax.annotation.Nullable;
 
 public final class FishStackUtil {
     private static final String FISH_ID = "FishId";
@@ -64,6 +65,17 @@ public final class FishStackUtil {
 
     public static void setFishCaughtTime(ItemStack stack, long time) {
         stack.getOrCreateTag().putLong(FISH_CAUGHT_TIME, time);
+    }
+
+    public static void attachFishData(ItemStack stack, FishData fishData) {
+        CompoundTag tag = stack.getOrCreateTag();
+        tag.putString(FISH_ID, fishData.fishId());
+        if (!tag.contains(FISH_WEIGHT)) {
+            tag.putInt(FISH_WEIGHT, 1);
+        }
+        if (!tag.contains("fishWeight")) {
+            tag.putDouble("fishWeight", getFishWeight(stack));
+        }
     }
 
     public static boolean hasScale(ItemStack stack) {

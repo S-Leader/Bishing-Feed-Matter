@@ -1,5 +1,6 @@
 package net.theawesomegem.fishingmadebetter.mixins.aquaculture;
 
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.theawesomegem.fishingmadebetter.common.item.attachment.ReelItem;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,6 +14,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 abstract class AquacultureReelSlotMixin {
     @Inject(method = {"mayPlace", "m_5857_"}, at = @At("HEAD"), cancellable = true, remap = false)
     private void fishingmadebetter$useReel(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-        cir.setReturnValue(stack.getItem() instanceof ReelItem);
+        if (stack.getItem() instanceof ReelItem && ((Slot) (Object) this).isActive()) {
+            cir.setReturnValue(true);
+        }
     }
 }

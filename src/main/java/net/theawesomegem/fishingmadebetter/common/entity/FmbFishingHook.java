@@ -1,8 +1,11 @@
 package net.theawesomegem.fishingmadebetter.common.entity;
 
-import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -12,15 +15,11 @@ import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.MoverType;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
@@ -28,8 +27,8 @@ import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -38,6 +37,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.ToolActions;
 import net.theawesomegem.fishingmadebetter.Constants;
 import net.theawesomegem.fishingmadebetter.common.data.FishData;
 import net.theawesomegem.fishingmadebetter.common.data.FishData.FishingLiquid;
@@ -51,6 +51,8 @@ import net.theawesomegem.fishingmadebetter.common.item.attachment.ReelItem;
 import net.theawesomegem.fishingmadebetter.common.network.ReelingInput;
 import net.theawesomegem.fishingmadebetter.common.util.BaitUtil;
 import net.theawesomegem.fishingmadebetter.common.util.FishStackUtil;
+
+import java.util.List;
 
 public class FmbFishingHook extends FishingHook {
     private static final ResourceLocation FMB_COMBINED_LOOT = new ResourceLocation(Constants.MOD_ID, "fishing_combined");
@@ -281,8 +283,8 @@ public class FmbFishingHook extends FishingHook {
     }
 
     private boolean shouldStopCustomFishing(Player player) {
-        boolean mainHandRod = player.getMainHandItem().getItem() instanceof BetterFishingRodItem;
-        boolean offHandRod = player.getOffhandItem().getItem() instanceof BetterFishingRodItem;
+        boolean mainHandRod = player.getMainHandItem().canPerformAction(ToolActions.FISHING_ROD_CAST);
+        boolean offHandRod = player.getOffhandItem().canPerformAction(ToolActions.FISHING_ROD_CAST);
         double maxDistance = Math.max(8, reelRange);
         if (!player.isRemoved() && player.isAlive() && (mainHandRod || offHandRod) && distanceToSqr(player) <= maxDistance * maxDistance) {
             return false;

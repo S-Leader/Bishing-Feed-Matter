@@ -1,17 +1,18 @@
 package net.theawesomegem.fishingmadebetter.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import java.util.function.Consumer;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.theawesomegem.fishingmadebetter.common.entity.FmbFishingHook;
 import net.theawesomegem.fishingmadebetter.common.network.ReelingInput;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.function.Consumer;
+
 public final class ReelingKeyMappings {
     public static final String CATEGORY = "key.categories.fishingmadebetter";
-    public static final KeyMapping REEL_IN = new KeyMapping("key.fishingmadebetter.reel_in", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_LEFT, CATEGORY);
-    public static final KeyMapping REEL_OUT = new KeyMapping("key.fishingmadebetter.reel_out", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT, CATEGORY);
+    public static final KeyMapping REEL_IN = new KeyMapping("key.fishingmadebetter.reel_out", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT, CATEGORY);
+    public static final KeyMapping REEL_OUT = new KeyMapping("key.fishingmadebetter.reel_in", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_LEFT, CATEGORY);
     public static final KeyMapping OPEN_CONFIG = new KeyMapping("key.fishingmadebetter.open_config", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, CATEGORY);
     private static ReelingInput lastInput = ReelingInput.NONE;
 

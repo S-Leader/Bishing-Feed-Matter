@@ -1,10 +1,11 @@
 package net.theawesomegem.fishingmadebetter.compat;
 
+import net.theawesomegem.fishingmadebetter.Constants;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import net.theawesomegem.fishingmadebetter.Constants;
 
 public final class LegacyFishConfigBootstrap {
     private static final String RESOURCE_ROOT = "/data/fishingmadebetter/fishingmadebetter/fish/";
@@ -16,6 +17,7 @@ public final class LegacyFishConfigBootstrap {
         Path fishDataDirectory = forgeConfigDirectory.resolve(Constants.MOD_ID).resolve("fishdata");
         try {
             Files.createDirectories(fishDataDirectory);
+            copyIfMissing(fishDataDirectory, "advancedfishing.json");
             copyIfMissing(fishDataDirectory, "aquaculture.json");
             copyIfMissing(fishDataDirectory, "netherdepths.json");
         } catch (IOException exception) {

@@ -1,8 +1,5 @@
 package net.theawesomegem.fishingmadebetter.common.recipe;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Nullable;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -22,6 +19,10 @@ import net.theawesomegem.fishingmadebetter.common.item.FishSliceItem;
 import net.theawesomegem.fishingmadebetter.common.item.KnifeItem;
 import net.theawesomegem.fishingmadebetter.common.util.FishStackUtil;
 import net.theawesomegem.fishingmadebetter.registry.ModRecipeSerializers;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FishSliceRecipe extends CustomRecipe {
     private static final ResourceLocation RAW_SLICE_ID = new ResourceLocation(Constants.MOD_ID, "fish_slice_raw");
@@ -149,7 +150,15 @@ public class FishSliceRecipe extends CustomRecipe {
     @Nullable
     private static FishData getFishData(ItemStack stack) {
         String fishId = FishStackUtil.getFishId(stack);
-        return fishId == null ? null : FishDataRegistry.get(fishId);
+        if (fishId != null) {
+            return FishDataRegistry.get(fishId);
+        }
+
+        ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
+        return FishDataRegistry.all().stream()
+                .filter(data -> data.itemId().equals(itemId.toString()))
+                .findFirst()
+                .orElse(null);
     }
 
     private record Slots(int knife, int fish) {

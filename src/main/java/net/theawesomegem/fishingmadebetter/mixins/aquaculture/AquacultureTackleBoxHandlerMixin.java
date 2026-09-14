@@ -18,7 +18,9 @@ abstract class AquacultureTackleBoxHandlerMixin {
     @Inject(method = "isItemValid", at = @At("HEAD"), cancellable = true, remap = false)
     private void fishingmadebetter$acceptGear(int slot, ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         if (slot == 0) {
-            cir.setReturnValue(stack.getItem() instanceof BetterFishingRodItem);
+            if (stack.getItem() instanceof BetterFishingRodItem) {
+                cir.setReturnValue(true);
+            }
             return;
         }
         if (stack.getItem() instanceof HookItem || stack.getItem() instanceof ReelItem

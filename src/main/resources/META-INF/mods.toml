@@ -12,37 +12,43 @@ logoFile = "${mod_id}.png" #optional (needs to be in the root of your mod jar (r
 credits = "${credits}" #optional
 authors = "${mod_author}" #optional
 description = '''${description}''' #mandatory (Supports multiline text)
-[[dependencies.${mod_id}]] #optional
+[[dependencies.${ mod_id }]] #optional
 modId = "forge" #mandatory
 mandatory = true #mandatory
 versionRange = "[${forge_version},)" #mandatory
 ordering = "NONE" # The order that this dependency should load in relation to your mod, required to be either 'BEFORE' or 'AFTER' if the dependency is not mandatory
 side = "BOTH" # Side this dependency is applied on - 'BOTH', 'CLIENT' or 'SERVER'
-[[dependencies.${mod_id}]]
+[[dependencies.${ mod_id }]]
 modId = "minecraft"
 mandatory = true
 versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"
-[[dependencies.${mod_id}]]
+[[dependencies.${ mod_id }]]
 modId = "yet_another_config_lib_v3"
 mandatory = false
 versionRange = "${yacl_version_range}"
 ordering = "NONE"
 side = "CLIENT"
-[[dependencies.${mod_id}]]
+[[dependencies.${ mod_id }]]
 modId = "jei"
 mandatory = false
 versionRange = "[15,)"
 ordering = "AFTER"
 side = "CLIENT"
-[[dependencies.${mod_id}]]
+[[dependencies.${ mod_id }]]
+modId = "advanced_fishing"
+mandatory = false
+versionRange = "[1.4,)"
+ordering = "AFTER"
+side = "BOTH"
+[[dependencies.${ mod_id }]]
 modId = "aquaculture"
 mandatory = false
 versionRange = "[2.5,)"
 ordering = "AFTER"
 side = "BOTH"
-[[dependencies.${mod_id}]]
+[[dependencies.${ mod_id }]]
 modId = "netherdepthsupgrade"
 mandatory = false
 versionRange = "[3,)"

@@ -12,7 +12,19 @@
         },
         {
           "type": "minecraft:loot_table",
+          "name": "minecraft:gameplay/fishing/junk",
+          "weight": 10,
+          "quality": -1
+        },
+        {
+          "type": "minecraft:loot_table",
           "name": "fishingmadebetter:fishing_treasure",
+          "weight": 5,
+          "quality": 2
+        },
+        {
+          "type": "minecraft:loot_table",
+          "name": "minecraft:gameplay/fishing/treasure",
           "weight": 5,
           "quality": 2
         }

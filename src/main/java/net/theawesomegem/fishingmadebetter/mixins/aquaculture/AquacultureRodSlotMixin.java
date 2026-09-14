@@ -13,6 +13,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 abstract class AquacultureRodSlotMixin {
     @Inject(method = {"mayPlace", "m_5857_"}, at = @At("HEAD"), cancellable = true, remap = false)
     private void fishingmadebetter$acceptFishingEvolvedRod(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-        cir.setReturnValue(stack.getItem() instanceof BetterFishingRodItem);
+        if (stack.getItem() instanceof BetterFishingRodItem) {
+            cir.setReturnValue(true);
+        }
     }
 }

@@ -1,20 +1,6 @@
 package net.theawesomegem.fishingmadebetter.common.data;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.io.Reader;
-import java.io.IOException;
-import com.google.gson.Gson;
-import javax.annotation.Nullable;
+import com.google.gson.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -24,9 +10,27 @@ import net.theawesomegem.fishingmadebetter.Constants;
 import net.theawesomegem.fishingmadebetter.common.data.FishData.FishingLiquid;
 import net.theawesomegem.fishingmadebetter.common.data.FishData.TimeToFish;
 
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+
 public final class FishDataRegistry {
     private static final Map<String, FishData> FISH_DATA = new LinkedHashMap<>();
     private static final Gson GSON = new Gson();
+    private static final List<String> LEGACY_ADVANCED_FISHING_ITEMS = List.of(
+            "blue_jellyfish", "magma_jellyfish", "mud_tuna", "frost_minnow", "piranha",
+            "golden_koi", "specular_snapper", "cave_trout", "obsidian_bream", "nether_sturgeon",
+            "quartz_chub", "flarefin_koi", "blaze_pike", "ender_shad", "pearl_sardine",
+            "chorus_koi", "explosive_crucian", "ruffe", "sparkling_eel", "angelfish",
+            "angler_fish", "sponge_eater", "snowy_walleye", "squid", "withered_crucian",
+            "sandy_bass", "mandarinfish", "red_shroomfin", "brown_shroomfin", "fungi_catfish",
+            "swamp_plaice", "crystal_mullet", "charged_bullhead", "abyssal_lurker", "sunfish",
+            "glacier_anchovy", "catfish", "pike", "magikarp", "green_jellyfish",
+            "bone_fish", "cursed_koi", "spookyfin"
+    );
 
     private FishDataRegistry() {
     }
@@ -132,7 +136,10 @@ public final class FishDataRegistry {
 
     private static FishData parse(ResourceLocation id, JsonObject json) {
         String fishId = string(json, "fish_id", "fishId", id.toString());
-        String itemId = string(json, "item", "itemId", "");
+        String itemId = normalizeLegacyItemId(
+                string(json, "item", "itemId", ""),
+                integer(json, "item_metadata", "itemMetaData", 0)
+        );
         if (itemId.isEmpty()) {
             throw new JsonSyntaxException("Missing fish item/itemId");
         }
@@ -162,11 +169,17 @@ public final class FishDataRegistry {
         List<String> dimensionList = readStringList(json, "dimensions", "dimensionList");
         int timeAliveOutsideWater = integer(json, "time_alive_outside_water", "timeOutsideOfWater", 20);
         boolean allowScaling = bool(json, "allow_scaling", "allowScaling", false);
-        String scalingItem = string(json, "scaling_item", "scalingItem", "");
+        String scalingItem = normalizeLegacyItemId(
+                string(json, "scaling_item", "scalingItem", ""),
+                integer(json, "scaling_item_metadata", "scalingItemMetadata", 0)
+        );
         boolean scalingUseWeight = bool(json, "scaling_use_weight", "scalingUseWeight", false);
         boolean allowFillet = bool(json, "allow_fillet", "allowFillet", true);
         boolean defaultFillet = bool(json, "default_fillet", "defaultFillet", true);
-        String filletItem = string(json, "fillet_item", "filletItem", "");
+        String filletItem = normalizeLegacyItemId(
+                string(json, "fillet_item", "filletItem", ""),
+                integer(json, "fillet_item_metadata", "filletItemMetadata", 0)
+        );
         boolean filletUseWeight = bool(json, "fillet_use_weight", "filletUseWeight", true);
         List<String> validBaits = readBaits(json);
 
@@ -266,7 +279,64 @@ public final class FishDataRegistry {
         if (!values.isEmpty() || !json.has("baitItemMap")) {
             return values;
         }
-        return List.copyOf(GsonHelper.getAsJsonObject(json, "baitItemMap").keySet());
+
+        List<String> legacyValues = new ArrayList<>();
+        for (Map.Entry<String, JsonElement> entry : GsonHelper.getAsJsonObject(json, "baitItemMap").entrySet()) {
+            int metadata = 0;
+            if (entry.getValue().isJsonArray() && !entry.getValue().getAsJsonArray().isEmpty()) {
+                metadata = entry.getValue().getAsJsonArray().get(0).getAsInt();
+            } else if (entry.getValue().isJsonPrimitive()) {
+                metadata = entry.getValue().getAsInt();
+            }
+            legacyValues.add(normalizeLegacyItemId(entry.getKey(), metadata));
+        }
+        return List.copyOf(legacyValues);
+    }
+
+    private static String normalizeLegacyItemId(String itemId, int metadata) {
+        if (itemId == null || itemId.isEmpty()) {
+            return "";
+        }
+        if ((itemId.equals("advanced-fishing:fish") || itemId.equals("advanced_fishing:fish"))
+                && metadata >= 0 && metadata < LEGACY_ADVANCED_FISHING_ITEMS.size()) {
+            return "advanced_fishing:" + LEGACY_ADVANCED_FISHING_ITEMS.get(metadata);
+        }
+        if (itemId.equals("minecraft:fish")) {
+            return switch (metadata) {
+                case 1 -> "minecraft:salmon";
+                case 2 -> "minecraft:tropical_fish";
+                case 3 -> "minecraft:pufferfish";
+                default -> "minecraft:cod";
+            };
+        }
+        if (itemId.equals("minecraft:cooked_fish")) {
+            return metadata == 1 ? "minecraft:cooked_salmon" : "minecraft:cooked_cod";
+        }
+        if (itemId.equals("minecraft:dye")) {
+            return switch (metadata) {
+                case 1 -> "minecraft:red_dye";
+                case 2 -> "minecraft:green_dye";
+                case 3 -> "minecraft:cocoa_beans";
+                case 4 -> "minecraft:lapis_lazuli";
+                case 5 -> "minecraft:purple_dye";
+                case 6 -> "minecraft:cyan_dye";
+                case 7 -> "minecraft:light_gray_dye";
+                case 8 -> "minecraft:gray_dye";
+                case 9 -> "minecraft:pink_dye";
+                case 10 -> "minecraft:lime_dye";
+                case 11 -> "minecraft:yellow_dye";
+                case 12 -> "minecraft:light_blue_dye";
+                case 13 -> "minecraft:magenta_dye";
+                case 14 -> "minecraft:orange_dye";
+                case 15 -> "minecraft:bone_meal";
+                default -> "minecraft:ink_sac";
+            };
+        }
+        return switch (itemId) {
+            case "minecraft:melon" -> "minecraft:melon_slice";
+            case "minecraft:waterlily" -> "minecraft:lily_pad";
+            default -> itemId;
+        };
     }
 
     private static List<String> readStringList(JsonObject json, String modernKey, String legacyKey) {

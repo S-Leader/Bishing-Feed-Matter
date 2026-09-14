@@ -1,8 +1,6 @@
 {
-  "key.reelIn": "Tension Line Left",
-  "key.reelOut": "Tension Line Right",
-  "key.fishingmadebetter.reel_in": "Tension Line Left",
-  "key.fishingmadebetter.reel_out": "Tension Line Right",
+  "key.fishingmadebetter.reel_in": "Tension Line Right",
+  "key.fishingmadebetter.reel_out": "Tension Line Left",
   "key.fishingmadebetter.open_config": "Open Config",
   "key.fishingmadebetter.category": "Fishing Evolved",
   "key.categories.fishingmadebetter": "Fishing Evolved",
