@@ -34,6 +34,7 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -52,6 +53,7 @@ import net.theawesomegem.fishingmadebetter.client.renderer.BlueWhaleRenderer;
 import net.theawesomegem.fishingmadebetter.common.block.BaitBoxBlock;
 import net.theawesomegem.fishingmadebetter.common.block.BaitBoxBlockEntity;
 import net.theawesomegem.fishingmadebetter.common.config.FmbCommonConfig;
+import net.theawesomegem.fishingmadebetter.common.data.FishDataRegistry;
 import net.theawesomegem.fishingmadebetter.common.data.FishDataReloadListener;
 import net.theawesomegem.fishingmadebetter.common.entity.BlueWhaleEntity;
 import net.theawesomegem.fishingmadebetter.common.entity.LavaFishingHook;
@@ -194,12 +196,20 @@ public class FishingMadeBetterForge {
         SOUND_EVENTS.register(modBus);
         CREATIVE_MODE_TABS.register(modBus);
         modBus.addListener(AquacultureCompat::hideCreativeItems);
+        modBus.addListener(this::commonSetup);
         FishingMadeBetter.init();
         registerNetworkMessages();
         MinecraftForge.EVENT_BUS.addListener(this::addReloadListeners);
         if (FMLEnvironment.dist == Dist.CLIENT) {
             ClientEvents.registerConfigScreen();
         }
+    }
+
+    private void commonSetup(FMLCommonSetupEvent event) {
+        // JEI builds its synthetic fish-processing recipes on the physical client.
+        // Dedicated-server datapack reloads do not populate this client-side static registry,
+        // so preload the local legacy fish configs once registries are ready.
+        event.enqueueWork(() -> FishDataRegistry.reload(Map.of(), fishConfigDirectory));
     }
 
     private void addReloadListeners(AddReloadListenerEvent event) {
