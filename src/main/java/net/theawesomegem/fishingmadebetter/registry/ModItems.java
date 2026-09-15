@@ -1,23 +1,20 @@
 package net.theawesomegem.fishingmadebetter.registry;
 
-import java.util.List;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Tiers;
-import net.theawesomegem.fishingmadebetter.common.item.BaitBucketItem;
-import net.theawesomegem.fishingmadebetter.common.item.BetterFishingRodItem;
-import net.theawesomegem.fishingmadebetter.common.item.FishBucketItem;
-import net.theawesomegem.fishingmadebetter.common.item.FishSliceItem;
-import net.theawesomegem.fishingmadebetter.common.item.KnifeItem;
+import net.minecraftforge.common.ForgeSpawnEggItem;
+import net.theawesomegem.fishingmadebetter.Constants;
+import net.theawesomegem.fishingmadebetter.common.item.*;
 import net.theawesomegem.fishingmadebetter.common.item.KnifeItem.KnifeType;
-import net.theawesomegem.fishingmadebetter.common.item.SteelTier;
 import net.theawesomegem.fishingmadebetter.common.item.attachment.BobberItem;
 import net.theawesomegem.fishingmadebetter.common.item.attachment.HookItem;
 import net.theawesomegem.fishingmadebetter.common.item.attachment.ReelItem;
 import net.theawesomegem.fishingmadebetter.common.item.tracker.FishTrackerItem;
 import net.theawesomegem.fishingmadebetter.common.item.tracker.FishTrackerItem.TrackingLiquid;
 import net.theawesomegem.fishingmadebetter.common.item.tracker.FishTrackerItem.TrackingVision;
-import net.theawesomegem.fishingmadebetter.Constants;
+
+import java.util.List;
 
 public final class ModItems {
     public static final List<ItemDefinition> ITEMS = List.of(
@@ -61,7 +58,8 @@ public final class ModItems {
             item("whale"),
             item("whale_steak"),
             item("whale_steak_cooked"),
-            item("whale_burger")
+            item("whale_burger"),
+            item("blue_whale_spawn_egg")
     );
 
     private ModItems() {
@@ -78,16 +76,26 @@ public final class ModItems {
             case "fishing_rod_diamond" -> new BetterFishingRodItem(Tiers.DIAMOND);
             case "fishing_rod_steel" -> new BetterFishingRodItem(SteelTier.INSTANCE);
             case "fishing_rod_netherite" -> new BetterFishingRodItem(Tiers.NETHERITE, true);
-            case "fillet_knife_wood" -> new KnifeItem(Tiers.WOOD, "item.fishingmadebetter.fillet_knife.tooltip", KnifeType.FILLET);
-            case "fillet_knife_iron" -> new KnifeItem(Tiers.IRON, "item.fishingmadebetter.fillet_knife.tooltip", KnifeType.FILLET);
-            case "fillet_knife_diamond" -> new KnifeItem(Tiers.DIAMOND, "item.fishingmadebetter.fillet_knife.tooltip", KnifeType.FILLET);
-            case "fillet_knife_steel" -> new KnifeItem(SteelTier.INSTANCE, "item.fishingmadebetter.fillet_knife.tooltip", KnifeType.FILLET);
-            case "fillet_knife_netherite" -> new KnifeItem(Tiers.NETHERITE, "item.fishingmadebetter.fillet_knife.tooltip", KnifeType.FILLET, true);
-            case "scaling_knife_wood" -> new KnifeItem(Tiers.WOOD, "item.fishingmadebetter.scaling_knife.tooltip", KnifeType.SCALING);
-            case "scaling_knife_iron" -> new KnifeItem(Tiers.IRON, "item.fishingmadebetter.scaling_knife.tooltip", KnifeType.SCALING);
-            case "scaling_knife_diamond" -> new KnifeItem(Tiers.DIAMOND, "item.fishingmadebetter.scaling_knife.tooltip", KnifeType.SCALING);
-            case "scaling_knife_steel" -> new KnifeItem(SteelTier.INSTANCE, "item.fishingmadebetter.scaling_knife.tooltip", KnifeType.SCALING);
-            case "scaling_knife_netherite" -> new KnifeItem(Tiers.NETHERITE, "item.fishingmadebetter.scaling_knife.tooltip", KnifeType.SCALING, true);
+            case "fillet_knife_wood" ->
+                    new KnifeItem(Tiers.WOOD, "item.fishingmadebetter.fillet_knife.tooltip", KnifeType.FILLET);
+            case "fillet_knife_iron" ->
+                    new KnifeItem(Tiers.IRON, "item.fishingmadebetter.fillet_knife.tooltip", KnifeType.FILLET);
+            case "fillet_knife_diamond" ->
+                    new KnifeItem(Tiers.DIAMOND, "item.fishingmadebetter.fillet_knife.tooltip", KnifeType.FILLET);
+            case "fillet_knife_steel" ->
+                    new KnifeItem(SteelTier.INSTANCE, "item.fishingmadebetter.fillet_knife.tooltip", KnifeType.FILLET);
+            case "fillet_knife_netherite" ->
+                    new KnifeItem(Tiers.NETHERITE, "item.fishingmadebetter.fillet_knife.tooltip", KnifeType.FILLET, true);
+            case "scaling_knife_wood" ->
+                    new KnifeItem(Tiers.WOOD, "item.fishingmadebetter.scaling_knife.tooltip", KnifeType.SCALING);
+            case "scaling_knife_iron" ->
+                    new KnifeItem(Tiers.IRON, "item.fishingmadebetter.scaling_knife.tooltip", KnifeType.SCALING);
+            case "scaling_knife_diamond" ->
+                    new KnifeItem(Tiers.DIAMOND, "item.fishingmadebetter.scaling_knife.tooltip", KnifeType.SCALING);
+            case "scaling_knife_steel" ->
+                    new KnifeItem(SteelTier.INSTANCE, "item.fishingmadebetter.scaling_knife.tooltip", KnifeType.SCALING);
+            case "scaling_knife_netherite" ->
+                    new KnifeItem(Tiers.NETHERITE, "item.fishingmadebetter.scaling_knife.tooltip", KnifeType.SCALING, true);
             case "fish_slice_raw" -> new FishSliceItem(2, 0.1F);
             case "fish_slice_cooked" -> new FishSliceItem(6, 0.8F);
             case "fish_tracker_iron" -> new FishTrackerItem(TrackingVision.BAD, TrackingLiquid.WATER, 50);
@@ -102,7 +110,8 @@ public final class ModItems {
             case "bobber_obsidian" -> new BobberItem(new Item.Properties().durability(512), true, false, 0, 0, false);
             case "bobber_void" -> new BobberItem(new Item.Properties().durability(128), false, true, 0, 0, false);
             case "bobber_heavy" -> new BobberItem(new Item.Properties().durability(256), false, false, 3, 0, false);
-            case "bobber_lightweight" -> new BobberItem(new Item.Properties().durability(128), false, false, 0, 4, false);
+            case "bobber_lightweight" ->
+                    new BobberItem(new Item.Properties().durability(128), false, false, 0, 4, false);
             case "hook_basic" -> new HookItem(new Item.Properties().stacksTo(16), 0, 0, 0, 0, true);
             case "hook_barbed" -> new HookItem(new Item.Properties().durability(256), 4, 0, 0, 0, false);
             case "hook_fatty" -> new HookItem(new Item.Properties().durability(64), 0, 0, 0, 35, false);
@@ -111,9 +120,18 @@ public final class ModItems {
             case "fish_bucket" -> new FishBucketItem();
             case "bait_bucket" -> new BaitBucketItem();
             case "whale" -> new Item(new Item.Properties());
-            case "whale_steak" -> new Item(new Item.Properties().food(new FoodProperties.Builder().nutrition(2).saturationMod(0.3F).meat().build()));
-            case "whale_steak_cooked" -> new Item(new Item.Properties().food(new FoodProperties.Builder().nutrition(10).saturationMod(0.8F).meat().build()));
-            case "whale_burger" -> new Item(new Item.Properties().food(new FoodProperties.Builder().nutrition(20).saturationMod(0.8F).meat().build()));
+            case "whale_steak" ->
+                    new Item(new Item.Properties().food(new FoodProperties.Builder().nutrition(2).saturationMod(0.3F).meat().build()));
+            case "whale_steak_cooked" ->
+                    new Item(new Item.Properties().food(new FoodProperties.Builder().nutrition(10).saturationMod(0.8F).meat().build()));
+            case "whale_burger" ->
+                    new Item(new Item.Properties().food(new FoodProperties.Builder().nutrition(20).saturationMod(0.8F).meat().build()));
+            case "blue_whale_spawn_egg" -> new ForgeSpawnEggItem(
+                    ModEntities.BLUE_WHALE,
+                    0x536C8C,
+                    0xB8C7D9,
+                    new Item.Properties()
+            );
             default -> new Item(new Item.Properties());
         };
     }

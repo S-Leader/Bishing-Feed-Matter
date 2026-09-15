@@ -65,28 +65,16 @@ public final class BlueWhaleEntity extends WaterAnimal {
     private static final int AIR_CONSUMPTION_INTERVAL = 100;
     private static final int STUN_DURATION = 60;
     private static final int SHIELD_DISABLE_DURATION = 200;
-    /**
-     * 与海豚同值：离水 2400 tick（2 分钟）后开始脱水掉血。
-     */
     private static final int TOTAL_MOISTNESS = 2400;
     private static final float DRY_OUT_DAMAGE = 1.0F;
-    /**
-     * 搁浅时玩家推动的助力倍率，用来抵消上岸后的强阻尼。
-     */
     private static final double BEACHED_PUSH_ASSIST = 2.0D;
     private static final int MAX_STUCK_TRIDENTS = 8;
     private static final int MAX_STUCK_ARROWS = 16;
-    /**
-     * 拔三叉戟时玩家眼睛到插着位置的最大距离。
-     */
     private static final double PULL_REACH = 6.0D;
     private static final float OBSIDIAN_HARDNESS = 50.0F;
     private static final double OBSTACLE_PROBE_DISTANCE = 4.5D;
     private static final int YAW_HISTORY_SIZE = 32;
     private static final int YAW_HISTORY_MASK = YAW_HISTORY_SIZE - 1;
-    /**
-     * 每格身长对应的偏航滞后 tick 数，越大身体越软。
-     */
     private static final float YAW_LAG_PER_BLOCK = 1.1F;
     private static final double SPINE_STEP = 0.5D;
     private static final double[] PART_OFFSETS = {1.8D, 0.2D, -1.65D, -3.0D, -4.2D, -5.35D};
@@ -265,10 +253,6 @@ public final class BlueWhaleEntity extends WaterAnimal {
         return Mth.lerp(Mth.clamp(partialTick, 0.0F, 1.0F), previousVisualPitch, visualPitch);
     }
 
-    /**
-     * 与海豚同一套湿度机制：沾水或淋雨即回满，离水满 2400 tick 后每 tick 掉 1 点血。
-     * 氧气是另一条独立的线（handleAirSupply），鲸鱼同时需要水和空气。
-     */
     private void updateMoistness() {
         if (isInWaterRainOrBubble()) {
             moistness = TOTAL_MOISTNESS;
@@ -280,10 +264,6 @@ public final class BlueWhaleEntity extends WaterAnimal {
         }
     }
 
-    /**
-     * 搁浅时被玩家顶动：几十吨的身体只吃水平推力，且要盖过上岸后的阻尼才推得动。
-     * 传进来的方向已经是「背离推动者」，正好就是把它顶回海里的方向。
-     */
     void pushFromBodyPart(double x, double z) {
         if (!isBeached() || isStunned()) {
             return;
