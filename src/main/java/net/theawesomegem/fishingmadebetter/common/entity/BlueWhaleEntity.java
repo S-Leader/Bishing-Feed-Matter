@@ -45,13 +45,10 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.theawesomegem.fishingmadebetter.FishingMadeBetterForge;
 import net.theawesomegem.fishingmadebetter.common.config.FmbCommonConfig;
 import net.theawesomegem.fishingmadebetter.mixins.ThrownTridentAccessor;
+import net.theawesomegem.fishingmadebetter.registry.ModSounds;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public final class BlueWhaleEntity extends WaterAnimal {
     public static final int ACTION_IDLE = 0;
@@ -66,20 +63,28 @@ public final class BlueWhaleEntity extends WaterAnimal {
     private static final int RAM_DURATION = 24;
     private static final int AIR_CONSUMPTION_INTERVAL = 100;
     private static final int STUN_DURATION = 60;
-    /** 与海豚同值：离水 2400 tick（2 分钟）后开始脱水掉血。 */
+    /**
+     * 与海豚同值：离水 2400 tick（2 分钟）后开始脱水掉血。
+     */
     private static final int TOTAL_MOISTNESS = 2400;
     private static final float DRY_OUT_DAMAGE = 1.0F;
-    /** 搁浅时玩家推动的助力倍率，用来抵消上岸后的强阻尼。 */
+    /**
+     * 搁浅时玩家推动的助力倍率，用来抵消上岸后的强阻尼。
+     */
     private static final double BEACHED_PUSH_ASSIST = 2.0D;
     private static final int MAX_STUCK_TRIDENTS = 8;
     private static final int MAX_STUCK_ARROWS = 16;
-    /** 拔三叉戟时玩家眼睛到插着位置的最大距离。 */
+    /**
+     * 拔三叉戟时玩家眼睛到插着位置的最大距离。
+     */
     private static final double PULL_REACH = 6.0D;
     private static final float OBSIDIAN_HARDNESS = 50.0F;
     private static final double OBSTACLE_PROBE_DISTANCE = 4.5D;
     private static final int YAW_HISTORY_SIZE = 32;
     private static final int YAW_HISTORY_MASK = YAW_HISTORY_SIZE - 1;
-    /** 每格身长对应的偏航滞后 tick 数，越大身体越软。 */
+    /**
+     * 每格身长对应的偏航滞后 tick 数，越大身体越软。
+     */
     private static final float YAW_LAG_PER_BLOCK = 1.1F;
     private static final double SPINE_STEP = 0.5D;
     private static final double[] PART_OFFSETS = {1.8D, 0.2D, -1.65D, -3.0D, -4.2D, -5.35D};
@@ -255,7 +260,7 @@ public final class BlueWhaleEntity extends WaterAnimal {
             setXRot(0.0F);
             setDeltaMovement(getDeltaMovement().multiply(0.45D, 1.0D, 0.45D));
             if (!level().isClientSide && tickCount % 140 == 0) {
-                playSound(SoundEvents.DOLPHIN_AMBIENT, 1.1F, 0.55F);
+                playSound(ModSounds.BLUE_WHALE_AMBIENT.get(), 1.1F, 0.72F);
             }
         } else {
             beachedProgress = Math.max(0.0F, beachedProgress - 1.0F);
@@ -737,7 +742,9 @@ public final class BlueWhaleEntity extends WaterAnimal {
         return true;
     }
 
-    /** 机体坐标系：右 / 上 / 前，插着的投射物按这三轴归一化记录。 */
+    /**
+     * 机体坐标系：右 / 上 / 前，插着的投射物按这三轴归一化记录。
+     */
     private Vec3[] bodyAxes() {
         Vec3 forward = Vec3.directionFromRotation(getXRot(), yBodyRot).normalize();
         Vec3 right = new Vec3(-forward.z, 0.0D, forward.x);
@@ -745,7 +752,9 @@ public final class BlueWhaleEntity extends WaterAnimal {
         return new Vec3[]{right, right.cross(forward).normalize(), forward};
     }
 
-    /** 由记录的归一化坐标还原插着的世界位置，与 recordStuckProjectile 互为逆运算。 */
+    /**
+     * 由记录的归一化坐标还原插着的世界位置，与 recordStuckProjectile 互为逆运算。
+     */
     private Vec3 stuckProjectilePosition(CompoundTag entry) {
         BlueWhalePart part = bodyParts[Mth.clamp(entry.getByte("Part"), 0, bodyParts.length - 1)];
         Vec3[] axes = bodyAxes();
@@ -781,7 +790,9 @@ public final class BlueWhaleEntity extends WaterAnimal {
         level().addFreshEntity(item);
     }
 
-    /** 死亡时把插着的三叉戟原样归还世界。 */
+    /**
+     * 死亡时把插着的三叉戟原样归还世界。
+     */
     private void dropStuckTridents() {
         CompoundTag data = entityData.get(STUCK_PROJECTILES).copy();
         ListTag entries = data.getList("Entries", Tag.TAG_COMPOUND);
@@ -810,7 +821,9 @@ public final class BlueWhaleEntity extends WaterAnimal {
         return super.mobInteract(player, hand);
     }
 
-    /** 空手右键拔三叉戟：取视线最对准的一根，谁拔谁立刻被记恨。 */
+    /**
+     * 空手右键拔三叉戟：取视线最对准的一根，谁拔谁立刻被记恨。
+     */
     private InteractionResult pullStuckTrident(Player player) {
         CompoundTag data = entityData.get(STUCK_PROJECTILES).copy();
         ListTag entries = data.getList("Entries", Tag.TAG_COMPOUND);
@@ -900,7 +913,9 @@ public final class BlueWhaleEntity extends WaterAnimal {
         scatterAlongBody(butcherDrops(looting));
     }
 
-    /** 按配置切出战利品：默认鲸鱼肉，另一档是原版鳕鱼加骨粉。 */
+    /**
+     * 按配置切出战利品：默认鲸鱼肉，另一档是原版鳕鱼加骨粉。
+     */
     private List<ItemStack> butcherDrops(int looting) {
         int bonus = Math.max(0, looting);
         List<ItemStack> drops = new ArrayList<>();
@@ -922,7 +937,9 @@ public final class BlueWhaleEntity extends WaterAnimal {
         return drops;
     }
 
-    /** 沿体轴一路铺开，而不是全堆在死亡点上：这么大一头鲸鱼，掉落也该有那个体量感。 */
+    /**
+     * 沿体轴一路铺开，而不是全堆在死亡点上：这么大一头鲸鱼，掉落也该有那个体量感。
+     */
     private void scatterAlongBody(List<ItemStack> drops) {
         int count = drops.size();
         if (count <= 0) {
@@ -1040,23 +1057,25 @@ public final class BlueWhaleEntity extends WaterAnimal {
     @Nullable
     @Override
     protected SoundEvent getAmbientSound() {
-        return SoundEvents.DOLPHIN_AMBIENT_WATER;
+        return ModSounds.BLUE_WHALE_AMBIENT.get();
     }
 
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
-        return SoundEvents.DOLPHIN_HURT;
+        return ModSounds.BLUE_WHALE_HURT.get();
     }
 
     @Override
     protected SoundEvent getDeathSound() {
-        return SoundEvents.DOLPHIN_DEATH;
+        return ModSounds.BLUE_WHALE_DEATH.get();
     }
 
     private final class SurfaceToBreatheGoal extends Goal {
         private BlockPos surfaceAir;
         private boolean blowStarted;
         private boolean emergencyBreathing;
+        private int stalledTicks;
+        private double lastY;
 
         private SurfaceToBreatheGoal() {
             setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
@@ -1094,6 +1113,8 @@ public final class BlueWhaleEntity extends WaterAnimal {
         public void start() {
             surfacing = true;
             blowStarted = false;
+            stalledTicks = 0;
+            lastY = getY();
             navigation.stop();
         }
 
@@ -1106,8 +1127,7 @@ public final class BlueWhaleEntity extends WaterAnimal {
                 setXRot(Mth.approachDegrees(getXRot(), 0.0F, 1.5F));
                 return;
             }
-            double targetY = surfaceAir.getY() - getBbHeight() + 0.35D;
-            steerToward(new Vec3(surfaceAir.getX() + 0.5D, targetY, surfaceAir.getZ() + 0.5D), 0.018D, 18.0F, 2.0F);
+            riseToSurface();
             if (!isEyeInFluid(FluidTags.WATER)) {
                 blowStarted = true;
                 setAirSupply(getMaxAirSupply());
@@ -1118,14 +1138,54 @@ public final class BlueWhaleEntity extends WaterAnimal {
 
         @Override
         public void stop() {
+            boolean breathed = blowStarted;
             surfacing = false;
             surfaceAir = null;
             blowStarted = false;
             emergencyBreathing = false;
-            breatheCountdown = random.nextInt(900, 1801);
+            // If another goal interrupted the ascent, retry as soon as it is safe instead of
+            // silently postponing breathing for another full interval.
+            breatheCountdown = breathed ? random.nextInt(900, 1801) : 0;
             if (getAction() == ACTION_BLOW) {
                 setAction(ACTION_IDLE);
             }
+        }
+
+        private void riseToSurface() {
+            double targetX = surfaceAir.getX() + 0.5D;
+            double targetZ = surfaceAir.getZ() + 0.5D;
+            double dx = targetX - getX();
+            double dz = targetZ - getZ();
+            double horizontalDistance = Math.sqrt(dx * dx + dz * dz);
+
+            if (horizontalDistance > 0.15D) {
+                float targetYaw = (float) (Mth.atan2(dz, dx) * Mth.RAD_TO_DEG) - 90.0F;
+                setYRot(Mth.approachDegrees(getYRot(), targetYaw, 2.0F));
+                yBodyRot = getYRot();
+                yHeadRot = getYRot();
+            }
+            setXRot(Mth.approachDegrees(getXRot(), emergencyBreathing ? -24.0F : -18.0F, 1.2F));
+
+            Vec3 movement = getDeltaMovement();
+            double horizontalAcceleration = emergencyBreathing ? 0.012D : 0.008D;
+            double horizontalX = horizontalDistance > 1.0E-4D ? dx / horizontalDistance * horizontalAcceleration : 0.0D;
+            double horizontalZ = horizontalDistance > 1.0E-4D ? dz / horizontalDistance * horizontalAcceleration : 0.0D;
+            double riseAcceleration = emergencyBreathing ? 0.055D : 0.035D;
+            double maximumRiseSpeed = emergencyBreathing ? 0.13D : 0.085D;
+            double verticalSpeed = Mth.clamp(movement.y * 0.72D + riseAcceleration, 0.028D, maximumRiseSpeed);
+
+            if (getY() <= lastY + 0.002D) {
+                stalledTicks++;
+            } else {
+                stalledTicks = 0;
+            }
+            lastY = getY();
+            if (stalledTicks > 25) {
+                verticalSpeed = maximumRiseSpeed;
+            }
+
+            setDeltaMovement(movement.x * 0.82D + horizontalX, verticalSpeed, movement.z * 0.82D + horizontalZ);
+            hasImpulse = true;
         }
 
         @Nullable
@@ -1262,6 +1322,7 @@ public final class BlueWhaleEntity extends WaterAnimal {
         @Override
         public void start() {
             secondRam = false;
+            playSound(ModSounds.BLUE_WHALE_ANGRY.get(), 1.8F, 1.0F);
             beginWindup(12);
         }
 

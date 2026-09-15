@@ -1,0 +1,17 @@
+Blue whale recordings
+=====================
+
+Source: NOAA Pacific Marine Environmental Laboratory (PMEL) Acoustics Program.
+The source recordings are works recorded by NOAA and are public-domain U.S. government material.
+The sounds shipped by this mod are edited excerpts and are not official NOAA audio products.
+
+Ambient: Western Pacific blue whale call
+https://www.pmel.noaa.gov/acoustics/whales/sounds/sounds_wpacblue.html
+
+Angry: Northeast Pacific blue whale call
+https://www.pmel.noaa.gov/acoustics/whales/sounds/sounds_nepblue.html
+
+Hurt: South Pacific blue whale call
+https://www.pmel.noaa.gov/acoustics/whales/sounds/sounds_spacblue.html
+
+Death: derived only from the processed hurt sound by lowering its pitch and extending its duration.

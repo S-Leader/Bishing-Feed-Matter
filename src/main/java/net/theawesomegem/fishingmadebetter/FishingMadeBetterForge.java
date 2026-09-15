@@ -8,6 +8,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.CreativeModeTab;
@@ -50,6 +51,7 @@ import net.theawesomegem.fishingmadebetter.client.model.BlueWhaleModel;
 import net.theawesomegem.fishingmadebetter.client.renderer.BlueWhaleRenderer;
 import net.theawesomegem.fishingmadebetter.common.block.BaitBoxBlock;
 import net.theawesomegem.fishingmadebetter.common.block.BaitBoxBlockEntity;
+import net.theawesomegem.fishingmadebetter.common.config.FmbCommonConfig;
 import net.theawesomegem.fishingmadebetter.common.data.FishDataReloadListener;
 import net.theawesomegem.fishingmadebetter.common.entity.BlueWhaleEntity;
 import net.theawesomegem.fishingmadebetter.common.entity.LavaFishingHook;
@@ -61,7 +63,6 @@ import net.theawesomegem.fishingmadebetter.common.network.ReelingInputHandler;
 import net.theawesomegem.fishingmadebetter.common.util.FishStackUtil;
 import net.theawesomegem.fishingmadebetter.common.world.BlueWhaleShipwreckSpawner;
 import net.theawesomegem.fishingmadebetter.compat.AquacultureCompat;
-import net.theawesomegem.fishingmadebetter.common.config.FmbCommonConfig;
 import net.theawesomegem.fishingmadebetter.compat.LegacyFishConfigBootstrap;
 import net.theawesomegem.fishingmadebetter.registry.*;
 
@@ -83,12 +84,18 @@ public class FishingMadeBetterForge {
     private static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, Constants.MOD_ID);
     private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, Constants.MOD_ID);
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, Constants.MOD_ID);
+    private static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, Constants.MOD_ID);
     private static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Constants.MOD_ID);
     private static final RegistryObject<Block> BAIT_BOX = BLOCKS.register(ModBlocks.BAIT_BOX.path(), BaitBoxBlock::new);
     private static final Map<String, RegistryObject<Item>> REGISTERED_ITEMS = new LinkedHashMap<>();
     private final java.nio.file.Path fishConfigDirectory;
 
     static {
+        ModSounds.BLUE_WHALE_AMBIENT = registerSound("entity.blue_whale.ambient");
+        ModSounds.BLUE_WHALE_ANGRY = registerSound("entity.blue_whale.angry");
+        ModSounds.BLUE_WHALE_HURT = registerSound("entity.blue_whale.hurt");
+        ModSounds.BLUE_WHALE_DEATH = registerSound("entity.blue_whale.death");
+
         REGISTERED_ITEMS.put(ModBlocks.BAIT_BOX.path(), ITEMS.register(
                 ModBlocks.BAIT_BOX.path(),
                 () -> new BaitBoxItem(BAIT_BOX.get(), new Item.Properties())
@@ -184,6 +191,7 @@ public class FishingMadeBetterForge {
         ENTITY_TYPES.register(modBus);
         BLOCK_ENTITY_TYPES.register(modBus);
         RECIPE_SERIALIZERS.register(modBus);
+        SOUND_EVENTS.register(modBus);
         CREATIVE_MODE_TABS.register(modBus);
         modBus.addListener(AquacultureCompat::hideCreativeItems);
         FishingMadeBetter.init();
@@ -204,6 +212,11 @@ public class FishingMadeBetterForge {
             throw new IllegalArgumentException("Unknown Fishing Evolved item: " + path);
         }
         return item.get();
+    }
+
+    private static RegistryObject<SoundEvent> registerSound(String path) {
+        ResourceLocation id = new ResourceLocation(Constants.MOD_ID, path);
+        return SOUND_EVENTS.register(path, () -> SoundEvent.createVariableRangeEvent(id));
     }
 
     @EventBusSubscriber(modid = Constants.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
