@@ -13,6 +13,8 @@ import net.theawesomegem.fishingmadebetter.common.entity.BlueWhaleEntity;
 
 public final class BlueWhaleModel extends HierarchicalModel<BlueWhaleEntity> {
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(Constants.MOD_ID, "blue_whale"), "main");
+    /** Model pixels; only the rendered whale moves, while the entity and multipart hitboxes stay put. */
+    private static final float MODEL_RAISE = 6.0F;
     private final ModelPart root;
     private final ModelPart controller;
     private final ModelPart headTop;
@@ -203,23 +205,25 @@ public final class BlueWhaleModel extends HierarchicalModel<BlueWhaleEntity> {
     @Override
     public void setupAnim(BlueWhaleEntity whale, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         root.getAllParts().forEach(ModelPart::resetPose);
+        controller.y -= MODEL_RAISE;
         float moving = Mth.clamp((float) whale.getDeltaMovement().length() * 4.0F, 0.18F, 1.0F);
         float wave = Mth.sin(ageInTicks * 0.18F);
         float partialTick = ageInTicks - whale.tickCount;
         float beached = whale.getBeachedProgress(partialTick);
+        float bodyPitch = whale.getVisualPitch(partialTick) * Mth.DEG_TO_RAD * (1.0F - beached);
         // 搁浅的鲸鱼尾巴使不上劲：整条尾链的摆幅随搁浅进度归零。
         float tailAmplitude = 1.65F * (1.0F - beached);
         applySpineBend(whale, partialTick);
 
         // A hard ram collision leaves the whale rigid for a short time, like an axolotl playing dead.
         if (whale.isStunned()) {
-            controller.xRot = headPitch * Mth.DEG_TO_RAD * (1.0F - beached);
+            controller.xRot = bodyPitch;
             leftFin.zRot = -0.08F;
             rightFin.zRot = 0.08F;
             return;
         }
 
-        controller.xRot = headPitch * Mth.DEG_TO_RAD * (1.0F - beached);
+        controller.xRot = bodyPitch;
         tail.xRot += wave * 0.035F * moving * tailAmplitude;
         tail3.xRot += Mth.sin(ageInTicks * 0.18F - 0.18F) * 0.038F * moving * tailAmplitude;
         tail4.xRot += Mth.sin(ageInTicks * 0.18F - 0.36F) * 0.042F * moving * tailAmplitude;

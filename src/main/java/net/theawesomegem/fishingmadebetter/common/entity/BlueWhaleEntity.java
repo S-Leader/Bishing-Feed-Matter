@@ -32,6 +32,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.ThrownTrident;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -63,6 +64,7 @@ public final class BlueWhaleEntity extends WaterAnimal {
     private static final int RAM_DURATION = 24;
     private static final int AIR_CONSUMPTION_INTERVAL = 100;
     private static final int STUN_DURATION = 60;
+    private static final int SHIELD_DISABLE_DURATION = 200;
     /**
      * 与海豚同值：离水 2400 tick（2 分钟）后开始脱水掉血。
      */
@@ -107,6 +109,9 @@ public final class BlueWhaleEntity extends WaterAnimal {
     private boolean bodyPartsInitialized;
     private float previousBeachedProgress;
     private float beachedProgress;
+    private float previousVisualPitch;
+    private float visualPitch;
+    private float yawVelocity;
     private final float[] yawHistory = new float[YAW_HISTORY_SIZE];
     private int yawHistoryIndex = -1;
     @Nullable
@@ -178,7 +183,9 @@ public final class BlueWhaleEntity extends WaterAnimal {
     public void aiStep() {
         super.aiStep();
         updateBeachedState();
+        updateVisualPitch();
         updateAction();
+        updateSmoothBodyRotation();
         recordYawHistory();
         updateBodyParts();
         pushEntitiesFromParts();
@@ -197,7 +204,6 @@ public final class BlueWhaleEntity extends WaterAnimal {
             if (stunnedTicks > 0) {
                 stunnedTicks--;
                 navigation.stop();
-                setDeltaMovement(Vec3.ZERO);
                 setAction(ACTION_IDLE);
                 if (stunnedTicks == 0) {
                     setStunned(false);
@@ -215,6 +221,48 @@ public final class BlueWhaleEntity extends WaterAnimal {
                 setTarget(null);
             }
         }
+    }
+
+    /**
+     * Keeps the rendered body on a broad turning arc instead of snapping it to the navigation
+     * heading. Multipart placement uses the same body yaw, so the visible whale and its hitboxes
+     * remain together while turning.
+     */
+    private void updateSmoothBodyRotation() {
+        if (yawHistoryIndex < 0) {
+            yBodyRot = getYRot();
+            yHeadRot = getYRot();
+            return;
+        }
+        float bodyStep = getAction() == ACTION_RAM ? 3.5F : 2.0F;
+        float headStep = getAction() == ACTION_RAM ? 4.5F : 3.0F;
+        yBodyRot = Mth.approachDegrees(yBodyRot, getYRot(), bodyStep);
+        yHeadRot = Mth.approachDegrees(yHeadRot, getYRot(), headStep);
+    }
+
+    /**
+     * Prevent Mob's BodyRotationControl from replacing the whale's smoothed body rotation.
+     */
+    @Override
+    protected float tickHeadTurn(float movementYaw, float animationStep) {
+        return animationStep;
+    }
+
+    private void updateVisualPitch() {
+        previousVisualPitch = visualPitch;
+        float targetPitch = isBeached() ? 0.0F : getXRot();
+        Vec3 movement = getDeltaMovement();
+        if (!isBeached() && isInWaterOrBubble() && movement.lengthSqr() > 1.0E-4D) {
+            double horizontal = Math.max(1.0E-4D, movement.horizontalDistance());
+            float movementPitch = Mth.clamp((float) (-Mth.atan2(movement.y, horizontal) * Mth.RAD_TO_DEG), -32.0F, 32.0F);
+            // Follow the actual swimming path, while retaining some of the AI's intended pitch.
+            targetPitch = Mth.lerp(0.72F, targetPitch, movementPitch);
+        }
+        visualPitch = Mth.approachDegrees(visualPitch, targetPitch, isStunned() ? 0.8F : 1.8F);
+    }
+
+    public float getVisualPitch(float partialTick) {
+        return Mth.lerp(Mth.clamp(partialTick, 0.0F, 1.0F), previousVisualPitch, visualPitch);
     }
 
     /**
@@ -354,7 +402,9 @@ public final class BlueWhaleEntity extends WaterAnimal {
         if (yawHistoryIndex < 0) {
             return yBodyRot;
         }
-        float lag = (float) Math.max(0.0D, distanceBehind) * YAW_LAG_PER_BLOCK - partialTick;
+        // The renderer interpolates from the previous tick to the current tick. Including that
+        // one-tick window here prevents the first tail joint from stepping against the body.
+        float lag = (float) Math.max(0.0D, distanceBehind) * YAW_LAG_PER_BLOCK + 1.0F - Mth.clamp(partialTick, 0.0F, 1.0F);
         if (lag <= 0.0F) {
             return yBodyRot;
         }
@@ -383,13 +433,21 @@ public final class BlueWhaleEntity extends WaterAnimal {
         double horizontal = Math.sqrt(offset.x * offset.x + offset.z * offset.z);
         float targetYaw = (float) (Mth.atan2(offset.z, offset.x) * Mth.RAD_TO_DEG) - 90.0F;
         float targetPitch = Mth.clamp((float) (-Mth.atan2(offset.y, horizontal) * Mth.RAD_TO_DEG), -maximumPitch, maximumPitch);
-        setYRot(Mth.approachDegrees(getYRot(), targetYaw, yawStep));
-        yBodyRot = getYRot();
-        yHeadRot = getYRot();
+        turnToward(targetYaw, yawStep, Math.max(0.12F, yawStep * 0.12F));
         setXRot(Mth.approachDegrees(getXRot(), targetPitch, 1.0F));
 
-        Vec3 forward = Vec3.directionFromRotation(getXRot(), getYRot());
+        Vec3 forward = Vec3.directionFromRotation(getXRot(), yBodyRot);
         setDeltaMovement(getDeltaMovement().scale(0.82D).add(forward.scale(acceleration)));
+    }
+
+    private void turnToward(float targetYaw, float maximumSpeed, float acceleration) {
+        float error = Mth.wrapDegrees(targetYaw - getYRot());
+        float desiredVelocity = Mth.clamp(error * 0.18F, -maximumSpeed, maximumSpeed);
+        yawVelocity = Mth.approach(yawVelocity, desiredVelocity, acceleration);
+        if (Math.abs(error) < Math.abs(yawVelocity)) {
+            yawVelocity = error;
+        }
+        setYRot(getYRot() + yawVelocity);
     }
 
     /**
@@ -417,12 +475,7 @@ public final class BlueWhaleEntity extends WaterAnimal {
             right = right.normalize();
         }
 
-        Vec3[] candidates = new Vec3[]{
-                direction.add(right.scale(1.25D)).add(0.0D, 0.12D, 0.0D).normalize(),
-                direction.add(right.scale(-1.25D)).add(0.0D, 0.12D, 0.0D).normalize(),
-                direction.add(0.0D, 1.15D, 0.0D).normalize(),
-                direction.add(0.0D, -0.90D, 0.0D).normalize()
-        };
+        Vec3[] candidates = new Vec3[]{direction.add(right.scale(1.25D)).add(0.0D, 0.12D, 0.0D).normalize(), direction.add(right.scale(-1.25D)).add(0.0D, 0.12D, 0.0D).normalize(), direction.add(0.0D, 1.15D, 0.0D).normalize(), direction.add(0.0D, -0.90D, 0.0D).normalize()};
 
         Vec3 bestDirection = direction;
         double bestClearance = -1.0D;
@@ -491,13 +544,13 @@ public final class BlueWhaleEntity extends WaterAnimal {
         }
         Vec3 normalized = direction.normalize();
         AABB headBox = headPart.getBoundingBox().inflate(0.18D);
-        double sweepDistance = Math.max(2.25D, getDeltaMovement().length() + 1.25D);
+        double sweepDistance = Math.max(0.7D, getDeltaMovement().length() + 0.35D);
         // 每 tick 求值一次：配置开关 + mobGriefing 事件（后者让其他 mod 能按生物单独放行/拦截）。
         boolean mayBreak = FmbCommonConfig.whaleBreaksBlocks() && ForgeEventFactory.getMobGriefingEvent(level(), this);
 
         for (double distance = 0.35D; distance <= sweepDistance; distance += 0.35D) {
             if (processRamBlockSlice(headBox.move(normalized.scale(distance)), mayBreak)) {
-                stunFromCollision();
+                stunFromCollision(getDeltaMovement());
                 return true;
             }
         }
@@ -527,7 +580,7 @@ public final class BlueWhaleEntity extends WaterAnimal {
                     if (!mayBreak || hardness < 0.0F || hardness >= OBSIDIAN_HARDNESS) {
                         VoxelShape shape = state.getCollisionShape(level(), pos);
                         if (!shape.isEmpty() && shape.bounds().move(x, y, z).intersects(box)) {
-                            return true;
+                            return playHardRamImpact(pos.immutable(), state);
                         }
                     }
                 }
@@ -548,13 +601,12 @@ public final class BlueWhaleEntity extends WaterAnimal {
                         continue;
                     }
                     float hardness = state.getDestroySpeed(level(), pos);
-                    if (hardness >= 0.0F && hardness < OBSIDIAN_HARDNESS
-                            && new AABB(x, y, z, x + 1.0D, y + 1.0D, z + 1.0D).intersects(box)) {
+                    if (hardness >= 0.0F && hardness < OBSIDIAN_HARDNESS && new AABB(x, y, z, x + 1.0D, y + 1.0D, z + 1.0D).intersects(box)) {
                         BlockPos target = pos.immutable();
                         // 领地/保护类 mod 的拦截入口；被拒绝的实心方块同样把鲸鱼撞晕。
                         if (!ForgeEventFactory.onEntityDestroyBlock(this, target, state)) {
                             if (!state.getCollisionShape(level(), target).isEmpty()) {
-                                return true;
+                                return playHardRamImpact(target, state);
                             }
                             continue;
                         }
@@ -566,13 +618,21 @@ public final class BlueWhaleEntity extends WaterAnimal {
         return false;
     }
 
-    private void stunFromCollision() {
+    private boolean playHardRamImpact(BlockPos pos, BlockState state) {
+        var soundType = state.getSoundType(level(), pos, this);
+        level().playSound(null, pos, soundType.getHitSound(), getSoundSource(), Math.max(2.0F, soundType.getVolume() * 2.0F), Math.max(0.45F, soundType.getPitch() * 0.62F));
+        return true;
+    }
+
+    private void stunFromCollision(Vec3 incomingMovement) {
         stunnedTicks = STUN_DURATION;
         setStunned(true);
         navigation.stop();
         surfacing = false;
         setAction(ACTION_IDLE);
-        setDeltaMovement(Vec3.ZERO);
+        // Recoil and water drag make the impact readable without freezing in a single frame.
+        setDeltaMovement(incomingMovement.scale(-0.14D));
+        hasImpulse = true;
         attackCooldown = Math.max(attackCooldown, STUN_DURATION);
     }
 
@@ -675,9 +735,7 @@ public final class BlueWhaleEntity extends WaterAnimal {
                 arrow.discard();
             }
         }
-        if (hurt && !level().isClientSide
-                && source.getEntity() instanceof LivingEntity attacker
-                && !(attacker instanceof Player player && (player.isCreative() || player.isSpectator()))) {
+        if (hurt && !level().isClientSide && source.getEntity() instanceof LivingEntity attacker && !(attacker instanceof Player player && (player.isCreative() || player.isSpectator()))) {
             setTarget(attacker);
         }
         return hurt;
@@ -760,10 +818,7 @@ public final class BlueWhaleEntity extends WaterAnimal {
         Vec3[] axes = bodyAxes();
         double halfWidth = Math.max(0.001D, part.getBbWidth() * 0.5D);
         double halfHeight = Math.max(0.001D, part.getBbHeight() * 0.5D);
-        return part.getBoundingBox().getCenter()
-                .add(axes[0].scale(entry.getFloat("X") * halfWidth))
-                .add(axes[1].scale(entry.getFloat("Y") * halfHeight))
-                .add(axes[2].scale(entry.getFloat("Z") * halfWidth));
+        return part.getBoundingBox().getCenter().add(axes[0].scale(entry.getFloat("X") * halfWidth)).add(axes[1].scale(entry.getFloat("Y") * halfHeight)).add(axes[2].scale(entry.getFloat("Z") * halfWidth));
     }
 
     private void refreshTridentCount(ListTag entries) {
@@ -899,11 +954,7 @@ public final class BlueWhaleEntity extends WaterAnimal {
     }
 
     private static Vec3 closestPoint(AABB box, Vec3 point) {
-        return new Vec3(
-                Mth.clamp(point.x, box.minX, box.maxX),
-                Mth.clamp(point.y, box.minY, box.maxY),
-                Mth.clamp(point.z, box.minZ, box.maxZ)
-        );
+        return new Vec3(Mth.clamp(point.x, box.minX, box.maxX), Mth.clamp(point.y, box.minY, box.maxY), Mth.clamp(point.z, box.minZ, box.maxZ));
     }
 
     @Override
@@ -977,9 +1028,7 @@ public final class BlueWhaleEntity extends WaterAnimal {
         moistness = tag.contains("Moistness") ? tag.getInt("Moistness") : TOTAL_MOISTNESS;
         stunnedTicks = Math.max(0, tag.getInt("StunnedTicks"));
         setStunned(stunnedTicks > 0);
-        entityData.set(STUCK_PROJECTILES, tag.contains("StuckProjectiles", Tag.TAG_COMPOUND)
-                ? tag.getCompound("StuckProjectiles").copy()
-                : new CompoundTag());
+        entityData.set(STUCK_PROJECTILES, tag.contains("StuckProjectiles", Tag.TAG_COMPOUND) ? tag.getCompound("StuckProjectiles").copy() : new CompoundTag());
         // 数量以条目为准，避免存档里的计数与实际插着的投射物对不上。
         refreshTridentCount(getStuckProjectileData());
     }
@@ -1039,7 +1088,10 @@ public final class BlueWhaleEntity extends WaterAnimal {
     @Override
     public void travel(Vec3 travelVector) {
         if (isStunned()) {
-            setDeltaMovement(Vec3.ZERO);
+            if (isEffectiveAi()) {
+                move(MoverType.SELF, getDeltaMovement());
+                setDeltaMovement(getDeltaMovement().multiply(0.72D, 0.82D, 0.72D));
+            }
             return;
         }
         if (isEffectiveAi() && isInWater()) {
@@ -1071,10 +1123,14 @@ public final class BlueWhaleEntity extends WaterAnimal {
     }
 
     private final class SurfaceToBreatheGoal extends Goal {
+        private static final int MAX_DESCENT_TICKS = 100;
+        private static final double DESCENT_DEPTH_BELOW_SURFACE = 3.0D;
         private BlockPos surfaceAir;
         private boolean blowStarted;
+        private boolean descending;
         private boolean emergencyBreathing;
         private int stalledTicks;
+        private int descentTicks;
         private double lastY;
 
         private SurfaceToBreatheGoal() {
@@ -1100,8 +1156,9 @@ public final class BlueWhaleEntity extends WaterAnimal {
         @Override
         public boolean canContinueToUse() {
             return surfacing && !isBeached() && !isStunned() && surfaceAir != null
-                    && (getTarget() == null || emergencyBreathing)
-                    && (!blowStarted || getAction() == ACTION_BLOW);
+                    // Once breathing has begun, always finish the return below the surface before
+                    // handing control back to normal swimming or combat goals.
+                    && (blowStarted || getTarget() == null || emergencyBreathing);
         }
 
         @Override
@@ -1113,6 +1170,8 @@ public final class BlueWhaleEntity extends WaterAnimal {
         public void start() {
             surfacing = true;
             blowStarted = false;
+            descending = false;
+            descentTicks = 0;
             stalledTicks = 0;
             lastY = getY();
             navigation.stop();
@@ -1120,7 +1179,17 @@ public final class BlueWhaleEntity extends WaterAnimal {
 
         @Override
         public void tick() {
+            if (descending) {
+                descendFromSurface();
+                return;
+            }
             if (blowStarted) {
+                if (getAction() != ACTION_BLOW) {
+                    descending = true;
+                    descentTicks = 0;
+                    descendFromSurface();
+                    return;
+                }
                 Vec3 movement = getDeltaMovement();
                 Vec3 forward = Vec3.directionFromRotation(0.0F, getYRot()).scale(0.006D);
                 setDeltaMovement(movement.x * 0.88D + forward.x, Math.min(movement.y, 0.0D), movement.z * 0.88D + forward.z);
@@ -1142,12 +1211,32 @@ public final class BlueWhaleEntity extends WaterAnimal {
             surfacing = false;
             surfaceAir = null;
             blowStarted = false;
+            descending = false;
+            descentTicks = 0;
             emergencyBreathing = false;
             // If another goal interrupted the ascent, retry as soon as it is safe instead of
             // silently postponing breathing for another full interval.
             breatheCountdown = breathed ? random.nextInt(900, 1801) : 0;
             if (getAction() == ACTION_BLOW) {
                 setAction(ACTION_IDLE);
+            }
+        }
+
+        private void descendFromSurface() {
+            descentTicks++;
+            setXRot(Mth.approachDegrees(getXRot(), 18.0F, 1.4F));
+
+            Vec3 movement = getDeltaMovement();
+            Vec3 forward = Vec3.directionFromRotation(getXRot(), yBodyRot);
+            double horizontalX = movement.x * 0.82D + forward.x * 0.014D;
+            double horizontalZ = movement.z * 0.82D + forward.z * 0.014D;
+            double verticalSpeed = Mth.clamp(movement.y * 0.82D + forward.y * 0.018D - 0.018D, -0.11D, -0.02D);
+            setDeltaMovement(horizontalX, verticalSpeed, horizontalZ);
+            hasImpulse = true;
+
+            double targetEyeY = surfaceAir.getY() - DESCENT_DEPTH_BELOW_SURFACE;
+            if (getEyeY() <= targetEyeY || descentTicks >= MAX_DESCENT_TICKS || horizontalCollision) {
+                surfacing = false;
             }
         }
 
@@ -1160,9 +1249,7 @@ public final class BlueWhaleEntity extends WaterAnimal {
 
             if (horizontalDistance > 0.15D) {
                 float targetYaw = (float) (Mth.atan2(dz, dx) * Mth.RAD_TO_DEG) - 90.0F;
-                setYRot(Mth.approachDegrees(getYRot(), targetYaw, 2.0F));
-                yBodyRot = getYRot();
-                yHeadRot = getYRot();
+                turnToward(targetYaw, 2.0F, 0.18F);
             }
             setXRot(Mth.approachDegrees(getXRot(), emergencyBreathing ? -24.0F : -18.0F, 1.2F));
 
@@ -1249,8 +1336,7 @@ public final class BlueWhaleEntity extends WaterAnimal {
 
         @Override
         public boolean canContinueToUse() {
-            return !isBeached() && !isStunned() && !surfacing && getTarget() == null && swimTarget != null
-                    && Vec3.atCenterOf(swimTarget).distanceToSqr(position()) > 6.25D && travelTicks < 420;
+            return !isBeached() && !isStunned() && !surfacing && getTarget() == null && swimTarget != null && Vec3.atCenterOf(swimTarget).distanceToSqr(position()) > 6.25D && travelTicks < 420;
         }
 
         @Override
@@ -1363,31 +1449,42 @@ public final class BlueWhaleEntity extends WaterAnimal {
                 return;
             }
             if (phase == CHARGE) {
-                Vec3 direction = target.getEyePosition().subtract(getEyePosition());
-                if (direction.lengthSqr() > 1.0E-5D) {
-                    direction = direction.normalize();
-                    if (processRamBlocks(direction)) {
+                Vec3 targetDirection = target.getEyePosition().subtract(getEyePosition());
+                if (targetDirection.lengthSqr() > 1.0E-5D) {
+                    targetDirection = targetDirection.normalize();
+                    double horizontal = Math.sqrt(targetDirection.x * targetDirection.x + targetDirection.z * targetDirection.z);
+                    float targetYaw = (float) (Mth.atan2(targetDirection.z, targetDirection.x) * Mth.RAD_TO_DEG) - 90.0F;
+                    float targetPitch = Mth.clamp((float) (-Mth.atan2(targetDirection.y, horizontal) * Mth.RAD_TO_DEG), -30.0F, 30.0F);
+                    turnToward(targetYaw, 4.5F, 0.45F);
+                    setXRot(Mth.approachDegrees(getXRot(), targetPitch, 2.0F));
+                }
+
+                // Accelerate along the visible body's axis so turns form an arc instead of a
+                // sideways slide toward the target.
+                Vec3 driveDirection = Vec3.directionFromRotation(getXRot(), yBodyRot).normalize();
+                if (processRamBlocks(driveDirection)) {
+                    phase = DONE;
+                    return;
+                }
+                setDeltaMovement(getDeltaMovement().scale(0.68D).add(driveDirection.scale(0.22D)));
+
+                if (headPart.getBoundingBox().inflate(0.7D).intersects(target.getBoundingBox())) {
+                    DamageSource ramSource = damageSources().mobAttack(BlueWhaleEntity.this);
+                    boolean blockedByShield = target.isDamageSourceBlocked(ramSource);
+                    Item blockingItem = blockedByShield ? target.getUseItem().getItem() : null;
+                    Vec3 incomingMovement = getDeltaMovement();
+                    target.hurt(ramSource, (float) getAttributeValue(Attributes.ATTACK_DAMAGE));
+                    if (blockedByShield) {
+                        if (target instanceof Player player && blockingItem != null) {
+                            player.getCooldowns().addCooldown(blockingItem, SHIELD_DISABLE_DURATION);
+                            player.stopUsingItem();
+                            level().broadcastEntityEvent(player, (byte) 30);
+                        }
+                        stunFromCollision(incomingMovement);
                         phase = DONE;
                         return;
                     }
-
-                    // Multipart placement follows body yaw/pitch rather than LookControl.
-                    // Keep the whale's actual head/body axis aimed at the target throughout the ram.
-                    double horizontal = Math.sqrt(direction.x * direction.x + direction.z * direction.z);
-                    float targetYaw = (float) (Mth.atan2(direction.z, direction.x) * Mth.RAD_TO_DEG) - 90.0F;
-                    float targetPitch = Mth.clamp((float) (-Mth.atan2(direction.y, horizontal) * Mth.RAD_TO_DEG), -30.0F, 30.0F);
-                    setYRot(Mth.approachDegrees(getYRot(), targetYaw, 12.0F));
-                    yBodyRot = getYRot();
-                    yHeadRot = getYRot();
-                    setXRot(Mth.approachDegrees(getXRot(), targetPitch, 6.0F));
-
-                    setDeltaMovement(getDeltaMovement().scale(0.68D).add(direction.scale(0.22D)));
-                    getMoveControl().setWantedPosition(target.getX(), target.getEyeY(), target.getZ(), 1.55D);
-                }
-                if (headPart.getBoundingBox().inflate(0.7D).intersects(target.getBoundingBox())) {
-                    target.hurt(damageSources().mobAttack(BlueWhaleEntity.this),
-                            (float) getAttributeValue(Attributes.ATTACK_DAMAGE));
-                    target.push(direction.x * 2.2D, 0.45D, direction.z * 2.2D);
+                    target.push(driveDirection.x * 2.2D, 0.45D, driveDirection.z * 2.2D);
                     beginRecovery();
                 } else if (--phaseTicks <= 0) {
                     beginRecovery();
