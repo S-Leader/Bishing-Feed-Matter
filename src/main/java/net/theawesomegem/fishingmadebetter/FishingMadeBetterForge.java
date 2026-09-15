@@ -24,6 +24,8 @@ import net.minecraftforge.client.event.RenderGuiEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
+import net.minecraftforge.event.level.ChunkEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
@@ -44,9 +46,12 @@ import net.theawesomegem.fishingmadebetter.client.FmbClientConfig;
 import net.theawesomegem.fishingmadebetter.client.ReelingHudRenderer;
 import net.theawesomegem.fishingmadebetter.client.ReelingKeyMappings;
 import net.theawesomegem.fishingmadebetter.client.RodModelProperties;
+import net.theawesomegem.fishingmadebetter.client.model.BlueWhaleModel;
+import net.theawesomegem.fishingmadebetter.client.renderer.BlueWhaleRenderer;
 import net.theawesomegem.fishingmadebetter.common.block.BaitBoxBlock;
 import net.theawesomegem.fishingmadebetter.common.block.BaitBoxBlockEntity;
 import net.theawesomegem.fishingmadebetter.common.data.FishDataReloadListener;
+import net.theawesomegem.fishingmadebetter.common.entity.BlueWhaleEntity;
 import net.theawesomegem.fishingmadebetter.common.entity.LavaFishingHook;
 import net.theawesomegem.fishingmadebetter.common.entity.VoidFishingHook;
 import net.theawesomegem.fishingmadebetter.common.entity.WaterFishingHook;
@@ -54,7 +59,9 @@ import net.theawesomegem.fishingmadebetter.common.item.BaitBoxItem;
 import net.theawesomegem.fishingmadebetter.common.network.ReelingInput;
 import net.theawesomegem.fishingmadebetter.common.network.ReelingInputHandler;
 import net.theawesomegem.fishingmadebetter.common.util.FishStackUtil;
+import net.theawesomegem.fishingmadebetter.common.world.BlueWhaleShipwreckSpawner;
 import net.theawesomegem.fishingmadebetter.compat.AquacultureCompat;
+import net.theawesomegem.fishingmadebetter.common.config.FmbCommonConfig;
 import net.theawesomegem.fishingmadebetter.compat.LegacyFishConfigBootstrap;
 import net.theawesomegem.fishingmadebetter.registry.*;
 
@@ -133,6 +140,14 @@ public class FishingMadeBetterForge {
                         .updateInterval(5)
                         .build("void_fishing_hook")
         );
+        ModEntities.BLUE_WHALE = ENTITY_TYPES.register(
+                "blue_whale",
+                () -> EntityType.Builder.of(BlueWhaleEntity::new, MobCategory.WATER_CREATURE)
+                        .sized(2.8F, 2.5F)
+                        .clientTrackingRange(12)
+                        .updateInterval(2)
+                        .build("blue_whale")
+        );
 
         ModRecipeSerializers.ROD_ATTACHMENT = RECIPE_SERIALIZERS.register(
                 ModRecipeSerializers.ROD_ATTACHMENT_ID.getPath(),
@@ -162,6 +177,7 @@ public class FishingMadeBetterForge {
 
     public FishingMadeBetterForge() {
         fishConfigDirectory = LegacyFishConfigBootstrap.installDefaults(FMLPaths.CONFIGDIR.get());
+        FmbCommonConfig.register();
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         BLOCKS.register(modBus);
         ITEMS.register(modBus);
@@ -182,6 +198,25 @@ public class FishingMadeBetterForge {
         event.addListener(new FishDataReloadListener(fishConfigDirectory));
     }
 
+    public static Item registeredItem(String path) {
+        RegistryObject<Item> item = REGISTERED_ITEMS.get(path);
+        if (item == null) {
+            throw new IllegalArgumentException("Unknown Fishing Evolved item: " + path);
+        }
+        return item.get();
+    }
+
+    @EventBusSubscriber(modid = Constants.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+    public static final class CommonModEvents {
+        private CommonModEvents() {
+        }
+
+        @SubscribeEvent
+        public static void registerAttributes(EntityAttributeCreationEvent event) {
+            event.put(ModEntities.BLUE_WHALE.get(), BlueWhaleEntity.createAttributes().build());
+        }
+    }
+
     @EventBusSubscriber(modid = Constants.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static final class ClientEvents {
         private ClientEvents() {
@@ -200,6 +235,12 @@ public class FishingMadeBetterForge {
             event.registerEntityRenderer(ModEntities.WATER_FISHING_HOOK.get(), FishingHookRenderer::new);
             event.registerEntityRenderer(ModEntities.LAVA_FISHING_HOOK.get(), FishingHookRenderer::new);
             event.registerEntityRenderer(ModEntities.VOID_FISHING_HOOK.get(), FishingHookRenderer::new);
+            event.registerEntityRenderer(ModEntities.BLUE_WHALE.get(), BlueWhaleRenderer::new);
+        }
+
+        @SubscribeEvent
+        public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
+            event.registerLayerDefinition(BlueWhaleModel.LAYER_LOCATION, BlueWhaleModel::createBodyLayer);
         }
 
         @SubscribeEvent
@@ -255,6 +296,16 @@ public class FishingMadeBetterForge {
                 }
                 FishStackUtil.refreshInventoryState(stack, currentTime);
             }
+        }
+
+        @SubscribeEvent
+        public static void chunkLoad(ChunkEvent.Load event) {
+            BlueWhaleShipwreckSpawner.onChunkLoad(event);
+        }
+
+        @SubscribeEvent
+        public static void levelTick(TickEvent.LevelTickEvent event) {
+            BlueWhaleShipwreckSpawner.onLevelTick(event);
         }
     }
 
