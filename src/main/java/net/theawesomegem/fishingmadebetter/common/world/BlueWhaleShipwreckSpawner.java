@@ -112,7 +112,7 @@ public final class BlueWhaleShipwreckSpawner {
 
         savedData.markChecked(startChunk);
         RandomSource structureRandom = RandomSource.create(level.getSeed() ^ startChunk * 0x9E3779B97F4A7C15L ^ 0x42574C5545574841L);
-        if (structureRandom.nextFloat() >= 0.03F) {
+        if (structureRandom.nextFloat() >= 0.1F) {
             return;
         }
 

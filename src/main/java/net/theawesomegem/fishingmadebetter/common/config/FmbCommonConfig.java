@@ -4,10 +4,6 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 
-/**
- * 通用玩法配置（config/fishingmadebetter-common.toml）。
- * 只在逻辑服务端求值，因此不需要向客户端同步。
- */
 public final class FmbCommonConfig {
     private static final ForgeConfigSpec SPEC;
     private static final ForgeConfigSpec.BooleanValue WHALE_BREAKS_BLOCKS;
@@ -37,7 +33,6 @@ public final class FmbCommonConfig {
     private FmbCommonConfig() {
     }
 
-    /** 鲸鱼死亡掉落的两档方案。 */
     public enum WhaleDrop {
         WHALE_STEAK,
         COD_AND_BONE_MEAL
