@@ -76,7 +76,7 @@ public final class BlueWhaleStuckProjectileLayer extends RenderLayer<BlueWhaleEn
                            Entity projectile, CompoundTag entry, float partialTick) {
         poseStack.pushPose();
 
-        int part = Mth.clamp(entry.getByte("Part"), 0, 5);
+        int part = Mth.clamp(entry.getByte("Part"), 0, 7);
         float x = entry.getFloat("X");
         float y = entry.getFloat("Y");
         float z = entry.getFloat("Z");

@@ -77,8 +77,20 @@ public final class BlueWhaleEntity extends WaterAnimal {
     private static final int YAW_HISTORY_MASK = YAW_HISTORY_SIZE - 1;
     private static final float YAW_LAG_PER_BLOCK = 1.1F;
     private static final double SPINE_STEP = 0.5D;
-    private static final double[] PART_OFFSETS = {1.8D, 0.2D, -1.65D, -3.0D, -4.2D, -5.35D};
-    private static final double[] PART_HEIGHT_OFFSETS = {0.05D, 0.0D, 0.0D, 0.05D, 0.1D, 0.2D};
+    // Model-space longitudinal centers (blocks). Positive is toward the head.
+    // These cover the actual 512x512 large Blockbench model from the snout through the fluke.
+    private static final double[] PART_OFFSETS = {1.85D, -0.94D, -3.56D, -5.75D, -8.10D, -10.80D};
+    // Vertical center of each multipart relative to the main body's center. These values come
+    // directly from the large Blockbench model's neutral-pose cube bounds after moving Controller
+    // from Y=24 to Y=0. Keeping centers instead of common bottom offsets lets the boxes follow
+    // pitch without floating above the mesh.
+    private static final double[] PART_CENTER_UP_OFFSETS = {0.13D, 0.0D, 0.0D, 0.13D, 0.81D, 1.06D};
+    private static final double BODY_CENTER_HEIGHT = 1.875D;
+    private static final int SPINE_PART_COUNT = 6;
+    private static final double FIN_LONGITUDINAL_OFFSET = -2.23D;
+    private static final double LEFT_FIN_LATERAL_OFFSET = -3.125D;
+    private static final double RIGHT_FIN_LATERAL_OFFSET = 2.875D;
+    private static final double FIN_CENTER_UP_OFFSET = 0.25D;
 
     public final BlueWhalePart headPart;
     public final BlueWhalePart frontBodyPart;
@@ -86,6 +98,8 @@ public final class BlueWhaleEntity extends WaterAnimal {
     public final BlueWhalePart firstTailPart;
     public final BlueWhalePart secondTailPart;
     public final BlueWhalePart tailFinPart;
+    public final BlueWhalePart leftFinPart;
+    public final BlueWhalePart rightFinPart;
     private final BlueWhalePart[] bodyParts;
     private int actionTick;
     private int lastAction = ACTION_IDLE;
@@ -102,6 +116,12 @@ public final class BlueWhaleEntity extends WaterAnimal {
     private float yawVelocity;
     private final float[] yawHistory = new float[YAW_HISTORY_SIZE];
     private int yawHistoryIndex = -1;
+
+    public final AnimationState beachedAnimationState = new AnimationState();
+    public final AnimationState swimAnimationState = new AnimationState();
+    public final AnimationState ramAnimationState = new AnimationState();
+    public final AnimationState blowAnimationState = new AnimationState();
+
     @Nullable
     private BlueWhalePart damagePartContext;
 
@@ -110,13 +130,16 @@ public final class BlueWhaleEntity extends WaterAnimal {
         moveControl = new SmoothSwimmingMoveControl(this, 18, 10, 0.02F, 0.08F, false);
         lookControl = new SmoothSwimmingLookControl(this, 6);
         noCulling = true;
-        headPart = new BlueWhalePart(this, 3.2F, 2.6F);
-        frontBodyPart = new BlueWhalePart(this, 3.4F, 2.8F);
-        rearBodyPart = new BlueWhalePart(this, 3.0F, 2.5F);
-        firstTailPart = new BlueWhalePart(this, 2.4F, 2.0F);
-        secondTailPart = new BlueWhalePart(this, 1.8F, 1.5F);
-        tailFinPart = new BlueWhalePart(this, 2.7F, 0.8F);
-        bodyParts = new BlueWhalePart[]{headPart, frontBodyPart, rearBodyPart, firstTailPart, secondTailPart, tailFinPart};
+        headPart = new BlueWhalePart(this, 4.25F, 4.45F);
+        frontBodyPart = new BlueWhalePart(this, 3.60F, 3.75F);
+        rearBodyPart = new BlueWhalePart(this, 2.80F, 3.50F);
+        firstTailPart = new BlueWhalePart(this, 2.30F, 2.80F);
+        secondTailPart = new BlueWhalePart(this, 1.55F, 1.40F);
+        tailFinPart = new BlueWhalePart(this, 3.55F, 0.90F);
+        // The large model's pectoral fins extend about 2.5 blocks from their local center.
+        leftFinPart = new BlueWhalePart(this, 2.55F, 0.50F);
+        rightFinPart = new BlueWhalePart(this, 2.55F, 0.50F);
+        bodyParts = new BlueWhalePart[]{headPart, frontBodyPart, rearBodyPart, firstTailPart, secondTailPart, tailFinPart, leftFinPart, rightFinPart};
         breatheCountdown = random.nextInt(900, 1801);
     }
 
@@ -173,6 +196,7 @@ public final class BlueWhaleEntity extends WaterAnimal {
         updateBeachedState();
         updateVisualPitch();
         updateAction();
+        updateAnimationStates();
         updateSmoothBodyRotation();
         recordYawHistory();
         updateBodyParts();
@@ -238,15 +262,10 @@ public final class BlueWhaleEntity extends WaterAnimal {
 
     private void updateVisualPitch() {
         previousVisualPitch = visualPitch;
+        // Use only the whale's intentional pitch. Deriving render pitch from tiny changes in water
+        // velocity made this very long model rock up/down around its origin while barely moving.
         float targetPitch = isBeached() ? 0.0F : getXRot();
-        Vec3 movement = getDeltaMovement();
-        if (!isBeached() && isInWaterOrBubble() && movement.lengthSqr() > 1.0E-4D) {
-            double horizontal = Math.max(1.0E-4D, movement.horizontalDistance());
-            float movementPitch = Mth.clamp((float) (-Mth.atan2(movement.y, horizontal) * Mth.RAD_TO_DEG), -32.0F, 32.0F);
-            // Follow the actual swimming path, while retaining some of the AI's intended pitch.
-            targetPitch = Mth.lerp(0.72F, targetPitch, movementPitch);
-        }
-        visualPitch = Mth.approachDegrees(visualPitch, targetPitch, isStunned() ? 0.8F : 1.8F);
+        visualPitch = Mth.approachDegrees(visualPitch, targetPitch, isStunned() ? 0.8F : 1.6F);
     }
 
     public float getVisualPitch(float partialTick) {
@@ -261,6 +280,25 @@ public final class BlueWhaleEntity extends WaterAnimal {
         moistness--;
         if (moistness <= 0) {
             hurt(damageSources().dryOut(), DRY_OUT_DAMAGE);
+        }
+    }
+
+    @Override
+    public boolean isPushable() {
+        return isBeached();
+    }
+
+    @Override
+    public void push(Entity entity) {
+        if (isBeached()) {
+            super.push(entity);
+        }
+    }
+
+    @Override
+    public void push(double x, double y, double z) {
+        if (isBeached()) {
+            super.push(x, y, z);
         }
     }
 
@@ -295,6 +333,22 @@ public final class BlueWhaleEntity extends WaterAnimal {
         }
     }
 
+    private void updateAnimationStates() {
+        if (!level().isClientSide) {
+            return;
+        }
+
+        boolean stunned = isStunned();
+        boolean beached = isBeached() && !stunned;
+        int action = getAction();
+        Vec3 movement = getDeltaMovement();
+        boolean moving = movement.horizontalDistanceSqr() > 4.0E-4D || Math.abs(movement.y) > 0.02D;
+        beachedAnimationState.animateWhen(beached, tickCount);
+        swimAnimationState.animateWhen(!beached && !stunned && action == ACTION_IDLE && isInWaterOrBubble() && moving, tickCount);
+        ramAnimationState.animateWhen(!beached && !stunned && action == ACTION_RAM, tickCount);
+        blowAnimationState.animateWhen(!beached && !stunned && action == ACTION_BLOW, tickCount);
+    }
+
     private void updateAction() {
         int action = getAction();
         if (lastAction != action) {
@@ -313,9 +367,11 @@ public final class BlueWhaleEntity extends WaterAnimal {
         for (int i = 0; i < bodyParts.length; i++) {
             previousPositions[i] = bodyParts[i].position();
         }
-        for (int i = 0; i < bodyParts.length; i++) {
-            positionPart(bodyParts[i], PART_OFFSETS[i], PART_HEIGHT_OFFSETS[i]);
+        for (int i = 0; i < SPINE_PART_COUNT; i++) {
+            positionPart(bodyParts[i], PART_OFFSETS[i], PART_CENTER_UP_OFFSETS[i]);
         }
+        positionFinPart(leftFinPart, LEFT_FIN_LATERAL_OFFSET);
+        positionFinPart(rightFinPart, RIGHT_FIN_LATERAL_OFFSET);
         for (int i = 0; i < bodyParts.length; i++) {
             BlueWhalePart part = bodyParts[i];
             Vec3 previous = bodyPartsInitialized ? previousPositions[i] : part.position();
@@ -334,9 +390,18 @@ public final class BlueWhaleEntity extends WaterAnimal {
         updateBodyParts();
     }
 
-    private void positionPart(BlueWhalePart part, double distance, double yOffset) {
-        Vec3 spine = spinePoint(distance);
-        part.setPos(spine.x, spine.y + yOffset, spine.z);
+    private void positionPart(BlueWhalePart part, double distance, double centerUpOffset) {
+        Vec3[] axes = bodyAxes();
+        Vec3 center = spinePoint(distance).add(axes[1].scale(centerUpOffset));
+        part.setPos(center.x, center.y - part.getBbHeight() * 0.5D, center.z);
+    }
+
+    private void positionFinPart(BlueWhalePart part, double lateralOffset) {
+        Vec3[] axes = bodyAxes();
+        Vec3 center = spinePoint(FIN_LONGITUDINAL_OFFSET)
+                .add(axes[0].scale(lateralOffset))
+                .add(axes[1].scale(FIN_CENTER_UP_OFFSET));
+        part.setPos(center.x, center.y - part.getBbHeight() * 0.5D, center.z);
     }
 
     /**
@@ -345,12 +410,12 @@ public final class BlueWhaleEntity extends WaterAnimal {
      */
     private Vec3 spinePoint(double distance) {
         float pitch = getXRot();
+        Vec3 point = position().add(0.0D, BODY_CENTER_HEIGHT, 0.0D);
         if (distance >= 0.0D) {
-            // 头部领航，不吃滞后。
-            return position().add(Vec3.directionFromRotation(pitch, yBodyRot).scale(distance));
+            // 头部领航，不吃滞后。基准点放在主体中心而不是实体脚底，俯仰时 multipart
+            // 才会围绕与模型相同的轴转动。
+            return point.add(Vec3.directionFromRotation(pitch, yBodyRot).scale(distance));
         }
-
-        Vec3 point = position();
         double remaining = -distance;
         double walked = 0.0D;
         while (remaining > 1.0E-4D) {
