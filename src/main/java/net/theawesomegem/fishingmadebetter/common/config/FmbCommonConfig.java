@@ -32,7 +32,7 @@ public final class FmbCommonConfig {
                         "Chance that a qualifying submerged cold-ocean shipwreck spawns a blue whale.",
                         "0 disables shipwreck whale spawning; 100 makes every qualifying wreck pass the roll."
                 )
-                .defineInRange("spawnChancePercent", 20, 0, 100);
+                .defineInRange("spawnChancePercent", 3, 0, 100);
         builder.pop();
         SPEC = builder.build();
     }
