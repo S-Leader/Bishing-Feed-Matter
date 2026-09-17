@@ -187,5 +187,14 @@
   "jei.fishingmadebetter.biometype.BEACH": "Beach",
   "jei.fishingmadebetter.biometype.NETHER": "Nether",
   "jei.fishingmadebetter.biometype.END": "The End",
-  "jei.fishingmadebetter.biometype.UNKNOWN": "Unknown"
+  "jei.fishingmadebetter.biometype.UNKNOWN": "Unknown",
+  "config.fishingmadebetter.category.server": "Server",
+  "config.fishingmadebetter.whale_breaks_blocks": "Blue Whale Breaks Blocks",
+  "config.fishingmadebetter.whale_breaks_blocks.description": "Whether a charging blue whale can smash blocks softer than obsidian. mobGriefing and protection hooks are still respected.",
+  "config.fishingmadebetter.whale_drop": "Blue Whale Drops",
+  "config.fishingmadebetter.whale_drop.description": "Select what a slain blue whale drops.",
+  "config.fishingmadebetter.whale_drop.whale_steak": "Whale Steak",
+  "config.fishingmadebetter.whale_drop.cod_and_bone_meal": "Cod and Bone Meal",
+  "config.fishingmadebetter.whale_spawn_chance": "Blue Whale Spawn Chance",
+  "config.fishingmadebetter.whale_spawn_chance.description": "Chance for a qualifying submerged cold-ocean shipwreck to spawn a blue whale (0-100%)."
 }

@@ -25,6 +25,7 @@ import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.level.ChunkEvent;
 import net.theawesomegem.fishingmadebetter.Constants;
+import net.theawesomegem.fishingmadebetter.common.config.FmbCommonConfig;
 import net.theawesomegem.fishingmadebetter.common.entity.BlueWhaleEntity;
 import net.theawesomegem.fishingmadebetter.registry.ModEntities;
 
@@ -110,7 +111,7 @@ public final class BlueWhaleShipwreckSpawner {
 
         savedData.markChecked(startChunk);
         RandomSource structureRandom = RandomSource.create(level.getSeed() ^ startChunk * 0x9E3779B97F4A7C15L ^ 0x42574C5545574841L);
-        if (structureRandom.nextFloat() >= 0.2F) {
+        if (structureRandom.nextDouble() >= FmbCommonConfig.whaleSpawnChance()) {
             return;
         }
 

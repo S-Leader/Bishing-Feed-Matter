@@ -89,6 +89,17 @@
           "type": "minecraft:item",
           "name": "minecraft:painting",
           "weight": 10
+        },
+        {
+          "type": "minecraft:loot_table",
+          "name": "aquaculture:gameplay/fishing/neptunium",
+          "weight": 1,
+          "conditions": [
+            {
+              "condition": "forge:mod_loaded",
+              "modid": "aquaculture"
+            }
+          ]
         }
       ]
     }

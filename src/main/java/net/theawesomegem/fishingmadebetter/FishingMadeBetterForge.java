@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ConfigScreenHandler;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RenderGuiEvent;
@@ -26,9 +27,11 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.ChunkEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -40,14 +43,12 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import net.theawesomegem.fishingmadebetter.client.FmbClientConfig;
-import net.theawesomegem.fishingmadebetter.client.ReelingHudRenderer;
-import net.theawesomegem.fishingmadebetter.client.ReelingKeyMappings;
-import net.theawesomegem.fishingmadebetter.client.RodModelProperties;
+import net.theawesomegem.fishingmadebetter.client.*;
 import net.theawesomegem.fishingmadebetter.client.model.BlueWhaleModel;
 import net.theawesomegem.fishingmadebetter.client.renderer.BlueWhaleRenderer;
 import net.theawesomegem.fishingmadebetter.common.block.BaitBoxBlock;
@@ -73,7 +74,7 @@ import java.util.Map;
 
 @Mod(Constants.MOD_ID)
 public class FishingMadeBetterForge {
-    private static final String NETWORK_VERSION = "1";
+    private static final String NETWORK_VERSION = "3";
     private static final String YACL_MOD_ID = "yet_another_config_lib_v3";
     private static final SimpleChannel NETWORK = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(Constants.MOD_ID, "main"),
@@ -322,6 +323,13 @@ public class FishingMadeBetterForge {
         }
 
         @SubscribeEvent
+        public static void playerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+            if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer player) {
+                sendServerConfigSnapshot(player);
+            }
+        }
+
+        @SubscribeEvent
         public static void chunkLoad(ChunkEvent.Load event) {
             BlueWhaleShipwreckSpawner.onChunkLoad(event);
         }
@@ -335,6 +343,11 @@ public class FishingMadeBetterForge {
     @EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.CLIENT)
     public static final class ForgeClientEvents {
         private ForgeClientEvents() {
+        }
+
+        @SubscribeEvent
+        public static void clientLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
+            ServerConfigClientState.clear();
         }
 
         @SubscribeEvent
@@ -354,6 +367,27 @@ public class FishingMadeBetterForge {
         }
     }
 
+    public static void sendServerConfigUpdate(boolean whaleBreaksBlocks, FmbCommonConfig.WhaleDrop whaleDrop, int whaleSpawnChancePercent) {
+        NETWORK.sendToServer(new ServerConfigUpdateMessage(whaleBreaksBlocks, whaleDrop, whaleSpawnChancePercent));
+    }
+
+    private static boolean canEditServerConfig(net.minecraft.server.level.ServerPlayer player) {
+        return player != null && (player.hasPermissions(2)
+                || player.getServer() != null && player.getServer().isSingleplayerOwner(player.getGameProfile()));
+    }
+
+    private static void sendServerConfigSnapshot(net.minecraft.server.level.ServerPlayer player) {
+        NETWORK.send(
+                PacketDistributor.PLAYER.with(() -> player),
+                new ServerConfigSnapshotMessage(
+                        FmbCommonConfig.whaleBreaksBlocks(),
+                        FmbCommonConfig.whaleDrop(),
+                        FmbCommonConfig.whaleSpawnChancePercent(),
+                        canEditServerConfig(player)
+                )
+        );
+    }
+
     private static void registerNetworkMessages() {
         NETWORK.registerMessage(
                 0,
@@ -361,6 +395,20 @@ public class FishingMadeBetterForge {
                 ReelingInputMessage::encode,
                 ReelingInputMessage::decode,
                 ReelingInputMessage::handle
+        );
+        NETWORK.registerMessage(
+                1,
+                ServerConfigUpdateMessage.class,
+                ServerConfigUpdateMessage::encode,
+                ServerConfigUpdateMessage::decode,
+                ServerConfigUpdateMessage::handle
+        );
+        NETWORK.registerMessage(
+                2,
+                ServerConfigSnapshotMessage.class,
+                ServerConfigSnapshotMessage::encode,
+                ServerConfigSnapshotMessage::decode,
+                ServerConfigSnapshotMessage::handle
         );
     }
 
@@ -379,4 +427,79 @@ public class FishingMadeBetterForge {
             context.setPacketHandled(true);
         }
     }
+
+    private record ServerConfigUpdateMessage(boolean whaleBreaksBlocks, FmbCommonConfig.WhaleDrop whaleDrop,
+                                             int whaleSpawnChancePercent) {
+        private static void encode(ServerConfigUpdateMessage message, FriendlyByteBuf buffer) {
+            buffer.writeBoolean(message.whaleBreaksBlocks);
+            buffer.writeEnum(message.whaleDrop);
+            buffer.writeVarInt(message.whaleSpawnChancePercent);
+        }
+
+        private static ServerConfigUpdateMessage decode(FriendlyByteBuf buffer) {
+            return new ServerConfigUpdateMessage(
+                    buffer.readBoolean(),
+                    buffer.readEnum(FmbCommonConfig.WhaleDrop.class),
+                    buffer.readVarInt()
+            );
+        }
+
+        private static void handle(ServerConfigUpdateMessage message, java.util.function.Supplier<NetworkEvent.Context> contextSupplier) {
+            NetworkEvent.Context context = contextSupplier.get();
+            context.enqueueWork(() -> {
+                net.minecraft.server.level.ServerPlayer sender = context.getSender();
+                if (!canEditServerConfig(sender)) {
+                    Constants.LOG.warn("Player {} tried to edit Fishing Evolved server config without permission",
+                            sender == null ? "<unknown>" : sender.getGameProfile().getName());
+                    return;
+                }
+
+                FmbCommonConfig.applyServerEdit(message.whaleBreaksBlocks, message.whaleDrop, message.whaleSpawnChancePercent);
+                if (sender != null && sender.getServer() != null) {
+                    for (net.minecraft.server.level.ServerPlayer player : sender.getServer().getPlayerList().getPlayers()) {
+                        sendServerConfigSnapshot(player);
+                    }
+                }
+            });
+            context.setPacketHandled(true);
+        }
+    }
+
+    private record ServerConfigSnapshotMessage(
+            boolean whaleBreaksBlocks,
+            FmbCommonConfig.WhaleDrop whaleDrop,
+            int whaleSpawnChancePercent,
+            boolean canEdit
+    ) {
+        private static void encode(ServerConfigSnapshotMessage message, FriendlyByteBuf buffer) {
+            buffer.writeBoolean(message.whaleBreaksBlocks);
+            buffer.writeEnum(message.whaleDrop);
+            buffer.writeVarInt(message.whaleSpawnChancePercent);
+            buffer.writeBoolean(message.canEdit);
+        }
+
+        private static ServerConfigSnapshotMessage decode(FriendlyByteBuf buffer) {
+            return new ServerConfigSnapshotMessage(
+                    buffer.readBoolean(),
+                    buffer.readEnum(FmbCommonConfig.WhaleDrop.class),
+                    buffer.readVarInt(),
+                    buffer.readBoolean()
+            );
+        }
+
+        private static void handle(ServerConfigSnapshotMessage message, java.util.function.Supplier<NetworkEvent.Context> contextSupplier) {
+            NetworkEvent.Context context = contextSupplier.get();
+            context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(
+                    Dist.CLIENT,
+                    () -> () -> ServerConfigClientState.update(
+                            message.whaleBreaksBlocks,
+                            message.whaleDrop,
+                            message.whaleSpawnChancePercent,
+                            message.canEdit
+                    )
+            ));
+            context.setPacketHandled(true);
+        }
+    }
+
 }

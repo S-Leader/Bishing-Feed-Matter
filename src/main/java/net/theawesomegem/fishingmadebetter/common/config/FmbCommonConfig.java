@@ -8,6 +8,7 @@ public final class FmbCommonConfig {
     private static final ForgeConfigSpec SPEC;
     private static final ForgeConfigSpec.BooleanValue WHALE_BREAKS_BLOCKS;
     private static final ForgeConfigSpec.EnumValue<WhaleDrop> WHALE_DROP;
+    private static final ForgeConfigSpec.IntValue WHALE_SPAWN_CHANCE_PERCENT;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -26,6 +27,12 @@ public final class FmbCommonConfig {
                         "COD_AND_BONE_MEAL: vanilla cod plus bone meal, for packs without the mod's food chain."
                 )
                 .defineEnum("drops", WhaleDrop.WHALE_STEAK);
+        WHALE_SPAWN_CHANCE_PERCENT = builder
+                .comment(
+                        "Chance that a qualifying submerged cold-ocean shipwreck spawns a blue whale.",
+                        "0 disables shipwreck whale spawning; 100 makes every qualifying wreck pass the roll."
+                )
+                .defineInRange("spawnChancePercent", 20, 0, 100);
         builder.pop();
         SPEC = builder.build();
     }
@@ -39,7 +46,9 @@ public final class FmbCommonConfig {
     }
 
     public static void register() {
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, SPEC);
+        // These values affect world/gameplay behaviour, so keep them in the world's
+        // serverconfig and let Forge sync the loaded SERVER config to clients.
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SPEC);
     }
 
     public static WhaleDrop whaleDrop() {
@@ -47,7 +56,29 @@ public final class FmbCommonConfig {
     }
 
     public static boolean whaleBreaksBlocks() {
-        // 配置文件尚未加载时（早期加载阶段）退回默认值，避免 ConfigValue 抛 IllegalStateException。
         return !SPEC.isLoaded() || WHALE_BREAKS_BLOCKS.get();
+    }
+
+    public static int whaleSpawnChancePercent() {
+        return SPEC.isLoaded() ? WHALE_SPAWN_CHANCE_PERCENT.get() : 20;
+    }
+
+    public static double whaleSpawnChance() {
+        return whaleSpawnChancePercent() / 100.0D;
+    }
+
+    /**
+     * Applies an edit on the logical server and persists the world SERVER config.
+     * Never call this from a client-side config screen directly; use the network
+     * update request so the server can enforce permissions.
+     */
+    public static void applyServerEdit(boolean whaleBreaksBlocks, WhaleDrop whaleDrop, int whaleSpawnChancePercent) {
+        if (!SPEC.isLoaded()) {
+            return;
+        }
+        WHALE_BREAKS_BLOCKS.set(whaleBreaksBlocks);
+        WHALE_DROP.set(whaleDrop == null ? WhaleDrop.WHALE_STEAK : whaleDrop);
+        WHALE_SPAWN_CHANCE_PERCENT.set(Math.max(0, Math.min(100, whaleSpawnChancePercent)));
+        SPEC.save();
     }
 }

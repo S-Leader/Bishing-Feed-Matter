@@ -7,10 +7,13 @@ import dev.isxander.yacl3.api.YetAnotherConfigLib;
 import dev.isxander.yacl3.api.controller.EnumControllerBuilder;
 import dev.isxander.yacl3.api.controller.IntegerSliderControllerBuilder;
 import dev.isxander.yacl3.api.controller.TickBoxControllerBuilder;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.theawesomegem.fishingmadebetter.client.FmbClientConfig;
 import net.theawesomegem.fishingmadebetter.client.FmbClientConfig.HudAnchor;
+import net.theawesomegem.fishingmadebetter.client.ServerConfigClientState;
+import net.theawesomegem.fishingmadebetter.common.config.FmbCommonConfig;
 
 public final class FishingMadeBetterConfigScreen {
     private FishingMadeBetterConfigScreen() {
@@ -18,7 +21,13 @@ public final class FishingMadeBetterConfigScreen {
 
     public static Screen create(Screen parent) {
         FmbClientConfig.ClientConfig config = FmbClientConfig.get();
-        return YetAnotherConfigLib.createBuilder()
+        ServerDraft serverDraft = new ServerDraft(
+                ServerConfigClientState.whaleBreaksBlocks(),
+                ServerConfigClientState.whaleDrop(),
+                ServerConfigClientState.whaleSpawnChancePercent()
+        );
+
+        var builder = YetAnotherConfigLib.createBuilder()
                 .title(Component.translatable("config.fishingmadebetter.title"))
                 .category(ConfigCategory.createBuilder()
                         .name(Component.translatable("config.fishingmadebetter.category.hud"))
@@ -48,9 +57,57 @@ public final class FishingMadeBetterConfigScreen {
                                 .binding(true, () -> config.showHudDistance, value -> config.showHudDistance = value)
                                 .controller(TickBoxControllerBuilder::create)
                                 .build())
-                        .build())
-                .save(FmbClientConfig::save)
+                        .build());
+
+        // SERVER config is editable only after the logical server has explicitly told
+        // this client that it has permission. This avoids changing a client-side copy
+        // of a Forge SERVER config and pretending it changed the dedicated server.
+        if (Minecraft.getInstance().getConnection() != null && ServerConfigClientState.canEdit()) {
+            builder = builder.category(ConfigCategory.createBuilder()
+                    .name(Component.translatable("config.fishingmadebetter.category.server"))
+                    .option(Option.<Boolean>createBuilder()
+                            .name(Component.translatable("config.fishingmadebetter.whale_breaks_blocks"))
+                            .description(OptionDescription.of(Component.translatable("config.fishingmadebetter.whale_breaks_blocks.description")))
+                            .binding(true, () -> serverDraft.whaleBreaksBlocks, value -> serverDraft.whaleBreaksBlocks = value)
+                            .controller(TickBoxControllerBuilder::create)
+                            .build())
+                    .option(Option.<FmbCommonConfig.WhaleDrop>createBuilder()
+                            .name(Component.translatable("config.fishingmadebetter.whale_drop"))
+                            .description(OptionDescription.of(Component.translatable("config.fishingmadebetter.whale_drop.description")))
+                            .binding(FmbCommonConfig.WhaleDrop.WHALE_STEAK, () -> serverDraft.whaleDrop, value -> serverDraft.whaleDrop = value)
+                            .controller(option -> EnumControllerBuilder.create(option)
+                                    .enumClass(FmbCommonConfig.WhaleDrop.class)
+                                    .formatValue(value -> Component.translatable("config.fishingmadebetter.whale_drop." + value.name().toLowerCase())))
+                            .build())
+                    .option(Option.<Integer>createBuilder()
+                            .name(Component.translatable("config.fishingmadebetter.whale_spawn_chance"))
+                            .description(OptionDescription.of(Component.translatable("config.fishingmadebetter.whale_spawn_chance.description")))
+                            .binding(20, () -> serverDraft.whaleSpawnChancePercent, value -> serverDraft.whaleSpawnChancePercent = value)
+                            .controller(option -> IntegerSliderControllerBuilder.create(option).range(0, 100).step(1))
+                            .build())
+                    .build());
+        }
+
+        return builder
+                .save(() -> {
+                    FmbClientConfig.save();
+                    if (Minecraft.getInstance().getConnection() != null && ServerConfigClientState.canEdit()) {
+                        FishingMadeBetterForge.sendServerConfigUpdate(serverDraft.whaleBreaksBlocks, serverDraft.whaleDrop, serverDraft.whaleSpawnChancePercent);
+                    }
+                })
                 .build()
                 .generateScreen(parent);
+    }
+
+    private static final class ServerDraft {
+        private boolean whaleBreaksBlocks;
+        private FmbCommonConfig.WhaleDrop whaleDrop;
+        private int whaleSpawnChancePercent;
+
+        private ServerDraft(boolean whaleBreaksBlocks, FmbCommonConfig.WhaleDrop whaleDrop, int whaleSpawnChancePercent) {
+            this.whaleBreaksBlocks = whaleBreaksBlocks;
+            this.whaleDrop = whaleDrop;
+            this.whaleSpawnChancePercent = whaleSpawnChancePercent;
+        }
     }
 }
