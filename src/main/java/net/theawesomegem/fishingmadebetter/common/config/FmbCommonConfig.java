@@ -60,7 +60,7 @@ public final class FmbCommonConfig {
     }
 
     public static int whaleSpawnChancePercent() {
-        return SPEC.isLoaded() ? WHALE_SPAWN_CHANCE_PERCENT.get() : 20;
+        return SPEC.isLoaded() ? WHALE_SPAWN_CHANCE_PERCENT.get() : 3;
     }
 
     public static double whaleSpawnChance() {
