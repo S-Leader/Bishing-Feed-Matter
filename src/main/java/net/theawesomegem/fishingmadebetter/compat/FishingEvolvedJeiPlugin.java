@@ -1,8 +1,5 @@
 package net.theawesomegem.fishingmadebetter.compat;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
@@ -35,6 +32,10 @@ import net.theawesomegem.fishingmadebetter.common.item.attachment.HookItem;
 import net.theawesomegem.fishingmadebetter.common.item.attachment.ReelItem;
 import net.theawesomegem.fishingmadebetter.common.util.FishStackUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 @JeiPlugin
 public final class FishingEvolvedJeiPlugin implements IModPlugin {
     private static final ResourceLocation UID = new ResourceLocation(Constants.MOD_ID, "jei");
@@ -47,9 +48,7 @@ public final class FishingEvolvedJeiPlugin implements IModPlugin {
 
     @Override
     public void registerItemSubtypes(ISubtypeRegistration registration) {
-        List<Item> nbtItems = BuiltInRegistries.ITEM.stream()
-                .filter(item -> item instanceof BetterFishingRodItem || item instanceof FishBucketItem || item instanceof BaitBucketItem)
-                .toList();
+        List<Item> nbtItems = BuiltInRegistries.ITEM.stream().filter(item -> item instanceof FishBucketItem || item instanceof BaitBucketItem).toList();
         registration.useNbtForSubtypes(nbtItems.toArray(Item[]::new));
     }
 
@@ -88,9 +87,7 @@ public final class FishingEvolvedJeiPlugin implements IModPlugin {
             String path = safe(fish.fishId());
 
             if (fish.allowFillet() && !filletKnives.isEmpty()) {
-                Item resultItem = fish.defaultFillet()
-                        ? item("fish_slice_raw")
-                        : FishDataRegistry.resolveItem(fish.filletItem());
+                Item resultItem = fish.defaultFillet() ? item("fish_slice_raw") : FishDataRegistry.resolveItem(fish.filletItem());
                 if (resultItem != null) {
                     recipes.add(recipe("jei/fillet/" + path, new ItemStack(resultItem), filletKnives, Ingredient.of(input)));
                 }
@@ -106,9 +103,7 @@ public final class FishingEvolvedJeiPlugin implements IModPlugin {
 
     private static void addRodRecipes(List<CraftingRecipe> recipes) {
         List<Item> rods = BuiltInRegistries.ITEM.stream().filter(item -> item instanceof BetterFishingRodItem).toList();
-        List<Item> attachments = BuiltInRegistries.ITEM.stream()
-                .filter(item -> item instanceof ReelItem || item instanceof BobberItem || item instanceof HookItem)
-                .toList();
+        List<Item> attachments = BuiltInRegistries.ITEM.stream().filter(item -> item instanceof ReelItem || item instanceof BobberItem || item instanceof HookItem).toList();
         for (Item rodItem : rods) {
             String rodPath = BuiltInRegistries.ITEM.getKey(rodItem).getPath();
             for (Item attachment : attachments) {
@@ -120,8 +115,7 @@ public final class FishingEvolvedJeiPlugin implements IModPlugin {
                 } else if (attachment instanceof HookItem hook) {
                     BetterFishingRodItem.setHookItem(output, hook);
                 }
-                recipes.add(recipe("jei/rod_attachment/" + rodPath + "/" + BuiltInRegistries.ITEM.getKey(attachment).getPath(),
-                        output, Ingredient.of(rodItem), Ingredient.of(attachment)));
+                recipes.add(recipe("jei/rod_attachment/" + rodPath + "/" + BuiltInRegistries.ITEM.getKey(attachment).getPath(), output, Ingredient.of(rodItem), Ingredient.of(attachment)));
             }
 
             ItemStack baited = rodItem.getDefaultInstance();
@@ -153,12 +147,7 @@ public final class FishingEvolvedJeiPlugin implements IModPlugin {
     }
 
     private static Ingredient itemsOf(Class<? extends KnifeItem> type, boolean fillet) {
-        ItemStack[] stacks = BuiltInRegistries.ITEM.stream()
-                .filter(type::isInstance)
-                .map(type::cast)
-                .filter(knife -> fillet ? knife.isFilletKnife() : knife.isScalingKnife())
-                .map(Item::getDefaultInstance)
-                .toArray(ItemStack[]::new);
+        ItemStack[] stacks = BuiltInRegistries.ITEM.stream().filter(type::isInstance).map(type::cast).filter(knife -> fillet ? knife.isFilletKnife() : knife.isScalingKnife()).map(Item::getDefaultInstance).toArray(ItemStack[]::new);
         return stacks.length == 0 ? Ingredient.EMPTY : Ingredient.of(stacks);
     }
 
