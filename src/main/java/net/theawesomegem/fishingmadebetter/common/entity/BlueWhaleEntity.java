@@ -577,6 +577,50 @@ public final class BlueWhaleEntity extends WaterAnimal {
         return false;
     }
 
+    private static boolean isBreathingIce(BlockState state) {
+        return state.is(Blocks.ICE) || state.is(Blocks.PACKED_ICE) || state.is(Blocks.BLUE_ICE);
+    }
+
+    /**
+     * While the whale is deliberately surfacing to breathe, clear a head-sized opening through
+     * vanilla ice, packed ice and blue ice.  This is independent from the ram block-breaking
+     * config because it is part of the breathing behavior, but still respects mobGriefing and
+     * Forge's per-block destruction hook so protection mods can veto the change.
+     */
+    private void breakBreathingIceAboveHead() {
+        if (level().isClientSide || !surfacing || !ForgeEventFactory.getMobGriefingEvent(level(), this)) {
+            return;
+        }
+
+        AABB breakBox = headPart.getBoundingBox()
+                .inflate(0.35D, 0.12D, 0.35D)
+                .expandTowards(0.0D, 1.6D, 0.0D);
+        int minX = Mth.floor(breakBox.minX);
+        int minY = Mth.floor(breakBox.minY);
+        int minZ = Mth.floor(breakBox.minZ);
+        int maxX = Mth.floor(breakBox.maxX);
+        int maxY = Mth.floor(breakBox.maxY);
+        int maxZ = Mth.floor(breakBox.maxZ);
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    pos.set(x, y, z);
+                    BlockState state = level().getBlockState(pos);
+                    if (!isBreathingIce(state)
+                            || !new AABB(x, y, z, x + 1.0D, y + 1.0D, z + 1.0D).intersects(breakBox)) {
+                        continue;
+                    }
+                    BlockPos target = pos.immutable();
+                    if (ForgeEventFactory.onEntityDestroyBlock(this, target, state)) {
+                        level().destroyBlock(target, false);
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Processes blocks swept by the whale's head during a ram. Soft blocks are smashed without
      * drops. Obsidian-hard (50) or unbreakable collidable blocks stop the ram and stun the whale.
@@ -1286,6 +1330,10 @@ public final class BlueWhaleEntity extends WaterAnimal {
         }
 
         private void riseToSurface() {
+            // A frozen ocean surface must not trap the whale below the ice.  Clear only the
+            // three vanilla ice blocks requested for breathing; normal terrain is untouched.
+            breakBreathingIceAboveHead();
+
             double targetX = surfaceAir.getX() + 0.5D;
             double targetZ = surfaceAir.getZ() + 0.5D;
             double dx = targetX - getX();
@@ -1355,6 +1403,17 @@ public final class BlueWhaleEntity extends WaterAnimal {
 
             while (cursor.getY() < level().getMaxBuildHeight() - 1 && level().getFluidState(cursor).is(FluidTags.WATER)) {
                 cursor.move(0, 1, 0);
+            }
+
+            // Frozen oceans can have ice directly on top of the water.  Treat a contiguous
+            // column of ice / packed ice / blue ice as a valid breathing route and target the
+            // first air block above it; riseToSurface() will physically break the ice on the way.
+            if (isBreathingIce(level().getBlockState(cursor))) {
+                while (cursor.getY() < level().getMaxBuildHeight() - 1
+                        && isBreathingIce(level().getBlockState(cursor))) {
+                    cursor.move(0, 1, 0);
+                }
+                return level().getBlockState(cursor).isAir() ? cursor.immutable() : null;
             }
 
             BlockPos air = cursor.immutable();
