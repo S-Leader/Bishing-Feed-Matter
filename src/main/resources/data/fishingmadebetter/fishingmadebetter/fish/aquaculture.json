@@ -498,53 +498,6 @@
       "meat": []
     }
   },
-  "Whale": {
-    "fishId": "Whale",
-    "itemId": "fishingmadebetter:whale",
-    "itemMetaData": 0,
-    "description": "a massive sea-dwelling mammal",
-    "minFishTime": 2800,
-    "maxFishTime": 3200,
-    "minErrorVariance": 1,
-    "maxErrorVariance": 1,
-    "minWeight": 1000,
-    "maxWeight": 1500,
-    "time": "any",
-    "liquid": "water",
-    "rainRequired": false,
-    "thunderRequired": false,
-    "rarity": 1,
-    "minDeepLevel": 120,
-    "maxDeepLevel": 150,
-    "minYLevel": 55,
-    "maxYLevel": 80,
-    "maxLightLevel": 16,
-    "reproductionTime": 60,
-    "eatingFrequency": 21,
-    "trackable": true,
-    "biomeBlacklist": false,
-    "dimensionBlacklist": true,
-    "biomeTagList": [
-      "OCEAN"
-    ],
-    "dimensionList": [
-      -1,
-      1
-    ],
-    "timeOutsideOfWater": 20,
-    "allowScaling": false,
-    "scalingItem": "",
-    "scalingItemMetadata": 0,
-    "scalingUseWeight": false,
-    "allowFillet": true,
-    "defaultFillet": false,
-    "filletItem": "fishingmadebetter:whale_steak",
-    "filletItemMetadata": 0,
-    "filletUseWeight": true,
-    "baitItemMap": {
-      "meat": []
-    }
-  },
   "Jellyfish": {
     "fishId": "Jellyfish",
     "itemId": "aquaculture:jellyfish",

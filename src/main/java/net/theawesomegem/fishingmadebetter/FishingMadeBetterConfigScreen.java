@@ -79,7 +79,7 @@ public final class FishingMadeBetterConfigScreen {
                     .option(Option.<Integer>createBuilder()
                             .name(Component.translatable("config.fishingmadebetter.whale_spawn_chance"))
                             .description(OptionDescription.of(Component.translatable("config.fishingmadebetter.whale_spawn_chance.description")))
-                            .binding(20, () -> serverDraft.whaleSpawnChancePercent, value -> serverDraft.whaleSpawnChancePercent = value)
+                            .binding(3, () -> serverDraft.whaleSpawnChancePercent, value -> serverDraft.whaleSpawnChancePercent = value)
                             .controller(option -> IntegerSliderControllerBuilder.create(option).range(0, 100).step(1))
                             .build())
                     .build());
