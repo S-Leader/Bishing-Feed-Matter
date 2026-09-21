@@ -198,7 +198,7 @@ public class FishingMadeBetterForge {
         CREATIVE_MODE_TABS.register(modBus);
         modBus.addListener(AquacultureCompat::hideCreativeItems);
         modBus.addListener(this::commonSetup);
-        FishingMadeBetter.init();
+        FishDataRegistry.init();
         registerNetworkMessages();
         MinecraftForge.EVENT_BUS.addListener(this::addReloadListeners);
         if (FMLEnvironment.dist == Dist.CLIENT) {
