@@ -55,6 +55,7 @@ public final class ModItems {
             item("hook_magnetic"),
             item("fish_bucket"),
             item("bait_bucket"),
+            item("whale_bucket"),
             item("whale"),
             item("whale_steak"),
             item("whale_steak_cooked"),
@@ -119,6 +120,7 @@ public final class ModItems {
             case "hook_magnetic" -> new HookItem(new Item.Properties().durability(256), 0, 20, 0, 0, false);
             case "fish_bucket" -> new FishBucketItem();
             case "bait_bucket" -> new BaitBucketItem();
+            case "whale_bucket" -> new WhaleBucketItem();
             case "whale" -> new Item(new Item.Properties());
             case "whale_steak" ->
                     new Item(new Item.Properties().food(new FoodProperties.Builder().nutrition(2).saturationMod(0.3F).meat().build()));

@@ -10,6 +10,8 @@
   "item.fishingmadebetter.scaling_knife_steel": "钢制刮鳞刀",
   "item.fishingmadebetter.scaling_knife_netherite": "下界合金刮鳞刀",
   "item.fishingmadebetter.whale": "鲸鱼",
+  "item.fishingmadebetter.whale_bucket": "鲸鱼桶",
+  "notif.fishingmadebetter.whale_bucket.impossible": "嘿，你觉得你可以把鲸鱼装进桶里吗",
   "item.fishingmadebetter.whale_steak": "鲸鱼肉排",
   "item.fishingmadebetter.whale_burger": "鲸鱼汉堡",
   "item.fishingmadebetter.whale_spawn_egg": "鲸刷怪蛋",

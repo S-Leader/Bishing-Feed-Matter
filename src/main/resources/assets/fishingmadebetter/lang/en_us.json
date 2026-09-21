@@ -28,6 +28,8 @@
   "item.fishingmadebetter.scaling_knife_steel": "Steel Scaling Knife",
   "item.fishingmadebetter.scaling_knife_netherite": "Netherite Scaling Knife",
   "item.fishingmadebetter.whale": "Whale",
+  "item.fishingmadebetter.whale_bucket": "Whale Bucket",
+  "notif.fishingmadebetter.whale_bucket.impossible": "Hey, do you think you can fit a whale in a bucket?",
   "item.fishingmadebetter.whale_steak": "Whale Slice",
   "item.fishingmadebetter.whale_steak_cooked": "Whale Steak",
   "item.fishingmadebetter.whale_burger": "Whale Burger",

@@ -78,7 +78,7 @@
         {
           "type": "minecraft:loot_table",
           "name": "aquaculture:gameplay/fishing/junk",
-          "weight": 1,
+          "weight": 20,
           "conditions": [
             {
               "condition": "forge:mod_loaded",
