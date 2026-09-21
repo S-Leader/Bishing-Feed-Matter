@@ -1,4 +1,4 @@
-package net.theawesomegem.fishingmadebetter.mixins;
+package net.theawesomegem.fishingmadebetter.mixins.aquaculture;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
