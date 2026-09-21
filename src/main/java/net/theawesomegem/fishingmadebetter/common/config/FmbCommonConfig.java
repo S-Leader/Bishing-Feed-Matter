@@ -7,7 +7,7 @@ import net.minecraftforge.fml.config.ModConfig;
 public final class FmbCommonConfig {
     private static final ForgeConfigSpec SPEC;
     private static final ForgeConfigSpec.BooleanValue WHALE_BREAKS_BLOCKS;
-    private static final ForgeConfigSpec.EnumValue<WhaleDrop> WHALE_DROP;
+    private static final ForgeConfigSpec.BooleanValue WHALE_DROPS_ENABLED;
     private static final ForgeConfigSpec.IntValue WHALE_SPAWN_CHANCE_PERCENT;
 
     static {
@@ -20,13 +20,12 @@ public final class FmbCommonConfig {
                         "With breaking disabled the whale is stunned by the wall it rams instead of grinding against it."
                 )
                 .define("breaksBlocks", true);
-        WHALE_DROP = builder
+        WHALE_DROPS_ENABLED = builder
                 .comment(
-                        "What a slain blue whale leaves behind.",
-                        "WHALE_STEAK: the mod's own whale steaks (default).",
-                        "COD_AND_BONE_MEAL: vanilla cod plus bone meal, for packs without the mod's food chain."
+                        "Whether a slain blue whale rolls its entity loot table.",
+                        "The loot table controls every dropped item and quantity."
                 )
-                .defineEnum("drops", WhaleDrop.WHALE_STEAK);
+                .define("dropsEnabled", true);
         WHALE_SPAWN_CHANCE_PERCENT = builder
                 .comment(
                         "Chance that a qualifying submerged cold-ocean shipwreck spawns a blue whale.",
@@ -40,19 +39,14 @@ public final class FmbCommonConfig {
     private FmbCommonConfig() {
     }
 
-    public enum WhaleDrop {
-        WHALE_STEAK,
-        COD_AND_BONE_MEAL
-    }
-
     public static void register() {
         // These values affect world/gameplay behaviour, so keep them in the world's
         // serverconfig and let Forge sync the loaded SERVER config to clients.
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SPEC);
     }
 
-    public static WhaleDrop whaleDrop() {
-        return SPEC.isLoaded() ? WHALE_DROP.get() : WhaleDrop.WHALE_STEAK;
+    public static boolean whaleDropsEnabled() {
+        return !SPEC.isLoaded() || WHALE_DROPS_ENABLED.get();
     }
 
     public static boolean whaleBreaksBlocks() {
@@ -72,12 +66,12 @@ public final class FmbCommonConfig {
      * Never call this from a client-side config screen directly; use the network
      * update request so the server can enforce permissions.
      */
-    public static void applyServerEdit(boolean whaleBreaksBlocks, WhaleDrop whaleDrop, int whaleSpawnChancePercent) {
+    public static void applyServerEdit(boolean whaleBreaksBlocks, boolean whaleDropsEnabled, int whaleSpawnChancePercent) {
         if (!SPEC.isLoaded()) {
             return;
         }
         WHALE_BREAKS_BLOCKS.set(whaleBreaksBlocks);
-        WHALE_DROP.set(whaleDrop == null ? WhaleDrop.WHALE_STEAK : whaleDrop);
+        WHALE_DROPS_ENABLED.set(whaleDropsEnabled);
         WHALE_SPAWN_CHANCE_PERCENT.set(Math.max(0, Math.min(100, whaleSpawnChancePercent)));
         SPEC.save();
     }

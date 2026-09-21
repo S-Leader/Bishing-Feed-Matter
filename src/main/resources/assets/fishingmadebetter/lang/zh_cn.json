@@ -70,10 +70,8 @@
   "config.fishingmadebetter.category.server": "服务器配置",
   "config.fishingmadebetter.whale_breaks_blocks": "蓝鲸冲撞破坏方块",
   "config.fishingmadebetter.whale_breaks_blocks.description": "是否允许冲撞中的蓝鲸破坏硬度低于黑曜石的方块；仍遵守 mobGriefing 和方块保护。",
-  "config.fishingmadebetter.whale_drop": "蓝鲸掉落物",
-  "config.fishingmadebetter.whale_drop.description": "选择蓝鲸死亡后的掉落类型。",
-  "config.fishingmadebetter.whale_drop.whale_steak": "鲸鱼肉排",
-  "config.fishingmadebetter.whale_drop.cod_and_bone_meal": "鳕鱼和骨粉",
+  "config.fishingmadebetter.whale_drops_enabled": "蓝鲸战利品",
+  "config.fishingmadebetter.whale_drops_enabled.description": "蓝鲸死亡时是否调用其实体战利品表。掉落物种类和数量完全由战利品表控制。",
   "config.fishingmadebetter.whale_spawn_chance": "蓝鲸生成概率",
   "config.fishingmadebetter.whale_spawn_chance.description": "符合条件的冷海沉船生成蓝鲸的概率（0-100%）。"
 }

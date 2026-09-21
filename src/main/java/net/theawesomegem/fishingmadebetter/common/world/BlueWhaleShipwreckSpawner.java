@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.MobSpawnType;
@@ -20,6 +21,7 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.TickEvent;
@@ -256,7 +258,7 @@ public final class BlueWhaleShipwreckSpawner {
         // The shipwreck is only the spawn anchor.  Do not try to place the whale on top of it.
         // Search an annulus around the wreck so the large multipart whale can find open ocean.
         int halfSpan = Math.max(box.getXSpan(), box.getZSpan()) / 2;
-        int minRadius = Math.max(12, halfSpan + 8);
+        int minRadius = Math.max(24, halfSpan + 16);
         int maxRadius = minRadius + 40;
 
         for (int attempt = 0; attempt < 128; attempt++) {
@@ -279,8 +281,11 @@ public final class BlueWhaleShipwreckSpawner {
             whale.moveTo(x + 0.5D, y + 0.1D, z + 0.5D, yaw, 0.0F);
             whale.yBodyRot = yaw;
             whale.refreshBodyPartsForSpawn();
+            boolean submergedParent = isFilledWithWater(level, whale.getBoundingBox());
+            boolean submergedParts = java.util.Arrays.stream(whale.getParts())
+                    .allMatch(part -> isFilledWithWater(level, part.getBoundingBox()));
             boolean clearParts = java.util.Arrays.stream(whale.getParts()).allMatch(level::noCollision);
-            if (level.noCollision(whale) && clearParts) {
+            if (submergedParent && submergedParts && level.noCollision(whale) && clearParts) {
                 return whale.position();
             }
         }
@@ -290,7 +295,7 @@ public final class BlueWhaleShipwreckSpawner {
     private static Integer findWaterColumnSpawnY(ServerLevel level, int centerX, int centerZ, RandomSource random) {
         // Start below the ocean surface, then walk downward through the local water column.
         // This deliberately has no dependency on the shipwreck's box.maxY().
-        int topY = Math.min(level.getSeaLevel() - 4, level.getMaxBuildHeight() - 5);
+        int topY = Math.min(level.getSeaLevel() - 10, level.getMaxBuildHeight() - 10);
         int bottomY = Math.max(level.getMinBuildHeight() + 2, level.getSeaLevel() - 48);
 
         // Offset the first probe a little so whales do not all appear at exactly the same depth.
@@ -306,10 +311,31 @@ public final class BlueWhaleShipwreckSpawner {
     private static boolean hasWhaleSizedWater(ServerLevel level, int centerX, int bottomY, int centerZ) {
         // Require a useful local water pocket around the body. Kelp/seagrass still count because
         // their FluidState is water; final multipart noCollision checks solids across the full whale.
-        for (int x = centerX - 2; x <= centerX + 2; x++) {
-            for (int z = centerZ - 2; z <= centerZ + 2; z++) {
-                for (int y = bottomY; y <= bottomY + 3; y++) {
+        for (int x = centerX - 4; x <= centerX + 4; x++) {
+            for (int z = centerZ - 4; z <= centerZ + 4; z++) {
+                for (int y = bottomY; y <= bottomY + 8; y++) {
                     if (!level.getFluidState(new BlockPos(x, y, z)).is(FluidTags.WATER)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    private static boolean isFilledWithWater(ServerLevel level, AABB box) {
+        int minX = Mth.floor(box.minX);
+        int minY = Mth.floor(box.minY);
+        int minZ = Mth.floor(box.minZ);
+        int maxX = Mth.floor(box.maxX - 1.0E-7D);
+        int maxY = Mth.floor(box.maxY - 1.0E-7D);
+        int maxZ = Mth.floor(box.maxZ - 1.0E-7D);
+        BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
+
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    if (!level.getFluidState(cursor.set(x, y, z)).is(FluidTags.WATER)) {
                         return false;
                     }
                 }

@@ -9,16 +9,16 @@ public final class ServerConfigClientState {
     private static boolean received;
     private static boolean canEdit;
     private static boolean whaleBreaksBlocks = true;
-    private static FmbCommonConfig.WhaleDrop whaleDrop = FmbCommonConfig.WhaleDrop.WHALE_STEAK;
+    private static boolean whaleDropsEnabled = true;
     private static int whaleSpawnChancePercent = 20;
 
     private ServerConfigClientState() {
     }
 
-    public static void update(boolean breaksBlocks, FmbCommonConfig.WhaleDrop drop, int spawnChancePercent, boolean editable) {
+    public static void update(boolean breaksBlocks, boolean dropsEnabled, int spawnChancePercent, boolean editable) {
         received = true;
         whaleBreaksBlocks = breaksBlocks;
-        whaleDrop = drop == null ? FmbCommonConfig.WhaleDrop.WHALE_STEAK : drop;
+        whaleDropsEnabled = dropsEnabled;
         whaleSpawnChancePercent = Math.max(0, Math.min(100, spawnChancePercent));
         canEdit = editable;
     }
@@ -40,8 +40,8 @@ public final class ServerConfigClientState {
         return received ? whaleBreaksBlocks : FmbCommonConfig.whaleBreaksBlocks();
     }
 
-    public static FmbCommonConfig.WhaleDrop whaleDrop() {
-        return received ? whaleDrop : FmbCommonConfig.whaleDrop();
+    public static boolean whaleDropsEnabled() {
+        return received ? whaleDropsEnabled : FmbCommonConfig.whaleDropsEnabled();
     }
 
     public static int whaleSpawnChancePercent() {

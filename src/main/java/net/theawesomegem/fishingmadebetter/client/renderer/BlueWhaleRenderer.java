@@ -14,7 +14,7 @@ public final class BlueWhaleRenderer extends MobRenderer<BlueWhaleEntity, BlueWh
     private static final ResourceLocation TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/entity/blue_whale.png");
 
     public BlueWhaleRenderer(EntityRendererProvider.Context context) {
-        super(context, new BlueWhaleModel(context.bakeLayer(BlueWhaleModel.LAYER_LOCATION)), 4.0F);
+        super(context, new BlueWhaleModel(context.bakeLayer(BlueWhaleModel.LAYER_LOCATION)), 8.0F);
         addLayer(new BlueWhaleStuckProjectileLayer(context, this));
     }
 
@@ -23,11 +23,11 @@ public final class BlueWhaleRenderer extends MobRenderer<BlueWhaleEntity, BlueWh
                                   float rotationYaw, float partialTick) {
         super.setupRotations(whale, poseStack, ageInTicks, rotationYaw, partialTick);
         if (!whale.isBeached()) {
-            // Pitch around the middle of the 3.75-block-tall torso. Rotating around the entity's
-            // feet made a 16-block whale seesaw vertically whenever its pitch changed slightly.
-            poseStack.translate(0.0F, 1.875F, 0.0F);
+            // Pitch around the middle of the 7.5-block-tall torso. Rotating around the entity's
+            // feet makes this 32-block whale seesaw vertically whenever its pitch changes.
+            poseStack.translate(0.0F, 3.75F, 0.0F);
             poseStack.mulPose(Axis.XP.rotationDegrees(-whale.getVisualPitch(partialTick)));
-            poseStack.translate(0.0F, -1.875F, 0.0F);
+            poseStack.translate(0.0F, -3.75F, 0.0F);
         }
     }
 

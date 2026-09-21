@@ -7,7 +7,6 @@
   "mixins": [
     "AquacultureRecipeCompatMixin",
     "FishingHookReplacementMixin",
-    "ThrownTridentAccessor",
     "aquaculture.AquacultureBaitSlotMixin",
     "aquaculture.AquacultureBobberSlotMixin",
     "aquaculture.AquacultureHookSlotMixin",

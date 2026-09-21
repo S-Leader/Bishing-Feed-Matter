@@ -13,7 +13,6 @@ import net.minecraft.network.chat.Component;
 import net.theawesomegem.fishingmadebetter.client.FmbClientConfig;
 import net.theawesomegem.fishingmadebetter.client.FmbClientConfig.HudAnchor;
 import net.theawesomegem.fishingmadebetter.client.ServerConfigClientState;
-import net.theawesomegem.fishingmadebetter.common.config.FmbCommonConfig;
 
 public final class FishingMadeBetterConfigScreen {
     private FishingMadeBetterConfigScreen() {
@@ -23,7 +22,7 @@ public final class FishingMadeBetterConfigScreen {
         FmbClientConfig.ClientConfig config = FmbClientConfig.get();
         ServerDraft serverDraft = new ServerDraft(
                 ServerConfigClientState.whaleBreaksBlocks(),
-                ServerConfigClientState.whaleDrop(),
+                ServerConfigClientState.whaleDropsEnabled(),
                 ServerConfigClientState.whaleSpawnChancePercent()
         );
 
@@ -71,13 +70,11 @@ public final class FishingMadeBetterConfigScreen {
                             .binding(true, () -> serverDraft.whaleBreaksBlocks, value -> serverDraft.whaleBreaksBlocks = value)
                             .controller(TickBoxControllerBuilder::create)
                             .build())
-                    .option(Option.<FmbCommonConfig.WhaleDrop>createBuilder()
-                            .name(Component.translatable("config.fishingmadebetter.whale_drop"))
-                            .description(OptionDescription.of(Component.translatable("config.fishingmadebetter.whale_drop.description")))
-                            .binding(FmbCommonConfig.WhaleDrop.WHALE_STEAK, () -> serverDraft.whaleDrop, value -> serverDraft.whaleDrop = value)
-                            .controller(option -> EnumControllerBuilder.create(option)
-                                    .enumClass(FmbCommonConfig.WhaleDrop.class)
-                                    .formatValue(value -> Component.translatable("config.fishingmadebetter.whale_drop." + value.name().toLowerCase())))
+                    .option(Option.<Boolean>createBuilder()
+                            .name(Component.translatable("config.fishingmadebetter.whale_drops_enabled"))
+                            .description(OptionDescription.of(Component.translatable("config.fishingmadebetter.whale_drops_enabled.description")))
+                            .binding(true, () -> serverDraft.whaleDropsEnabled, value -> serverDraft.whaleDropsEnabled = value)
+                            .controller(TickBoxControllerBuilder::create)
                             .build())
                     .option(Option.<Integer>createBuilder()
                             .name(Component.translatable("config.fishingmadebetter.whale_spawn_chance"))
@@ -92,7 +89,7 @@ public final class FishingMadeBetterConfigScreen {
                 .save(() -> {
                     FmbClientConfig.save();
                     if (Minecraft.getInstance().getConnection() != null && ServerConfigClientState.canEdit()) {
-                        FishingMadeBetterForge.sendServerConfigUpdate(serverDraft.whaleBreaksBlocks, serverDraft.whaleDrop, serverDraft.whaleSpawnChancePercent);
+                        FishingMadeBetterForge.sendServerConfigUpdate(serverDraft.whaleBreaksBlocks, serverDraft.whaleDropsEnabled, serverDraft.whaleSpawnChancePercent);
                     }
                 })
                 .build()
@@ -101,12 +98,12 @@ public final class FishingMadeBetterConfigScreen {
 
     private static final class ServerDraft {
         private boolean whaleBreaksBlocks;
-        private FmbCommonConfig.WhaleDrop whaleDrop;
+        private boolean whaleDropsEnabled;
         private int whaleSpawnChancePercent;
 
-        private ServerDraft(boolean whaleBreaksBlocks, FmbCommonConfig.WhaleDrop whaleDrop, int whaleSpawnChancePercent) {
+        private ServerDraft(boolean whaleBreaksBlocks, boolean whaleDropsEnabled, int whaleSpawnChancePercent) {
             this.whaleBreaksBlocks = whaleBreaksBlocks;
-            this.whaleDrop = whaleDrop;
+            this.whaleDropsEnabled = whaleDropsEnabled;
             this.whaleSpawnChancePercent = whaleSpawnChancePercent;
         }
     }

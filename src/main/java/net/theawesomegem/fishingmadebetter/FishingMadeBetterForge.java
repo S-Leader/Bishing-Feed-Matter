@@ -74,7 +74,7 @@ import java.util.Map;
 
 @Mod(Constants.MOD_ID)
 public class FishingMadeBetterForge {
-    private static final String NETWORK_VERSION = "3";
+    private static final String NETWORK_VERSION = "4";
     private static final String YACL_MOD_ID = "yet_another_config_lib_v3";
     private static final SimpleChannel NETWORK = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(Constants.MOD_ID, "main"),
@@ -153,7 +153,7 @@ public class FishingMadeBetterForge {
         ModEntities.BLUE_WHALE = ENTITY_TYPES.register(
                 "blue_whale",
                 () -> EntityType.Builder.of(BlueWhaleEntity::new, MobCategory.WATER_CREATURE)
-                        .sized(3.60F, 3.75F)
+                        .sized(7.20F, 7.50F)
                         .clientTrackingRange(12)
                         .updateInterval(2)
                         .build("blue_whale")
@@ -367,8 +367,8 @@ public class FishingMadeBetterForge {
         }
     }
 
-    public static void sendServerConfigUpdate(boolean whaleBreaksBlocks, FmbCommonConfig.WhaleDrop whaleDrop, int whaleSpawnChancePercent) {
-        NETWORK.sendToServer(new ServerConfigUpdateMessage(whaleBreaksBlocks, whaleDrop, whaleSpawnChancePercent));
+    public static void sendServerConfigUpdate(boolean whaleBreaksBlocks, boolean whaleDropsEnabled, int whaleSpawnChancePercent) {
+        NETWORK.sendToServer(new ServerConfigUpdateMessage(whaleBreaksBlocks, whaleDropsEnabled, whaleSpawnChancePercent));
     }
 
     private static boolean canEditServerConfig(net.minecraft.server.level.ServerPlayer player) {
@@ -381,7 +381,7 @@ public class FishingMadeBetterForge {
                 PacketDistributor.PLAYER.with(() -> player),
                 new ServerConfigSnapshotMessage(
                         FmbCommonConfig.whaleBreaksBlocks(),
-                        FmbCommonConfig.whaleDrop(),
+                        FmbCommonConfig.whaleDropsEnabled(),
                         FmbCommonConfig.whaleSpawnChancePercent(),
                         canEditServerConfig(player)
                 )
@@ -428,18 +428,18 @@ public class FishingMadeBetterForge {
         }
     }
 
-    private record ServerConfigUpdateMessage(boolean whaleBreaksBlocks, FmbCommonConfig.WhaleDrop whaleDrop,
+    private record ServerConfigUpdateMessage(boolean whaleBreaksBlocks, boolean whaleDropsEnabled,
                                              int whaleSpawnChancePercent) {
         private static void encode(ServerConfigUpdateMessage message, FriendlyByteBuf buffer) {
             buffer.writeBoolean(message.whaleBreaksBlocks);
-            buffer.writeEnum(message.whaleDrop);
+            buffer.writeBoolean(message.whaleDropsEnabled);
             buffer.writeVarInt(message.whaleSpawnChancePercent);
         }
 
         private static ServerConfigUpdateMessage decode(FriendlyByteBuf buffer) {
             return new ServerConfigUpdateMessage(
                     buffer.readBoolean(),
-                    buffer.readEnum(FmbCommonConfig.WhaleDrop.class),
+                    buffer.readBoolean(),
                     buffer.readVarInt()
             );
         }
@@ -454,7 +454,7 @@ public class FishingMadeBetterForge {
                     return;
                 }
 
-                FmbCommonConfig.applyServerEdit(message.whaleBreaksBlocks, message.whaleDrop, message.whaleSpawnChancePercent);
+                FmbCommonConfig.applyServerEdit(message.whaleBreaksBlocks, message.whaleDropsEnabled, message.whaleSpawnChancePercent);
                 if (sender != null && sender.getServer() != null) {
                     for (net.minecraft.server.level.ServerPlayer player : sender.getServer().getPlayerList().getPlayers()) {
                         sendServerConfigSnapshot(player);
@@ -467,13 +467,13 @@ public class FishingMadeBetterForge {
 
     private record ServerConfigSnapshotMessage(
             boolean whaleBreaksBlocks,
-            FmbCommonConfig.WhaleDrop whaleDrop,
+            boolean whaleDropsEnabled,
             int whaleSpawnChancePercent,
             boolean canEdit
     ) {
         private static void encode(ServerConfigSnapshotMessage message, FriendlyByteBuf buffer) {
             buffer.writeBoolean(message.whaleBreaksBlocks);
-            buffer.writeEnum(message.whaleDrop);
+            buffer.writeBoolean(message.whaleDropsEnabled);
             buffer.writeVarInt(message.whaleSpawnChancePercent);
             buffer.writeBoolean(message.canEdit);
         }
@@ -481,7 +481,7 @@ public class FishingMadeBetterForge {
         private static ServerConfigSnapshotMessage decode(FriendlyByteBuf buffer) {
             return new ServerConfigSnapshotMessage(
                     buffer.readBoolean(),
-                    buffer.readEnum(FmbCommonConfig.WhaleDrop.class),
+                    buffer.readBoolean(),
                     buffer.readVarInt(),
                     buffer.readBoolean()
             );
@@ -493,7 +493,7 @@ public class FishingMadeBetterForge {
                     Dist.CLIENT,
                     () -> () -> ServerConfigClientState.update(
                             message.whaleBreaksBlocks,
-                            message.whaleDrop,
+                            message.whaleDropsEnabled,
                             message.whaleSpawnChancePercent,
                             message.canEdit
                     )

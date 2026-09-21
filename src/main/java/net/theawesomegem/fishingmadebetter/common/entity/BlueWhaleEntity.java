@@ -13,8 +13,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -34,7 +32,6 @@ import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Blocks;
@@ -43,9 +40,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.theawesomegem.fishingmadebetter.FishingMadeBetterForge;
 import net.theawesomegem.fishingmadebetter.common.config.FmbCommonConfig;
-import net.theawesomegem.fishingmadebetter.mixins.ThrownTridentAccessor;
 import net.theawesomegem.fishingmadebetter.registry.ModSounds;
 
 import javax.annotation.Nullable;
@@ -57,40 +52,39 @@ public final class BlueWhaleEntity extends WaterAnimal {
     public static final int ACTION_RAM = 2;
     private static final EntityDataAccessor<Integer> ACTION = SynchedEntityData.defineId(BlueWhaleEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> BEACHED = SynchedEntityData.defineId(BlueWhaleEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Integer> TRIDENT_COUNT = SynchedEntityData.defineId(BlueWhaleEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<CompoundTag> STUCK_PROJECTILES = SynchedEntityData.defineId(BlueWhaleEntity.class, EntityDataSerializers.COMPOUND_TAG);
     private static final EntityDataAccessor<Boolean> STUNNED = SynchedEntityData.defineId(BlueWhaleEntity.class, EntityDataSerializers.BOOLEAN);
     private static final int BLOW_DURATION = 32;
     private static final int RAM_DURATION = 24;
+    private static final double RAM_KNOCKBACK_HORIZONTAL = 4.40D;
+    private static final double RAM_KNOCKBACK_VERTICAL = 0.90D;
     private static final int AIR_CONSUMPTION_INTERVAL = 100;
     private static final int STUN_DURATION = 60;
     private static final int SHIELD_DISABLE_DURATION = 200;
     private static final int TOTAL_MOISTNESS = 2400;
     private static final float DRY_OUT_DAMAGE = 1.0F;
     private static final double BEACHED_PUSH_ASSIST = 2.0D;
-    private static final int MAX_STUCK_TRIDENTS = 8;
     private static final int MAX_STUCK_ARROWS = 16;
-    private static final double PULL_REACH = 6.0D;
     private static final float OBSIDIAN_HARDNESS = 50.0F;
-    private static final double OBSTACLE_PROBE_DISTANCE = 4.5D;
+    private static final double OBSTACLE_PROBE_DISTANCE = 9.0D;
     private static final int YAW_HISTORY_SIZE = 32;
     private static final int YAW_HISTORY_MASK = YAW_HISTORY_SIZE - 1;
     private static final float YAW_LAG_PER_BLOCK = 1.1F;
     private static final double SPINE_STEP = 0.5D;
     // Model-space longitudinal centers (blocks). Positive is toward the head.
-    // These cover the actual 512x512 large Blockbench model from the snout through the fluke.
-    private static final double[] PART_OFFSETS = {1.85D, -0.94D, -3.56D, -5.75D, -8.10D, -10.80D};
+    // These cover the supplied 1024-space Blockbench model from the snout through the fluke.
+    private static final double[] PART_OFFSETS = {3.70D, -1.88D, -7.12D, -11.50D, -16.20D, -21.60D};
     // Vertical center of each multipart relative to the main body's center. These values come
     // directly from the large Blockbench model's neutral-pose cube bounds after moving Controller
     // from Y=24 to Y=0. Keeping centers instead of common bottom offsets lets the boxes follow
     // pitch without floating above the mesh.
-    private static final double[] PART_CENTER_UP_OFFSETS = {0.13D, 0.0D, 0.0D, 0.13D, 0.81D, 1.06D};
-    private static final double BODY_CENTER_HEIGHT = 1.875D;
+    private static final double[] PART_CENTER_UP_OFFSETS = {0.26D, 0.0D, 0.0D, 0.26D, 1.62D, 2.12D};
+    private static final double BODY_CENTER_HEIGHT = 3.75D;
     private static final int SPINE_PART_COUNT = 6;
-    private static final double FIN_LONGITUDINAL_OFFSET = -2.23D;
-    private static final double LEFT_FIN_LATERAL_OFFSET = -3.125D;
-    private static final double RIGHT_FIN_LATERAL_OFFSET = 2.875D;
-    private static final double FIN_CENTER_UP_OFFSET = 0.25D;
+    private static final double FIN_LONGITUDINAL_OFFSET = -4.46D;
+    private static final double LEFT_FIN_LATERAL_OFFSET = -6.25D;
+    private static final double RIGHT_FIN_LATERAL_OFFSET = 5.75D;
+    private static final double FIN_CENTER_UP_OFFSET = 0.50D;
 
     public final BlueWhalePart headPart;
     public final BlueWhalePart frontBodyPart;
@@ -116,6 +110,9 @@ public final class BlueWhaleEntity extends WaterAnimal {
     private float yawVelocity;
     private final float[] yawHistory = new float[YAW_HISTORY_SIZE];
     private int yawHistoryIndex = -1;
+    private final List<ItemStack> pendingLegacyTridents = new ArrayList<>();
+    private final List<ItemStack> capturedWhaleLoot = new ArrayList<>();
+    private boolean capturingWhaleLoot;
 
     public final AnimationState beachedAnimationState = new AnimationState();
     public final AnimationState swimAnimationState = new AnimationState();
@@ -130,15 +127,15 @@ public final class BlueWhaleEntity extends WaterAnimal {
         moveControl = new SmoothSwimmingMoveControl(this, 18, 10, 0.02F, 0.08F, false);
         lookControl = new SmoothSwimmingLookControl(this, 6);
         noCulling = true;
-        headPart = new BlueWhalePart(this, 4.25F, 4.45F);
-        frontBodyPart = new BlueWhalePart(this, 3.60F, 3.75F);
-        rearBodyPart = new BlueWhalePart(this, 2.80F, 3.50F);
-        firstTailPart = new BlueWhalePart(this, 2.30F, 2.80F);
-        secondTailPart = new BlueWhalePart(this, 1.55F, 1.40F);
-        tailFinPart = new BlueWhalePart(this, 3.55F, 0.90F);
-        // The large model's pectoral fins extend about 2.5 blocks from their local center.
-        leftFinPart = new BlueWhalePart(this, 2.55F, 0.50F);
-        rightFinPart = new BlueWhalePart(this, 2.55F, 0.50F);
+        headPart = new BlueWhalePart(this, 8.50F, 8.90F);
+        frontBodyPart = new BlueWhalePart(this, 7.20F, 7.50F);
+        rearBodyPart = new BlueWhalePart(this, 5.60F, 7.00F);
+        firstTailPart = new BlueWhalePart(this, 4.60F, 5.60F);
+        secondTailPart = new BlueWhalePart(this, 3.10F, 2.80F);
+        tailFinPart = new BlueWhalePart(this, 7.10F, 1.80F);
+        // The doubled model's pectoral fins extend about five blocks from their local center.
+        leftFinPart = new BlueWhalePart(this, 5.10F, 1.00F);
+        rightFinPart = new BlueWhalePart(this, 5.10F, 1.00F);
         bodyParts = new BlueWhalePart[]{headPart, frontBodyPart, rearBodyPart, firstTailPart, secondTailPart, tailFinPart, leftFinPart, rightFinPart};
         breatheCountdown = random.nextInt(900, 1801);
     }
@@ -152,7 +149,6 @@ public final class BlueWhaleEntity extends WaterAnimal {
         super.defineSynchedData();
         entityData.define(ACTION, ACTION_IDLE);
         entityData.define(BEACHED, false);
-        entityData.define(TRIDENT_COUNT, 0);
         entityData.define(STUCK_PROJECTILES, new CompoundTag());
         entityData.define(STUNNED, false);
     }
@@ -203,6 +199,14 @@ public final class BlueWhaleEntity extends WaterAnimal {
         pushEntitiesFromParts();
 
         if (!level().isClientSide) {
+            if (!pendingLegacyTridents.isEmpty()) {
+                // Old releases stored real trident stacks inside the whale. Return them once after
+                // loading instead of silently deleting player equipment when the sticking feature
+                // is removed.
+                List<ItemStack> legacyDrops = new ArrayList<>(pendingLegacyTridents);
+                pendingLegacyTridents.clear();
+                scatterAlongBody(legacyDrops);
+            }
             updateMoistness();
             if (!surfacing && getTarget() == null && !isBeached() && breatheCountdown > 0) {
                 // Leave the timer at 0 until SurfaceToBreatheGoal gets a chance to start on the
@@ -525,14 +529,14 @@ public final class BlueWhaleEntity extends WaterAnimal {
         Vec3 bestDirection = direction;
         double bestClearance = -1.0D;
         for (Vec3 candidate : candidates) {
-            double clearance = clearanceDistance(candidate, 6.0D);
+            double clearance = clearanceDistance(candidate, 12.0D);
             if (clearance > bestClearance) {
                 bestClearance = clearance;
                 bestDirection = candidate;
             }
         }
 
-        double detourDistance = Mth.clamp(desired.length(), 4.0D, 9.0D);
+        double detourDistance = Mth.clamp(desired.length(), 8.0D, 18.0D);
         return position().add(bestDirection.scale(detourDistance));
     }
 
@@ -750,7 +754,14 @@ public final class BlueWhaleEntity extends WaterAnimal {
     }
 
     public Vec3 getSpoutPosition() {
-        return new Vec3(headPart.getX(), headPart.getY() + headPart.getBbHeight() + 0.15D, headPart.getZ());
+        float pitch = getVisualPitch(1.0F);
+        Vec3 forward = Vec3.directionFromRotation(pitch, yBodyRot).normalize();
+        Vec3 right = new Vec3(-forward.z, 0.0D, forward.x);
+        right = right.lengthSqr() < 1.0E-6D ? new Vec3(1.0D, 0.0D, 0.0D) : right.normalize();
+        Vec3 up = right.cross(forward).normalize();
+        return headPart.getBoundingBox().getCenter()
+                .add(up.scale(headPart.getBbHeight() * 0.5D + 0.15D))
+                .subtract(forward.scale(2.0D));
     }
 
     public int getAction() {
@@ -789,10 +800,6 @@ public final class BlueWhaleEntity extends WaterAnimal {
         return Mth.lerp(partialTick, previousBeachedProgress, beachedProgress) / 10.0F;
     }
 
-    public int getTridentCount() {
-        return entityData.get(TRIDENT_COUNT);
-    }
-
     public ListTag getStuckProjectileData() {
         return entityData.get(STUCK_PROJECTILES).getList("Entries", Tag.TAG_COMPOUND);
     }
@@ -813,16 +820,8 @@ public final class BlueWhaleEntity extends WaterAnimal {
             return false;
         }
         boolean hurt = super.hurt(source, amount);
-        // 投射物不看这一下有没有真掉血：无敌帧内命中的三叉戟同样要插住，否则会掉回地上。
-        // 但已经死掉的鲸鱼不再接收，那时战利品已经掉完，收下等于凭空吞掉玩家的三叉戟。
-        if (!level().isClientSide && isAlive() && source.getDirectEntity() instanceof AbstractArrow arrow) {
-            boolean trident = arrow instanceof ThrownTrident;
-            // 三叉戟连附魔一起收进鲸鱼身上，拔下来或鲸鱼死亡时才还回世界。
-            ItemStack stuckItem = trident ? ((ThrownTridentAccessor) arrow).callGetPickupItem() : ItemStack.EMPTY;
-            boolean stored = recordStuckProjectile(arrow, damagePartContext, trident, stuckItem);
-            if (trident && stored) {
-                arrow.discard();
-            }
+        if (!level().isClientSide && isAlive() && source.getDirectEntity() instanceof AbstractArrow arrow && !(arrow instanceof ThrownTrident)) {
+            recordStuckArrow(arrow, damagePartContext);
         }
         if (hurt && !level().isClientSide && source.getEntity() instanceof LivingEntity attacker && !(attacker instanceof Player player && (player.isCreative() || player.isSpectator()))) {
             setTarget(attacker);
@@ -830,7 +829,7 @@ public final class BlueWhaleEntity extends WaterAnimal {
         return hurt;
     }
 
-    private boolean recordStuckProjectile(AbstractArrow projectile, @Nullable BlueWhalePart hitPart, boolean trident, ItemStack stuckItem) {
+    private boolean recordStuckArrow(AbstractArrow projectile, @Nullable BlueWhalePart hitPart) {
         BlueWhalePart part = hitPart != null ? hitPart : findClosestBodyPart(projectile.position());
         if (part == null) {
             return false;
@@ -854,7 +853,6 @@ public final class BlueWhaleEntity extends WaterAnimal {
 
         Vec3 direction = velocity.lengthSqr() > 1.0E-6D ? velocity.normalize() : forward.scale(-1.0D);
         CompoundTag entry = new CompoundTag();
-        entry.putBoolean("Trident", trident);
         entry.putByte("Part", (byte) getPartIndex(part));
         entry.putFloat("X", (float) Mth.clamp(offset.dot(right) / halfWidth, -1.0D, 1.0D));
         entry.putFloat("Y", (float) Mth.clamp(offset.dot(up) / halfHeight, -1.0D, 1.0D));
@@ -862,30 +860,20 @@ public final class BlueWhaleEntity extends WaterAnimal {
         entry.putFloat("DX", (float) direction.dot(right));
         entry.putFloat("DY", (float) direction.dot(up));
         entry.putFloat("DZ", (float) direction.dot(forward));
-        if (!stuckItem.isEmpty()) {
-            entry.put("Item", stuckItem.save(new CompoundTag()));
-        }
-
         CompoundTag data = entityData.get(STUCK_PROJECTILES).copy();
         ListTag oldEntries = data.getList("Entries", Tag.TAG_COMPOUND);
         ListTag entries = new ListTag();
-        int sameTypeKept = 0;
-        int limit = trident ? MAX_STUCK_TRIDENTS - 1 : MAX_STUCK_ARROWS - 1;
+        int kept = 0;
         for (int i = oldEntries.size() - 1; i >= 0; i--) {
             CompoundTag old = oldEntries.getCompound(i);
-            if (old.getBoolean("Trident") == trident) {
-                if (sameTypeKept++ >= limit) {
-                    // 挤掉最老的一根：带物品的必须还回世界，不能凭空吞掉玩家的三叉戟。
-                    dropStuckItem(old);
-                    continue;
-                }
+            if (old.getBoolean("Trident") || kept++ >= MAX_STUCK_ARROWS - 1) {
+                continue;
             }
             entries.add(0, old.copy());
         }
         entries.add(entry);
         data.put("Entries", entries);
         entityData.set(STUCK_PROJECTILES, data);
-        refreshTridentCount(entries);
         return true;
     }
 
@@ -897,125 +885,6 @@ public final class BlueWhaleEntity extends WaterAnimal {
         Vec3 right = new Vec3(-forward.z, 0.0D, forward.x);
         right = right.lengthSqr() < 1.0E-6D ? new Vec3(1.0D, 0.0D, 0.0D) : right.normalize();
         return new Vec3[]{right, right.cross(forward).normalize(), forward};
-    }
-
-    /**
-     * 由记录的归一化坐标还原插着的世界位置，与 recordStuckProjectile 互为逆运算。
-     */
-    private Vec3 stuckProjectilePosition(CompoundTag entry) {
-        BlueWhalePart part = bodyParts[Mth.clamp(entry.getByte("Part"), 0, bodyParts.length - 1)];
-        Vec3[] axes = bodyAxes();
-        double halfWidth = Math.max(0.001D, part.getBbWidth() * 0.5D);
-        double halfHeight = Math.max(0.001D, part.getBbHeight() * 0.5D);
-        return part.getBoundingBox().getCenter().add(axes[0].scale(entry.getFloat("X") * halfWidth)).add(axes[1].scale(entry.getFloat("Y") * halfHeight)).add(axes[2].scale(entry.getFloat("Z") * halfWidth));
-    }
-
-    private void refreshTridentCount(ListTag entries) {
-        int count = 0;
-        for (int i = 0; i < entries.size(); i++) {
-            if (entries.getCompound(i).getBoolean("Trident")) {
-                count++;
-            }
-        }
-        entityData.set(TRIDENT_COUNT, Math.min(MAX_STUCK_TRIDENTS, count));
-    }
-
-    private void dropStuckItem(CompoundTag entry) {
-        if (level().isClientSide || !entry.contains("Item", Tag.TAG_COMPOUND)) {
-            return;
-        }
-        ItemStack stack = ItemStack.of(entry.getCompound("Item"));
-        if (stack.isEmpty()) {
-            return;
-        }
-        Vec3 position = stuckProjectilePosition(entry);
-        ItemEntity item = new ItemEntity(level(), position.x, position.y, position.z, stack);
-        item.setDefaultPickUpDelay();
-        level().addFreshEntity(item);
-    }
-
-    /**
-     * 死亡时把插着的三叉戟原样归还世界。
-     */
-    private void dropStuckTridents() {
-        CompoundTag data = entityData.get(STUCK_PROJECTILES).copy();
-        ListTag entries = data.getList("Entries", Tag.TAG_COMPOUND);
-        ListTag remaining = new ListTag();
-        for (int i = 0; i < entries.size(); i++) {
-            CompoundTag entry = entries.getCompound(i);
-            if (entry.contains("Item", Tag.TAG_COMPOUND)) {
-                dropStuckItem(entry);
-            } else {
-                remaining.add(entry.copy());
-            }
-        }
-        data.put("Entries", remaining);
-        entityData.set(STUCK_PROJECTILES, data);
-        refreshTridentCount(remaining);
-    }
-
-    @Override
-    protected InteractionResult mobInteract(Player player, InteractionHand hand) {
-        if (hand == InteractionHand.MAIN_HAND && player.getItemInHand(hand).isEmpty()) {
-            InteractionResult result = pullStuckTrident(player);
-            if (result != InteractionResult.PASS) {
-                return result;
-            }
-        }
-        return super.mobInteract(player, hand);
-    }
-
-    /**
-     * 空手右键拔三叉戟：取视线最对准的一根，谁拔谁立刻被记恨。
-     */
-    private InteractionResult pullStuckTrident(Player player) {
-        CompoundTag data = entityData.get(STUCK_PROJECTILES).copy();
-        ListTag entries = data.getList("Entries", Tag.TAG_COMPOUND);
-        Vec3 eye = player.getEyePosition();
-        Vec3 look = player.getLookAngle();
-        int best = -1;
-        double bestScore = Double.MAX_VALUE;
-        for (int i = 0; i < entries.size(); i++) {
-            CompoundTag entry = entries.getCompound(i);
-            if (!entry.contains("Item", Tag.TAG_COMPOUND)) {
-                continue;
-            }
-            Vec3 offset = stuckProjectilePosition(entry).subtract(eye);
-            double distance = offset.length();
-            if (distance > PULL_REACH) {
-                continue;
-            }
-            // 视线越对准、距离越近越优先，避免在庞大的身体上拔错一根。
-            double aim = distance < 1.0E-4D ? 0.0D : 1.0D - offset.scale(1.0D / distance).dot(look);
-            double score = aim * 4.0D + distance;
-            if (score < bestScore) {
-                bestScore = score;
-                best = i;
-            }
-        }
-        if (best < 0) {
-            return InteractionResult.PASS;
-        }
-        if (level().isClientSide) {
-            return InteractionResult.SUCCESS;
-        }
-
-        CompoundTag entry = entries.getCompound(best);
-        ItemStack stack = ItemStack.of(entry.getCompound("Item"));
-        entries.remove(best);
-        data.put("Entries", entries);
-        entityData.set(STUCK_PROJECTILES, data);
-        refreshTridentCount(entries);
-
-        if (!stack.isEmpty() && !player.addItem(stack)) {
-            player.drop(stack, false);
-        }
-        playSound(SoundEvents.TRIDENT_RETURN, 1.2F, 0.85F + random.nextFloat() * 0.2F);
-        if (!player.isCreative() && !player.isSpectator()) {
-            setLastHurtByMob(player);
-            setTarget(player);
-        }
-        return InteractionResult.CONSUME;
     }
 
     private int getPartIndex(BlueWhalePart part) {
@@ -1047,54 +916,85 @@ public final class BlueWhaleEntity extends WaterAnimal {
     }
 
     @Override
-    protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHit) {
-        super.dropCustomDeathLoot(source, looting, recentlyHit);
-        dropStuckTridents();
-        scatterAlongBody(butcherDrops(looting));
-    }
-
-    /**
-     * 按配置切出战利品：默认鲸鱼肉，另一档是原版鳕鱼加骨粉。
-     */
-    private List<ItemStack> butcherDrops(int looting) {
-        int bonus = Math.max(0, looting);
-        List<ItemStack> drops = new ArrayList<>();
-        if (FmbCommonConfig.whaleDrop() == FmbCommonConfig.WhaleDrop.COD_AND_BONE_MEAL) {
-            int cod = 8 + random.nextInt(7) + bonus;
-            for (int i = 0; i < cod; i++) {
-                drops.add(new ItemStack(Items.COD));
-            }
-            int boneMeal = 4 + random.nextInt(5) + bonus;
-            for (int i = 0; i < boneMeal; i++) {
-                drops.add(new ItemStack(Items.BONE_MEAL));
-            }
-        } else {
-            int steak = 8 + random.nextInt(7) + bonus;
-            for (int i = 0; i < steak; i++) {
-                drops.add(new ItemStack(FishingMadeBetterForge.registeredItem("whale_steak")));
-            }
+    protected void dropFromLootTable(DamageSource source, boolean causedByPlayer) {
+        if (!FmbCommonConfig.whaleDropsEnabled()) {
+            return;
         }
-        return drops;
+
+        capturedWhaleLoot.clear();
+        capturingWhaleLoot = true;
+        try {
+            // Keep vanilla's complete entity LootContext and Forge loot modifiers. spawnAtLocation
+            // is intercepted only for this call so the resulting stacks can use the full body.
+            super.dropFromLootTable(source, causedByPlayer);
+        } finally {
+            capturingWhaleLoot = false;
+        }
+
+        if (!capturedWhaleLoot.isEmpty()) {
+            List<ItemStack> drops = new ArrayList<>(capturedWhaleLoot);
+            capturedWhaleLoot.clear();
+            scatterAlongBody(drops);
+        }
+    }
+
+    @Override
+    @Nullable
+    public ItemEntity spawnAtLocation(ItemStack stack, float yOffset) {
+        if (capturingWhaleLoot && !stack.isEmpty()) {
+            capturedWhaleLoot.add(stack.copy());
+            return null;
+        }
+        return super.spawnAtLocation(stack, yOffset);
     }
 
     /**
-     * 沿体轴一路铺开，而不是全堆在死亡点上：这么大一头鲸鱼，掉落也该有那个体量感。
+     * Spread death drops over the live multipart hitboxes so the whole curved body is used,
+     * including the fins and fluke, instead of concentrating everything near the entity origin.
      */
     private void scatterAlongBody(List<ItemStack> drops) {
-        int count = drops.size();
+        List<ItemStack> spreadDrops = new ArrayList<>();
+        for (ItemStack stack : drops) {
+            for (int i = 0; i < stack.getCount(); i++) {
+                ItemStack single = stack.copy();
+                single.setCount(1);
+                spreadDrops.add(single);
+            }
+        }
+
+        int count = spreadDrops.size();
         if (count <= 0) {
             return;
         }
-        Vec3 forward = Vec3.directionFromRotation(0.0F, yBodyRot).normalize();
-        Vec3 sideways = new Vec3(-forward.z, 0.0D, forward.x);
+
         for (int i = 0; i < count; i++) {
-            double along = count == 1 ? 0.0D : -3.4D + 6.8D * i / (count - 1.0D);
-            double side = ((i & 1) == 0 ? -0.45D : 0.45D) + (random.nextDouble() - 0.5D) * 0.2D;
-            Vec3 dropPosition = position().add(forward.scale(along)).add(sideways.scale(side)).add(0.0D, 0.6D + (i % 3) * 0.18D, 0.0D);
-            ItemEntity item = new ItemEntity(level(), dropPosition.x, dropPosition.y, dropPosition.z, drops.get(i));
+            // Five is coprime with the eight body parts, so consecutive stacks visit every part
+            // before repeating instead of clustering one item type at the head or tail.
+            int partIndex = count == 1 ? 1 : (i * 5) % bodyParts.length;
+            AABB box = bodyParts[partIndex].getBoundingBox();
+            double insetX = Math.min(0.35D, box.getXsize() * 0.20D);
+            double insetZ = Math.min(0.35D, box.getZsize() * 0.20D);
+            double dropX = Mth.lerp(random.nextDouble(), box.minX + insetX, box.maxX - insetX);
+            double dropY = box.maxY + 0.15D + random.nextDouble() * 0.35D;
+            double dropZ = Mth.lerp(random.nextDouble(), box.minZ + insetZ, box.maxZ - insetZ);
+            Vec3 dropPosition = new Vec3(dropX, dropY, dropZ);
+            ItemEntity item = new ItemEntity(level(), dropPosition.x, dropPosition.y, dropPosition.z, spreadDrops.get(i));
             item.setDefaultPickUpDelay();
-            item.setDeltaMovement(sideways.scale(side * 0.08D).add(0.0D, 0.12D, 0.0D));
-            level().addFreshEntity(item);
+
+            Vec3 outward = dropPosition.subtract(position()).multiply(1.0D, 0.0D, 1.0D);
+            if (outward.lengthSqr() < 1.0E-5D) {
+                outward = Vec3.directionFromRotation(0.0F, yBodyRot + 90.0F);
+            } else {
+                outward = outward.normalize();
+            }
+            double outwardSpeed = 0.08D + random.nextDouble() * 0.08D;
+            item.setDeltaMovement(outward.scale(outwardSpeed).add(0.0D, 0.14D + random.nextDouble() * 0.08D, 0.0D));
+            Collection<ItemEntity> capturedDrops = captureDrops();
+            if (capturedDrops != null) {
+                capturedDrops.add(item);
+            } else {
+                level().addFreshEntity(item);
+            }
         }
     }
 
@@ -1104,9 +1004,15 @@ public final class BlueWhaleEntity extends WaterAnimal {
         tag.putBoolean("Beached", isBeached());
         tag.putInt("BreatheCountdown", breatheCountdown);
         tag.putInt("Moistness", moistness);
-        tag.putInt("EmbeddedTridents", getTridentCount());
         tag.putInt("StunnedTicks", stunnedTicks);
         tag.put("StuckProjectiles", entityData.get(STUCK_PROJECTILES).copy());
+        if (!pendingLegacyTridents.isEmpty()) {
+            ListTag pending = new ListTag();
+            for (ItemStack stack : pendingLegacyTridents) {
+                pending.add(stack.save(new CompoundTag()));
+            }
+            tag.put("PendingLegacyTridents", pending);
+        }
     }
 
     @Override
@@ -1117,9 +1023,38 @@ public final class BlueWhaleEntity extends WaterAnimal {
         moistness = tag.contains("Moistness") ? tag.getInt("Moistness") : TOTAL_MOISTNESS;
         stunnedTicks = Math.max(0, tag.getInt("StunnedTicks"));
         setStunned(stunnedTicks > 0);
-        entityData.set(STUCK_PROJECTILES, tag.contains("StuckProjectiles", Tag.TAG_COMPOUND) ? tag.getCompound("StuckProjectiles").copy() : new CompoundTag());
-        // 数量以条目为准，避免存档里的计数与实际插着的投射物对不上。
-        refreshTridentCount(getStuckProjectileData());
+
+        pendingLegacyTridents.clear();
+        CompoundTag projectileData = tag.contains("StuckProjectiles", Tag.TAG_COMPOUND)
+                ? tag.getCompound("StuckProjectiles").copy()
+                : new CompoundTag();
+        ListTag savedEntries = projectileData.getList("Entries", Tag.TAG_COMPOUND);
+        ListTag arrows = new ListTag();
+        for (int i = 0; i < savedEntries.size(); i++) {
+            CompoundTag entry = savedEntries.getCompound(i);
+            if (entry.getBoolean("Trident")) {
+                if (!level().isClientSide && entry.contains("Item", Tag.TAG_COMPOUND)) {
+                    ItemStack stack = ItemStack.of(entry.getCompound("Item"));
+                    if (!stack.isEmpty()) {
+                        pendingLegacyTridents.add(stack);
+                    }
+                }
+            } else {
+                arrows.add(entry.copy());
+            }
+        }
+        projectileData.put("Entries", arrows);
+        entityData.set(STUCK_PROJECTILES, projectileData);
+
+        if (!level().isClientSide && tag.contains("PendingLegacyTridents", Tag.TAG_LIST)) {
+            ListTag pending = tag.getList("PendingLegacyTridents", Tag.TAG_COMPOUND);
+            for (int i = 0; i < pending.size(); i++) {
+                ItemStack stack = ItemStack.of(pending.getCompound(i));
+                if (!stack.isEmpty()) {
+                    pendingLegacyTridents.add(stack);
+                }
+            }
+        }
     }
 
     @Override
@@ -1171,7 +1106,16 @@ public final class BlueWhaleEntity extends WaterAnimal {
 
     @Override
     public boolean checkSpawnObstruction(LevelReader level) {
-        return level.isUnobstructed(this);
+        refreshBodyPartsForSpawn();
+        if (!level.isUnobstructed(this)) {
+            return false;
+        }
+        for (BlueWhalePart part : bodyParts) {
+            if (!level.isUnobstructed(part)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -1213,7 +1157,7 @@ public final class BlueWhaleEntity extends WaterAnimal {
 
     private final class SurfaceToBreatheGoal extends Goal {
         private static final int MAX_DESCENT_TICKS = 100;
-        private static final double DESCENT_DEPTH_BELOW_SURFACE = 3.0D;
+        private static final double DESCENT_DEPTH_BELOW_SURFACE = 6.0D;
         private BlockPos surfaceAir;
         private boolean blowStarted;
         private boolean descending;
@@ -1475,12 +1419,21 @@ public final class BlueWhaleEntity extends WaterAnimal {
                 while (cursor.getY() > level().getMinBuildHeight() + 2 && level().getFluidState(cursor.below()).is(FluidTags.WATER)) {
                     cursor.move(0, -1, 0);
                 }
-                BlockPos target = cursor.above(2 + random.nextInt(3)).immutable();
-                if (level().getFluidState(target).is(FluidTags.WATER) && level().getFluidState(target.above()).is(FluidTags.WATER)) {
+                BlockPos target = cursor.above(4 + random.nextInt(5)).immutable();
+                if (hasVerticalWaterClearance(target)) {
                     return target;
                 }
             }
             return null;
+        }
+
+        private boolean hasVerticalWaterClearance(BlockPos bottom) {
+            for (int y = 0; y <= 8; y++) {
+                if (!level().getFluidState(bottom.above(y)).is(FluidTags.WATER)) {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 
@@ -1588,7 +1541,11 @@ public final class BlueWhaleEntity extends WaterAnimal {
                         phase = DONE;
                         return;
                     }
-                    target.push(driveDirection.x * 2.2D, 0.45D, driveDirection.z * 2.2D);
+                    target.push(
+                            driveDirection.x * RAM_KNOCKBACK_HORIZONTAL,
+                            RAM_KNOCKBACK_VERTICAL,
+                            driveDirection.z * RAM_KNOCKBACK_HORIZONTAL
+                    );
                     beginRecovery();
                 } else if (--phaseTicks <= 0) {
                     beginRecovery();
