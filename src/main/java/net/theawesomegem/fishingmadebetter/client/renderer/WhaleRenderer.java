@@ -6,20 +6,18 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.theawesomegem.fishingmadebetter.Constants;
-import net.theawesomegem.fishingmadebetter.client.model.BlueWhaleModel;
-import net.theawesomegem.fishingmadebetter.client.renderer.layer.BlueWhaleStuckProjectileLayer;
-import net.theawesomegem.fishingmadebetter.common.entity.BlueWhaleEntity;
+import net.theawesomegem.fishingmadebetter.client.model.WhaleModel;
+import net.theawesomegem.fishingmadebetter.common.entity.WhaleEntity;
 
-public final class BlueWhaleRenderer extends MobRenderer<BlueWhaleEntity, BlueWhaleModel> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/entity/blue_whale.png");
+public final class WhaleRenderer extends MobRenderer<WhaleEntity, WhaleModel> {
+    private static final ResourceLocation TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/entity/whale.png");
 
-    public BlueWhaleRenderer(EntityRendererProvider.Context context) {
-        super(context, new BlueWhaleModel(context.bakeLayer(BlueWhaleModel.LAYER_LOCATION)), 8.0F);
-        addLayer(new BlueWhaleStuckProjectileLayer(context, this));
+    public WhaleRenderer(EntityRendererProvider.Context context) {
+        super(context, new WhaleModel(context.bakeLayer(WhaleModel.LAYER_LOCATION)), 8.0F);
     }
 
     @Override
-    protected void setupRotations(BlueWhaleEntity whale, PoseStack poseStack, float ageInTicks,
+    protected void setupRotations(WhaleEntity whale, PoseStack poseStack, float ageInTicks,
                                   float rotationYaw, float partialTick) {
         super.setupRotations(whale, poseStack, ageInTicks, rotationYaw, partialTick);
         if (!whale.isBeached()) {
@@ -32,7 +30,7 @@ public final class BlueWhaleRenderer extends MobRenderer<BlueWhaleEntity, BlueWh
     }
 
     @Override
-    public ResourceLocation getTextureLocation(BlueWhaleEntity whale) {
+    public ResourceLocation getTextureLocation(WhaleEntity whale) {
         return TEXTURE;
     }
 }

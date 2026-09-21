@@ -59,7 +59,7 @@ public final class ModItems {
             item("whale_steak"),
             item("whale_steak_cooked"),
             item("whale_burger"),
-            item("blue_whale_spawn_egg")
+            item("whale_spawn_egg")
     );
 
     private ModItems() {
@@ -126,8 +126,8 @@ public final class ModItems {
                     new Item(new Item.Properties().food(new FoodProperties.Builder().nutrition(10).saturationMod(0.8F).meat().build()));
             case "whale_burger" ->
                     new Item(new Item.Properties().food(new FoodProperties.Builder().nutrition(20).saturationMod(0.8F).meat().build()));
-            case "blue_whale_spawn_egg" -> new ForgeSpawnEggItem(
-                    ModEntities.BLUE_WHALE,
+            case "whale_spawn_egg" -> new ForgeSpawnEggItem(
+                    ModEntities.WHALE,
                     0x536C8C,
                     0xB8C7D9,
                     new Item.Properties()

@@ -31,8 +31,8 @@
   "item.fishingmadebetter.whale_steak": "Whale Slice",
   "item.fishingmadebetter.whale_steak_cooked": "Whale Steak",
   "item.fishingmadebetter.whale_burger": "Whale Burger",
-  "item.fishingmadebetter.blue_whale_spawn_egg": "Blue Whale Spawn Egg",
-  "entity.fishingmadebetter.blue_whale": "Blue Whale",
+  "item.fishingmadebetter.whale_spawn_egg": "Whale Spawn Egg",
+  "entity.fishingmadebetter.whale": "Whale",
   "item.fishingmadebetter.reel_basic": "Basic Reel",
   "item.fishingmadebetter.reel_fast": "Fast Reel",
   "item.fishingmadebetter.reel_long": "Long-Cast Reel",
@@ -189,10 +189,10 @@
   "jei.fishingmadebetter.biometype.END": "The End",
   "jei.fishingmadebetter.biometype.UNKNOWN": "Unknown",
   "config.fishingmadebetter.category.server": "Server",
-  "config.fishingmadebetter.whale_breaks_blocks": "Blue Whale Breaks Blocks",
-  "config.fishingmadebetter.whale_breaks_blocks.description": "Whether a charging blue whale can smash blocks softer than obsidian. mobGriefing and protection hooks are still respected.",
-  "config.fishingmadebetter.whale_drops_enabled": "Blue Whale Loot",
-  "config.fishingmadebetter.whale_drops_enabled.description": "Whether slain blue whales roll their entity loot table. Dropped items and quantities are controlled by the loot table.",
-  "config.fishingmadebetter.whale_spawn_chance": "Blue Whale Spawn Chance",
-  "config.fishingmadebetter.whale_spawn_chance.description": "Chance for a qualifying submerged cold-ocean shipwreck to spawn a blue whale (0-100%)."
+  "config.fishingmadebetter.whale_breaks_blocks": "Whale Breaks Blocks",
+  "config.fishingmadebetter.whale_breaks_blocks.description": "Whether a charging whale can smash blocks softer than obsidian. mobGriefing and protection hooks are still respected.",
+  "config.fishingmadebetter.whale_drops_enabled": "Whale Loot",
+  "config.fishingmadebetter.whale_drops_enabled.description": "Whether slain whales roll their entity loot table. Dropped items and quantities are controlled by the loot table.",
+  "config.fishingmadebetter.whale_spawn_chance": "Whale Spawn Chance",
+  "config.fishingmadebetter.whale_spawn_chance.description": "Chance for a qualifying submerged cold-ocean shipwreck to spawn a whale (0-100%)."
 }

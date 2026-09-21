@@ -28,17 +28,17 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.level.ChunkEvent;
 import net.theawesomegem.fishingmadebetter.Constants;
 import net.theawesomegem.fishingmadebetter.common.config.FmbCommonConfig;
-import net.theawesomegem.fishingmadebetter.common.entity.BlueWhaleEntity;
+import net.theawesomegem.fishingmadebetter.common.entity.WhaleEntity;
 import net.theawesomegem.fishingmadebetter.registry.ModEntities;
 
 import java.util.*;
 
-public final class BlueWhaleShipwreckSpawner {
+public final class WhaleShipwreckSpawner {
     private static final ResourceLocation SHIPWRECK_ID = new ResourceLocation("minecraft", "shipwreck");
     private static final Map<ServerLevel, Queue<Long>> PENDING = Collections.synchronizedMap(new WeakHashMap<>());
     private static final Map<ServerLevel, Set<Long>> QUEUED = Collections.synchronizedMap(new WeakHashMap<>());
 
-    private BlueWhaleShipwreckSpawner() {
+    private WhaleShipwreckSpawner() {
     }
 
     public static void onChunkLoad(ChunkEvent.Load event) {
@@ -94,7 +94,7 @@ public final class BlueWhaleShipwreckSpawner {
         }
 
         long startChunk = start.getChunkPos().toLong();
-        BlueWhaleShipwreckSavedData savedData = BlueWhaleShipwreckSavedData.get(level);
+        WhaleShipwreckSavedData savedData = WhaleShipwreckSavedData.get(level);
         if (savedData.hasChecked(startChunk)) {
             return;
         }
@@ -117,14 +117,14 @@ public final class BlueWhaleShipwreckSpawner {
             return;
         }
 
-        BlueWhaleEntity whale = ModEntities.BLUE_WHALE.get().create(level);
+        WhaleEntity whale = ModEntities.WHALE.get().create(level);
         if (whale == null) {
             return;
         }
         float spawnYaw = structureRandom.nextFloat() * 360.0F;
         Vec3 spawnPosition = findSpawnPosition(level, box, whale, structureRandom, spawnYaw);
         if (spawnPosition == null) {
-            Constants.LOG.debug("A blue whale passed its shipwreck roll at {}, but the wreck had no safe water volume", box.getCenter());
+            Constants.LOG.debug("A whale passed its shipwreck roll at {}, but the wreck had no safe water volume", box.getCenter());
             return;
         }
 
@@ -252,7 +252,7 @@ public final class BlueWhaleShipwreckSpawner {
         return true;
     }
 
-    private static Vec3 findSpawnPosition(ServerLevel level, BoundingBox box, BlueWhaleEntity whale, RandomSource random, float yaw) {
+    private static Vec3 findSpawnPosition(ServerLevel level, BoundingBox box, WhaleEntity whale, RandomSource random, float yaw) {
         BlockPos center = box.getCenter();
 
         // The shipwreck is only the spawn anchor.  Do not try to place the whale on top of it.

@@ -13,34 +13,34 @@
       "fishingmadebetter:fishsplashing"
     ]
   },
-  "entity.blue_whale.ambient": {
+  "entity.whale.ambient": {
     "sounds": [
       {
-        "name": "fishingmadebetter:entity/blue_whale/ambient",
+        "name": "fishingmadebetter:entity/whale/ambient",
         "attenuation_distance": 64
       }
     ]
   },
-  "entity.blue_whale.angry": {
+  "entity.whale.angry": {
     "sounds": [
       {
-        "name": "fishingmadebetter:entity/blue_whale/angry",
+        "name": "fishingmadebetter:entity/whale/angry",
         "attenuation_distance": 72
       }
     ]
   },
-  "entity.blue_whale.hurt": {
+  "entity.whale.hurt": {
     "sounds": [
       {
-        "name": "fishingmadebetter:entity/blue_whale/hurt",
+        "name": "fishingmadebetter:entity/whale/hurt",
         "attenuation_distance": 64
       }
     ]
   },
-  "entity.blue_whale.death": {
+  "entity.whale.death": {
     "sounds": [
       {
-        "name": "fishingmadebetter:entity/blue_whale/death",
+        "name": "fishingmadebetter:entity/whale/death",
         "attenuation_distance": 80
       }
     ]

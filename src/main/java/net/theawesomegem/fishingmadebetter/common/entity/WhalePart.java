@@ -17,10 +17,10 @@ import net.minecraftforge.entity.PartEntity;
 
 import javax.annotation.Nullable;
 
-public final class BlueWhalePart extends PartEntity<BlueWhaleEntity> {
+public final class WhalePart extends PartEntity<WhaleEntity> {
     private final EntityDimensions dimensions;
 
-    public BlueWhalePart(BlueWhaleEntity parent, float width, float height) {
+    public WhalePart(WhaleEntity parent, float width, float height) {
         super(parent);
         this.dimensions = EntityDimensions.scalable(width, height);
         refreshDimensions();

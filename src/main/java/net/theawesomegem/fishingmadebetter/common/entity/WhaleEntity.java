@@ -3,8 +3,6 @@ package net.theawesomegem.fishingmadebetter.common.entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -28,8 +26,6 @@ import net.minecraft.world.entity.ai.navigation.WaterBoundPathNavigation;
 import net.minecraft.world.entity.animal.WaterAnimal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -46,14 +42,13 @@ import net.theawesomegem.fishingmadebetter.registry.ModSounds;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public final class BlueWhaleEntity extends WaterAnimal {
+public final class WhaleEntity extends WaterAnimal {
     public static final int ACTION_IDLE = 0;
     public static final int ACTION_BLOW = 1;
     public static final int ACTION_RAM = 2;
-    private static final EntityDataAccessor<Integer> ACTION = SynchedEntityData.defineId(BlueWhaleEntity.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Boolean> BEACHED = SynchedEntityData.defineId(BlueWhaleEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<CompoundTag> STUCK_PROJECTILES = SynchedEntityData.defineId(BlueWhaleEntity.class, EntityDataSerializers.COMPOUND_TAG);
-    private static final EntityDataAccessor<Boolean> STUNNED = SynchedEntityData.defineId(BlueWhaleEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> ACTION = SynchedEntityData.defineId(WhaleEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> BEACHED = SynchedEntityData.defineId(WhaleEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> STUNNED = SynchedEntityData.defineId(WhaleEntity.class, EntityDataSerializers.BOOLEAN);
     private static final int BLOW_DURATION = 32;
     private static final int RAM_DURATION = 24;
     private static final double RAM_KNOCKBACK_HORIZONTAL = 4.40D;
@@ -72,29 +67,29 @@ public final class BlueWhaleEntity extends WaterAnimal {
     private static final float YAW_LAG_PER_BLOCK = 1.1F;
     private static final double SPINE_STEP = 0.5D;
     // Model-space longitudinal centers (blocks). Positive is toward the head.
-    // These cover the supplied 1024-space Blockbench model from the snout through the fluke.
-    private static final double[] PART_OFFSETS = {3.70D, -1.88D, -7.12D, -11.50D, -16.20D, -21.60D};
+    // These cover the actual 512x512 large Blockbench model from the snout through the fluke.
+    private static final double[] PART_OFFSETS = {1.85D, -0.94D, -3.56D, -5.75D, -8.10D, -10.80D};
     // Vertical center of each multipart relative to the main body's center. These values come
     // directly from the large Blockbench model's neutral-pose cube bounds after moving Controller
     // from Y=24 to Y=0. Keeping centers instead of common bottom offsets lets the boxes follow
     // pitch without floating above the mesh.
-    private static final double[] PART_CENTER_UP_OFFSETS = {0.26D, 0.0D, 0.0D, 0.26D, 1.62D, 2.12D};
-    private static final double BODY_CENTER_HEIGHT = 3.75D;
+    private static final double[] PART_CENTER_UP_OFFSETS = {0.13D, 0.0D, 0.0D, 0.13D, 0.81D, 1.06D};
+    private static final double BODY_CENTER_HEIGHT = 1.875D;
     private static final int SPINE_PART_COUNT = 6;
-    private static final double FIN_LONGITUDINAL_OFFSET = -4.46D;
-    private static final double LEFT_FIN_LATERAL_OFFSET = -6.25D;
-    private static final double RIGHT_FIN_LATERAL_OFFSET = 5.75D;
-    private static final double FIN_CENTER_UP_OFFSET = 0.50D;
+    private static final double FIN_LONGITUDINAL_OFFSET = -2.23D;
+    private static final double LEFT_FIN_LATERAL_OFFSET = -3.125D;
+    private static final double RIGHT_FIN_LATERAL_OFFSET = 2.875D;
+    private static final double FIN_CENTER_UP_OFFSET = 0.25D;
 
-    public final BlueWhalePart headPart;
-    public final BlueWhalePart frontBodyPart;
-    public final BlueWhalePart rearBodyPart;
-    public final BlueWhalePart firstTailPart;
-    public final BlueWhalePart secondTailPart;
-    public final BlueWhalePart tailFinPart;
-    public final BlueWhalePart leftFinPart;
-    public final BlueWhalePart rightFinPart;
-    private final BlueWhalePart[] bodyParts;
+    public final WhalePart headPart;
+    public final WhalePart frontBodyPart;
+    public final WhalePart rearBodyPart;
+    public final WhalePart firstTailPart;
+    public final WhalePart secondTailPart;
+    public final WhalePart tailFinPart;
+    public final WhalePart leftFinPart;
+    public final WhalePart rightFinPart;
+    private final WhalePart[] bodyParts;
     private int actionTick;
     private int lastAction = ACTION_IDLE;
     private int breatheCountdown;
@@ -110,7 +105,6 @@ public final class BlueWhaleEntity extends WaterAnimal {
     private float yawVelocity;
     private final float[] yawHistory = new float[YAW_HISTORY_SIZE];
     private int yawHistoryIndex = -1;
-    private final List<ItemStack> pendingLegacyTridents = new ArrayList<>();
     private final List<ItemStack> capturedWhaleLoot = new ArrayList<>();
     private boolean capturingWhaleLoot;
 
@@ -120,23 +114,23 @@ public final class BlueWhaleEntity extends WaterAnimal {
     public final AnimationState blowAnimationState = new AnimationState();
 
     @Nullable
-    private BlueWhalePart damagePartContext;
+    private WhalePart damagePartContext;
 
-    public BlueWhaleEntity(EntityType<? extends BlueWhaleEntity> type, Level level) {
+    public WhaleEntity(EntityType<? extends WhaleEntity> type, Level level) {
         super(type, level);
         moveControl = new SmoothSwimmingMoveControl(this, 18, 10, 0.02F, 0.08F, false);
         lookControl = new SmoothSwimmingLookControl(this, 6);
         noCulling = true;
-        headPart = new BlueWhalePart(this, 8.50F, 8.90F);
-        frontBodyPart = new BlueWhalePart(this, 7.20F, 7.50F);
-        rearBodyPart = new BlueWhalePart(this, 5.60F, 7.00F);
-        firstTailPart = new BlueWhalePart(this, 4.60F, 5.60F);
-        secondTailPart = new BlueWhalePart(this, 3.10F, 2.80F);
-        tailFinPart = new BlueWhalePart(this, 7.10F, 1.80F);
-        // The doubled model's pectoral fins extend about five blocks from their local center.
-        leftFinPart = new BlueWhalePart(this, 5.10F, 1.00F);
-        rightFinPart = new BlueWhalePart(this, 5.10F, 1.00F);
-        bodyParts = new BlueWhalePart[]{headPart, frontBodyPart, rearBodyPart, firstTailPart, secondTailPart, tailFinPart, leftFinPart, rightFinPart};
+        headPart = new WhalePart(this, 4.25F, 4.45F);
+        frontBodyPart = new WhalePart(this, 3.60F, 3.75F);
+        rearBodyPart = new WhalePart(this, 2.80F, 3.50F);
+        firstTailPart = new WhalePart(this, 2.30F, 2.80F);
+        secondTailPart = new WhalePart(this, 1.55F, 1.40F);
+        tailFinPart = new WhalePart(this, 3.55F, 0.90F);
+        // The large model's pectoral fins extend about 2.5 blocks from their local center.
+        leftFinPart = new WhalePart(this, 2.55F, 0.50F);
+        rightFinPart = new WhalePart(this, 2.55F, 0.50F);
+        bodyParts = new WhalePart[]{headPart, frontBodyPart, rearBodyPart, firstTailPart, secondTailPart, tailFinPart, leftFinPart, rightFinPart};
         breatheCountdown = random.nextInt(900, 1801);
     }
 
@@ -149,7 +143,6 @@ public final class BlueWhaleEntity extends WaterAnimal {
         super.defineSynchedData();
         entityData.define(ACTION, ACTION_IDLE);
         entityData.define(BEACHED, false);
-        entityData.define(STUCK_PROJECTILES, new CompoundTag());
         entityData.define(STUNNED, false);
     }
 
@@ -182,7 +175,7 @@ public final class BlueWhaleEntity extends WaterAnimal {
     }
 
     @Override
-    public BlueWhalePart[] getParts() {
+    public WhalePart[] getParts() {
         return bodyParts;
     }
 
@@ -199,14 +192,6 @@ public final class BlueWhaleEntity extends WaterAnimal {
         pushEntitiesFromParts();
 
         if (!level().isClientSide) {
-            if (!pendingLegacyTridents.isEmpty()) {
-                // Old releases stored real trident stacks inside the whale. Return them once after
-                // loading instead of silently deleting player equipment when the sticking feature
-                // is removed.
-                List<ItemStack> legacyDrops = new ArrayList<>(pendingLegacyTridents);
-                pendingLegacyTridents.clear();
-                scatterAlongBody(legacyDrops);
-            }
             updateMoistness();
             if (!surfacing && getTarget() == null && !isBeached() && breatheCountdown > 0) {
                 // Leave the timer at 0 until SurfaceToBreatheGoal gets a chance to start on the
@@ -330,7 +315,7 @@ public final class BlueWhaleEntity extends WaterAnimal {
             setXRot(0.0F);
             setDeltaMovement(getDeltaMovement().multiply(0.45D, 1.0D, 0.45D));
             if (!level().isClientSide && tickCount % 140 == 0) {
-                playSound(ModSounds.BLUE_WHALE_AMBIENT.get(), 1.1F, 0.72F);
+                playSound(ModSounds.WHALE_AMBIENT.get(), 1.1F, 0.72F);
             }
         } else {
             beachedProgress = Math.max(0.0F, beachedProgress - 1.0F);
@@ -377,7 +362,7 @@ public final class BlueWhaleEntity extends WaterAnimal {
         positionFinPart(leftFinPart, LEFT_FIN_LATERAL_OFFSET);
         positionFinPart(rightFinPart, RIGHT_FIN_LATERAL_OFFSET);
         for (int i = 0; i < bodyParts.length; i++) {
-            BlueWhalePart part = bodyParts[i];
+            WhalePart part = bodyParts[i];
             Vec3 previous = bodyPartsInitialized ? previousPositions[i] : part.position();
             part.xo = previous.x;
             part.yo = previous.y;
@@ -394,13 +379,13 @@ public final class BlueWhaleEntity extends WaterAnimal {
         updateBodyParts();
     }
 
-    private void positionPart(BlueWhalePart part, double distance, double centerUpOffset) {
+    private void positionPart(WhalePart part, double distance, double centerUpOffset) {
         Vec3[] axes = bodyAxes();
         Vec3 center = spinePoint(distance).add(axes[1].scale(centerUpOffset));
         part.setPos(center.x, center.y - part.getBbHeight() * 0.5D, center.z);
     }
 
-    private void positionFinPart(BlueWhalePart part, double lateralOffset) {
+    private void positionFinPart(WhalePart part, double lateralOffset) {
         Vec3[] axes = bodyAxes();
         Vec3 center = spinePoint(FIN_LONGITUDINAL_OFFSET)
                 .add(axes[0].scale(lateralOffset))
@@ -730,8 +715,8 @@ public final class BlueWhaleEntity extends WaterAnimal {
     }
 
     private void pushEntitiesFromParts() {
-        for (BlueWhalePart part : bodyParts) {
-            for (Entity entity : level().getEntities(part, part.getBoundingBox().inflate(0.1D), candidate -> candidate.isPushable() && candidate != this && !(candidate instanceof BlueWhalePart))) {
+        for (WhalePart part : bodyParts) {
+            for (Entity entity : level().getEntities(part, part.getBoundingBox().inflate(0.1D), candidate -> candidate.isPushable() && candidate != this && !(candidate instanceof WhalePart))) {
                 entity.push(this);
             }
         }
@@ -800,12 +785,8 @@ public final class BlueWhaleEntity extends WaterAnimal {
         return Mth.lerp(partialTick, previousBeachedProgress, beachedProgress) / 10.0F;
     }
 
-    public ListTag getStuckProjectileData() {
-        return entityData.get(STUCK_PROJECTILES).getList("Entries", Tag.TAG_COMPOUND);
-    }
-
-    boolean hurtFromPart(BlueWhalePart part, DamageSource source, float amount) {
-        BlueWhalePart previous = damagePartContext;
+    boolean hurtFromPart(WhalePart part, DamageSource source, float amount) {
+        WhalePart previous = damagePartContext;
         damagePartContext = part;
         try {
             return hurt(source, amount);
@@ -816,65 +797,14 @@ public final class BlueWhaleEntity extends WaterAnimal {
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (source.getEntity() == this || source.getEntity() instanceof BlueWhalePart) {
+        if (source.getEntity() == this || source.getEntity() instanceof WhalePart) {
             return false;
         }
         boolean hurt = super.hurt(source, amount);
-        if (!level().isClientSide && isAlive() && source.getDirectEntity() instanceof AbstractArrow arrow && !(arrow instanceof ThrownTrident)) {
-            recordStuckArrow(arrow, damagePartContext);
-        }
         if (hurt && !level().isClientSide && source.getEntity() instanceof LivingEntity attacker && !(attacker instanceof Player player && (player.isCreative() || player.isSpectator()))) {
             setTarget(attacker);
         }
         return hurt;
-    }
-
-    private boolean recordStuckArrow(AbstractArrow projectile, @Nullable BlueWhalePart hitPart) {
-        BlueWhalePart part = hitPart != null ? hitPart : findClosestBodyPart(projectile.position());
-        if (part == null) {
-            return false;
-        }
-
-        Vec3 velocity = projectile.getDeltaMovement();
-        Vec3 from = projectile.position().subtract(velocity);
-        Vec3 to = projectile.position().add(velocity);
-        AABB hitBox = part.getBoundingBox().inflate(0.05D);
-        Optional<Vec3> clipped = hitBox.clip(from, to);
-        Vec3 hit = clipped.orElseGet(() -> closestPoint(hitBox, projectile.position()));
-
-        Vec3[] axes = bodyAxes();
-        Vec3 right = axes[0];
-        Vec3 up = axes[1];
-        Vec3 forward = axes[2];
-        Vec3 center = part.getBoundingBox().getCenter();
-        Vec3 offset = hit.subtract(center);
-        double halfWidth = Math.max(0.001D, part.getBbWidth() * 0.5D);
-        double halfHeight = Math.max(0.001D, part.getBbHeight() * 0.5D);
-
-        Vec3 direction = velocity.lengthSqr() > 1.0E-6D ? velocity.normalize() : forward.scale(-1.0D);
-        CompoundTag entry = new CompoundTag();
-        entry.putByte("Part", (byte) getPartIndex(part));
-        entry.putFloat("X", (float) Mth.clamp(offset.dot(right) / halfWidth, -1.0D, 1.0D));
-        entry.putFloat("Y", (float) Mth.clamp(offset.dot(up) / halfHeight, -1.0D, 1.0D));
-        entry.putFloat("Z", (float) Mth.clamp(offset.dot(forward) / halfWidth, -1.0D, 1.0D));
-        entry.putFloat("DX", (float) direction.dot(right));
-        entry.putFloat("DY", (float) direction.dot(up));
-        entry.putFloat("DZ", (float) direction.dot(forward));
-        CompoundTag data = entityData.get(STUCK_PROJECTILES).copy();
-        ListTag oldEntries = data.getList("Entries", Tag.TAG_COMPOUND);
-        ListTag entries = new ListTag();
-        int kept = 0;
-        for (int i = oldEntries.size() - 1; i >= 0; i--) {
-            CompoundTag old = oldEntries.getCompound(i);
-            if (old.getBoolean("Trident") || kept++ >= MAX_STUCK_ARROWS - 1) {
-                continue;
-            }
-            entries.add(0, old.copy());
-        }
-        entries.add(entry);
-        data.put("Entries", entries);
-        entityData.set(STUCK_PROJECTILES, data);
-        return true;
     }
 
     /**
@@ -887,7 +817,7 @@ public final class BlueWhaleEntity extends WaterAnimal {
         return new Vec3[]{right, right.cross(forward).normalize(), forward};
     }
 
-    private int getPartIndex(BlueWhalePart part) {
+    private int getPartIndex(WhalePart part) {
         for (int i = 0; i < bodyParts.length; i++) {
             if (bodyParts[i] == part) {
                 return i;
@@ -897,10 +827,10 @@ public final class BlueWhaleEntity extends WaterAnimal {
     }
 
     @Nullable
-    private BlueWhalePart findClosestBodyPart(Vec3 point) {
-        BlueWhalePart closest = null;
+    private WhalePart findClosestBodyPart(Vec3 point) {
+        WhalePart closest = null;
         double bestDistance = Double.MAX_VALUE;
-        for (BlueWhalePart part : bodyParts) {
+        for (WhalePart part : bodyParts) {
             Vec3 nearest = closestPoint(part.getBoundingBox(), point);
             double distance = nearest.distanceToSqr(point);
             if (distance < bestDistance) {
@@ -1005,14 +935,6 @@ public final class BlueWhaleEntity extends WaterAnimal {
         tag.putInt("BreatheCountdown", breatheCountdown);
         tag.putInt("Moistness", moistness);
         tag.putInt("StunnedTicks", stunnedTicks);
-        tag.put("StuckProjectiles", entityData.get(STUCK_PROJECTILES).copy());
-        if (!pendingLegacyTridents.isEmpty()) {
-            ListTag pending = new ListTag();
-            for (ItemStack stack : pendingLegacyTridents) {
-                pending.add(stack.save(new CompoundTag()));
-            }
-            tag.put("PendingLegacyTridents", pending);
-        }
     }
 
     @Override
@@ -1023,38 +945,6 @@ public final class BlueWhaleEntity extends WaterAnimal {
         moistness = tag.contains("Moistness") ? tag.getInt("Moistness") : TOTAL_MOISTNESS;
         stunnedTicks = Math.max(0, tag.getInt("StunnedTicks"));
         setStunned(stunnedTicks > 0);
-
-        pendingLegacyTridents.clear();
-        CompoundTag projectileData = tag.contains("StuckProjectiles", Tag.TAG_COMPOUND)
-                ? tag.getCompound("StuckProjectiles").copy()
-                : new CompoundTag();
-        ListTag savedEntries = projectileData.getList("Entries", Tag.TAG_COMPOUND);
-        ListTag arrows = new ListTag();
-        for (int i = 0; i < savedEntries.size(); i++) {
-            CompoundTag entry = savedEntries.getCompound(i);
-            if (entry.getBoolean("Trident")) {
-                if (!level().isClientSide && entry.contains("Item", Tag.TAG_COMPOUND)) {
-                    ItemStack stack = ItemStack.of(entry.getCompound("Item"));
-                    if (!stack.isEmpty()) {
-                        pendingLegacyTridents.add(stack);
-                    }
-                }
-            } else {
-                arrows.add(entry.copy());
-            }
-        }
-        projectileData.put("Entries", arrows);
-        entityData.set(STUCK_PROJECTILES, projectileData);
-
-        if (!level().isClientSide && tag.contains("PendingLegacyTridents", Tag.TAG_LIST)) {
-            ListTag pending = tag.getList("PendingLegacyTridents", Tag.TAG_COMPOUND);
-            for (int i = 0; i < pending.size(); i++) {
-                ItemStack stack = ItemStack.of(pending.getCompound(i));
-                if (!stack.isEmpty()) {
-                    pendingLegacyTridents.add(stack);
-                }
-            }
-        }
     }
 
     @Override
@@ -1110,7 +1000,7 @@ public final class BlueWhaleEntity extends WaterAnimal {
         if (!level.isUnobstructed(this)) {
             return false;
         }
-        for (BlueWhalePart part : bodyParts) {
+        for (WhalePart part : bodyParts) {
             if (!level.isUnobstructed(part)) {
                 return false;
             }
@@ -1142,17 +1032,17 @@ public final class BlueWhaleEntity extends WaterAnimal {
     @Nullable
     @Override
     protected SoundEvent getAmbientSound() {
-        return ModSounds.BLUE_WHALE_AMBIENT.get();
+        return ModSounds.WHALE_AMBIENT.get();
     }
 
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
-        return ModSounds.BLUE_WHALE_HURT.get();
+        return ModSounds.WHALE_HURT.get();
     }
 
     @Override
     protected SoundEvent getDeathSound() {
-        return ModSounds.BLUE_WHALE_DEATH.get();
+        return ModSounds.WHALE_DEATH.get();
     }
 
     private final class SurfaceToBreatheGoal extends Goal {
@@ -1465,7 +1355,7 @@ public final class BlueWhaleEntity extends WaterAnimal {
         @Override
         public void start() {
             secondRam = false;
-            playSound(ModSounds.BLUE_WHALE_ANGRY.get(), 1.8F, 1.0F);
+            playSound(ModSounds.WHALE_ANGRY.get(), 1.8F, 1.0F);
             beginWindup(12);
         }
 
@@ -1526,7 +1416,7 @@ public final class BlueWhaleEntity extends WaterAnimal {
                 setDeltaMovement(getDeltaMovement().scale(0.68D).add(driveDirection.scale(0.22D)));
 
                 if (headPart.getBoundingBox().inflate(0.7D).intersects(target.getBoundingBox())) {
-                    DamageSource ramSource = damageSources().mobAttack(BlueWhaleEntity.this);
+                    DamageSource ramSource = damageSources().mobAttack(WhaleEntity.this);
                     boolean blockedByShield = target.isDamageSourceBlocked(ramSource);
                     Item blockingItem = blockedByShield ? target.getUseItem().getItem() : null;
                     Vec3 incomingMovement = getDeltaMovement();

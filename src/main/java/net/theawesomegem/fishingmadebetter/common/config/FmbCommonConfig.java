@@ -12,23 +12,23 @@ public final class FmbCommonConfig {
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
-        builder.push("blue_whale");
+        builder.push("whale");
         WHALE_BREAKS_BLOCKS = builder
                 .comment(
-                        "Whether a charging blue whale smashes blocks softer than obsidian.",
+                        "Whether a charging whale smashes blocks softer than obsidian.",
                         "The mobGriefing game rule and block protection mods are still honoured on top of this switch.",
                         "With breaking disabled the whale is stunned by the wall it rams instead of grinding against it."
                 )
                 .define("breaksBlocks", true);
         WHALE_DROPS_ENABLED = builder
                 .comment(
-                        "Whether a slain blue whale rolls its entity loot table.",
+                        "Whether a slain whale rolls its entity loot table.",
                         "The loot table controls every dropped item and quantity."
                 )
                 .define("dropsEnabled", true);
         WHALE_SPAWN_CHANCE_PERCENT = builder
                 .comment(
-                        "Chance that a qualifying submerged cold-ocean shipwreck spawns a blue whale.",
+                        "Chance that a qualifying submerged cold-ocean shipwreck spawns a whale.",
                         "0 disables shipwreck whale spawning; 100 makes every qualifying wreck pass the roll."
                 )
                 .defineInRange("spawnChancePercent", 3, 0, 100);

@@ -49,22 +49,22 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.theawesomegem.fishingmadebetter.client.*;
-import net.theawesomegem.fishingmadebetter.client.model.BlueWhaleModel;
-import net.theawesomegem.fishingmadebetter.client.renderer.BlueWhaleRenderer;
+import net.theawesomegem.fishingmadebetter.client.model.WhaleModel;
+import net.theawesomegem.fishingmadebetter.client.renderer.WhaleRenderer;
 import net.theawesomegem.fishingmadebetter.common.block.BaitBoxBlock;
 import net.theawesomegem.fishingmadebetter.common.block.BaitBoxBlockEntity;
 import net.theawesomegem.fishingmadebetter.common.config.FmbCommonConfig;
 import net.theawesomegem.fishingmadebetter.common.data.FishDataRegistry;
 import net.theawesomegem.fishingmadebetter.common.data.FishDataReloadListener;
-import net.theawesomegem.fishingmadebetter.common.entity.BlueWhaleEntity;
 import net.theawesomegem.fishingmadebetter.common.entity.LavaFishingHook;
 import net.theawesomegem.fishingmadebetter.common.entity.VoidFishingHook;
 import net.theawesomegem.fishingmadebetter.common.entity.WaterFishingHook;
+import net.theawesomegem.fishingmadebetter.common.entity.WhaleEntity;
 import net.theawesomegem.fishingmadebetter.common.item.BaitBoxItem;
 import net.theawesomegem.fishingmadebetter.common.network.ReelingInput;
 import net.theawesomegem.fishingmadebetter.common.network.ReelingInputHandler;
 import net.theawesomegem.fishingmadebetter.common.util.FishStackUtil;
-import net.theawesomegem.fishingmadebetter.common.world.BlueWhaleShipwreckSpawner;
+import net.theawesomegem.fishingmadebetter.common.world.WhaleShipwreckSpawner;
 import net.theawesomegem.fishingmadebetter.compat.AquacultureCompat;
 import net.theawesomegem.fishingmadebetter.compat.LegacyFishConfigBootstrap;
 import net.theawesomegem.fishingmadebetter.registry.*;
@@ -94,10 +94,10 @@ public class FishingMadeBetterForge {
     private final java.nio.file.Path fishConfigDirectory;
 
     static {
-        ModSounds.BLUE_WHALE_AMBIENT = registerSound("entity.blue_whale.ambient");
-        ModSounds.BLUE_WHALE_ANGRY = registerSound("entity.blue_whale.angry");
-        ModSounds.BLUE_WHALE_HURT = registerSound("entity.blue_whale.hurt");
-        ModSounds.BLUE_WHALE_DEATH = registerSound("entity.blue_whale.death");
+        ModSounds.WHALE_AMBIENT = registerSound("entity.whale.ambient");
+        ModSounds.WHALE_ANGRY = registerSound("entity.whale.angry");
+        ModSounds.WHALE_HURT = registerSound("entity.whale.hurt");
+        ModSounds.WHALE_DEATH = registerSound("entity.whale.death");
 
         REGISTERED_ITEMS.put(ModBlocks.BAIT_BOX.path(), ITEMS.register(
                 ModBlocks.BAIT_BOX.path(),
@@ -150,13 +150,13 @@ public class FishingMadeBetterForge {
                         .updateInterval(5)
                         .build("void_fishing_hook")
         );
-        ModEntities.BLUE_WHALE = ENTITY_TYPES.register(
-                "blue_whale",
-                () -> EntityType.Builder.of(BlueWhaleEntity::new, MobCategory.WATER_CREATURE)
+        ModEntities.WHALE = ENTITY_TYPES.register(
+                "whale",
+                () -> EntityType.Builder.of(WhaleEntity::new, MobCategory.WATER_CREATURE)
                         .sized(7.20F, 7.50F)
                         .clientTrackingRange(12)
                         .updateInterval(2)
-                        .build("blue_whale")
+                        .build("whale")
         );
 
         ModRecipeSerializers.ROD_ATTACHMENT = RECIPE_SERIALIZERS.register(
@@ -237,7 +237,7 @@ public class FishingMadeBetterForge {
 
         @SubscribeEvent
         public static void registerAttributes(EntityAttributeCreationEvent event) {
-            event.put(ModEntities.BLUE_WHALE.get(), BlueWhaleEntity.createAttributes().build());
+            event.put(ModEntities.WHALE.get(), WhaleEntity.createAttributes().build());
         }
     }
 
@@ -259,12 +259,12 @@ public class FishingMadeBetterForge {
             event.registerEntityRenderer(ModEntities.WATER_FISHING_HOOK.get(), FishingHookRenderer::new);
             event.registerEntityRenderer(ModEntities.LAVA_FISHING_HOOK.get(), FishingHookRenderer::new);
             event.registerEntityRenderer(ModEntities.VOID_FISHING_HOOK.get(), FishingHookRenderer::new);
-            event.registerEntityRenderer(ModEntities.BLUE_WHALE.get(), BlueWhaleRenderer::new);
+            event.registerEntityRenderer(ModEntities.WHALE.get(), WhaleRenderer::new);
         }
 
         @SubscribeEvent
         public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
-            event.registerLayerDefinition(BlueWhaleModel.LAYER_LOCATION, BlueWhaleModel::createBodyLayer);
+            event.registerLayerDefinition(WhaleModel.LAYER_LOCATION, WhaleModel::createBodyLayer);
         }
 
         @SubscribeEvent
@@ -331,12 +331,12 @@ public class FishingMadeBetterForge {
 
         @SubscribeEvent
         public static void chunkLoad(ChunkEvent.Load event) {
-            BlueWhaleShipwreckSpawner.onChunkLoad(event);
+            WhaleShipwreckSpawner.onChunkLoad(event);
         }
 
         @SubscribeEvent
         public static void levelTick(TickEvent.LevelTickEvent event) {
-            BlueWhaleShipwreckSpawner.onLevelTick(event);
+            WhaleShipwreckSpawner.onLevelTick(event);
         }
     }
 

@@ -6,20 +6,20 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
 
-final class BlueWhaleShipwreckSavedData extends SavedData {
-    private static final String DATA_NAME = "fishingmadebetter_blue_whale_shipwrecks";
+final class WhaleShipwreckSavedData extends SavedData {
+    private static final String DATA_NAME = "fishingmadebetter_whale_shipwrecks";
     private final LongSet checkedShipwrecks = new LongOpenHashSet();
 
-    static BlueWhaleShipwreckSavedData get(ServerLevel level) {
+    static WhaleShipwreckSavedData get(ServerLevel level) {
         return level.getDataStorage().computeIfAbsent(
-                BlueWhaleShipwreckSavedData::load,
-                BlueWhaleShipwreckSavedData::new,
+                WhaleShipwreckSavedData::load,
+                WhaleShipwreckSavedData::new,
                 DATA_NAME
         );
     }
 
-    private static BlueWhaleShipwreckSavedData load(CompoundTag tag) {
-        BlueWhaleShipwreckSavedData data = new BlueWhaleShipwreckSavedData();
+    private static WhaleShipwreckSavedData load(CompoundTag tag) {
+        WhaleShipwreckSavedData data = new WhaleShipwreckSavedData();
         data.checkedShipwrecks.addAll(LongOpenHashSet.of(tag.getLongArray("CheckedShipwrecks")));
         return data;
     }

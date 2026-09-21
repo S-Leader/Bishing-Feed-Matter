@@ -1,4 +1,4 @@
-Blue whale recordings
+Whale recordings
 =====================
 
 Source: NOAA Pacific Marine Environmental Laboratory (PMEL) Acoustics Program.
