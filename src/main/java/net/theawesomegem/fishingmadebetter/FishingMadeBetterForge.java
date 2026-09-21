@@ -153,7 +153,7 @@ public class FishingMadeBetterForge {
         ModEntities.WHALE = ENTITY_TYPES.register(
                 "whale",
                 () -> EntityType.Builder.of(WhaleEntity::new, MobCategory.WATER_CREATURE)
-                        .sized(7.20F, 7.50F)
+                        .sized(3.60F, 3.75F)
                         .clientTrackingRange(12)
                         .updateInterval(2)
                         .build("whale")
