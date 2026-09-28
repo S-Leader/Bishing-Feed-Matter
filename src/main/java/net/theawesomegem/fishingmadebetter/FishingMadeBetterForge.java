@@ -196,6 +196,7 @@ public class FishingMadeBetterForge {
         RECIPE_SERIALIZERS.register(modBus);
         SOUND_EVENTS.register(modBus);
         CREATIVE_MODE_TABS.register(modBus);
+        ModLootEntries.LOOT_ENTRIES.register(modBus);
         modBus.addListener(AquacultureCompat::hideCreativeItems);
         modBus.addListener(this::commonSetup);
         FishDataRegistry.init();
