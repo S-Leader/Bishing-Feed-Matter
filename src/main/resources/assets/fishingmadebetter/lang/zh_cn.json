@@ -75,5 +75,8 @@
   "config.fishingmadebetter.whale_drops_enabled": "鲸鱼战利品",
   "config.fishingmadebetter.whale_drops_enabled.description": "鲸鱼死亡时是否调用其实体战利品表。掉落物种类和数量完全由战利品表控制。",
   "config.fishingmadebetter.whale_spawn_chance": "鲸鱼生成概率",
-  "config.fishingmadebetter.whale_spawn_chance.description": "符合条件的冷海沉船生成鲸鱼的概率（0-100%）。"
+  "config.fishingmadebetter.whale_spawn_chance.description": "符合条件的冷海沉船生成鲸鱼的概率（0-100%）。",
+  "notif.fishingmadebetter.fish_tracker.open_jei": "点击查看 JEI 中的鱼类需求",
+  "notif.fishingmadebetter.fish_tracker.creative_fish": "%s 条 %s，水域：%s，Y：%s-%s",
+  "notif.fishingmadebetter.fish_tracker.creative_details": "最低线长 %sm，时间 %s，最高亮度 %s，雨天 %s，雷暴 %s"
 }

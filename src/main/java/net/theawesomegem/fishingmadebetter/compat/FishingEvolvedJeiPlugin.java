@@ -9,6 +9,7 @@ import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.IRuntimeRegistration;
 import mezz.jei.api.registration.ISubtypeRegistration;
+import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -39,7 +40,53 @@ import java.util.Locale;
 @JeiPlugin
 public final class FishingEvolvedJeiPlugin implements IModPlugin {
     private static final ResourceLocation UID = new ResourceLocation(Constants.MOD_ID, "jei");
+    private static IJeiRuntime activeRuntime;
     public static final RecipeType<FishData> FISH_REQUIREMENTS = RecipeType.create(Constants.MOD_ID, "fish_requirements", FishData.class);
+
+    @Override
+    public void onRuntimeAvailable(IJeiRuntime runtime) {
+        activeRuntime = runtime;
+    }
+
+    @Override
+    public void onRuntimeUnavailable() {
+        activeRuntime = null;
+    }
+
+    /** Used by the Localizator-style clickable Fish Tracker entries. */
+    public static boolean openFishRequirements(String fishId) {
+        FishData fish = FishDataRegistry.get(fishId);
+        if (fish == null || activeRuntime == null) {
+            return false;
+        }
+        // JEI's recipe-GUI API changed between versions. Resolve the available
+        // overload without introducing a hard dependency on a specific signature.
+        Object recipesGui = activeRuntime.getRecipesGui();
+        for (java.lang.reflect.Method method : recipesGui.getClass().getMethods()) {
+            if (!method.getName().equals("showRecipes") || method.getParameterCount() != 2) {
+                continue;
+            }
+            try {
+                method.invoke(recipesGui, FISH_REQUIREMENTS, List.of(fish));
+                return true;
+            } catch (ReflectiveOperationException | IllegalArgumentException ignored) {
+                // Try another overload rather than failing on the first match.
+            }
+        }
+        // Versions of JEI without a per-recipe show method can at least open
+        // the requirements category rather than silently ignoring the click.
+        for (java.lang.reflect.Method method : recipesGui.getClass().getMethods()) {
+            if (method.getName().equals("showTypes") && method.getParameterCount() == 1) {
+                try {
+                    method.invoke(recipesGui, List.of(FISH_REQUIREMENTS));
+                    return true;
+                } catch (ReflectiveOperationException | IllegalArgumentException ignored) {
+                    // No compatible JEI GUI entrypoint is available.
+                }
+            }
+        }
+        return false;
+    }
 
     @Override
     public ResourceLocation getPluginUid() {

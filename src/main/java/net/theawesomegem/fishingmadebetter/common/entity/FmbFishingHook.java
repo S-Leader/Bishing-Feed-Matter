@@ -91,6 +91,8 @@ public class FmbFishingHook extends FishingHook {
     private int fishMomentum;
     private int fishTugging;
     private int tensionMomentum;
+    private static final int TENSION_ACCELERATION = 3;
+    private static final int TENSION_REVERSE_ACCELERATION = 6;
     private String activeFishId = "";
     private int activeFishWeight;
     private int fishDistance;
@@ -245,6 +247,9 @@ public class FmbFishingHook extends FishingHook {
             return;
         } else if (state == State.BOBBING) {
             tickBobbing(blockPos, liquidHeight, inTargetLiquid);
+            if (isRemoved()) {
+                return; // Successful auto-catch already discarded the fishing hook.
+            }
         }
 
         if (!inTargetLiquid) {
@@ -360,6 +365,20 @@ public class FmbFishingHook extends FishingHook {
             tickFishTugging();
             tickReelingInput();
             tickFishDistance();
+            // The reel meter displays zero remaining distance at this point.
+            // Award the catch now rather than requiring a second right click.
+            if (isFishCloseEnough()) {
+                Player player = getPlayerOwner();
+                ItemStack rod = player == null ? ItemStack.EMPTY : findBetterFishingRod(player);
+                if (player != null && !rod.isEmpty() && tryCatchFish(player, rod)) {
+                    // Finish the hook before damaging equipment, just as manual retrieval does.
+                    discard();
+                    InteractionHand hand = player.getMainHandItem() == rod
+                            ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
+                    ((BetterFishingRodItem) rod.getItem()).damageRodAndAttachments(rod, 1, player, hand);
+                    return;
+                }
+            }
             tickLineBreak();
 
             // 1.12.2 continuously forced the vanilla bite interval back to 20
@@ -504,16 +523,23 @@ public class FmbFishingHook extends FishingHook {
 
     private void tickReelingInput() {
         int targetTension = 0;
+        // Both directions use identical acceleration and maximum speed.
+        int speed = 8 + reelSpeed * 2 + tensioningModifier;
         if (reelingInput == ReelingInput.REEL_IN) {
-            targetTension = 8 + reelSpeed * 2 + tensioningModifier;
+            targetTension = speed;
         } else if (reelingInput == ReelingInput.REEL_OUT) {
-            targetTension = -(8 + tensioningModifier);
+            targetTension = -speed;
         }
 
-        tensionMomentum += Integer.signum(targetTension - tensionMomentum);
-        reelAmount += tensionMomentum;
-        reelAmount = Mth.clamp(reelAmount, 0, 1000);
-
+        int acceleration = (targetTension == 0 ||
+                (tensionMomentum != 0 && Integer.signum(targetTension) != Integer.signum(tensionMomentum)))
+                ? TENSION_REVERSE_ACCELERATION : TENSION_ACCELERATION;
+        int difference = targetTension - tensionMomentum;
+        tensionMomentum += Mth.clamp(difference, -acceleration, acceleration);
+        reelAmount = Mth.clamp(reelAmount + tensionMomentum, 0, 1000);
+        if (reelAmount == 0 || reelAmount == 1000) {
+            tensionMomentum = 0;
+        }
     }
 
     private void tickFishDistance() {

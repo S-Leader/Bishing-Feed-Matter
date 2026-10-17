@@ -196,5 +196,8 @@
   "config.fishingmadebetter.whale_drops_enabled": "Whale Loot",
   "config.fishingmadebetter.whale_drops_enabled.description": "Whether slain whales roll their entity loot table. Dropped items and quantities are controlled by the loot table.",
   "config.fishingmadebetter.whale_spawn_chance": "Whale Spawn Chance",
-  "config.fishingmadebetter.whale_spawn_chance.description": "Chance for a qualifying submerged cold-ocean shipwreck to spawn a whale (0-100%)."
+  "config.fishingmadebetter.whale_spawn_chance.description": "Chance for a qualifying submerged cold-ocean shipwreck to spawn a whale (0-100%).",
+  "notif.fishingmadebetter.fish_tracker.open_jei": "Click to view fish requirements in JEI",
+  "notif.fishingmadebetter.fish_tracker.creative_fish": "%s %s in %s at Y%s-%s",
+  "notif.fishingmadebetter.fish_tracker.creative_details": "MinLine %sm, Time %s, MaxLight %s, Rain %s, Thunder %s"
 }

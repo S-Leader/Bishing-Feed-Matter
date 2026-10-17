@@ -42,7 +42,6 @@ public class ReelItem extends Item {
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         if (craftingOnly) {
             tooltip.add(Component.translatable("item.fishingmadebetter.reel_basic.tooltip").withStyle(ChatFormatting.DARK_RED));
-            return;
         }
         tooltip.add(Component.translatable("tooltip.fishingmadebetter.reel.range")
                 .append(": " + reelRange + "m")

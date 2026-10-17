@@ -54,7 +54,6 @@ public class HookItem extends Item {
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         if (craftingOnly) {
             tooltip.add(Component.translatable("item.fishingmadebetter.hook_basic.tooltip").withStyle(ChatFormatting.DARK_RED));
-            return;
         }
         if (tuggingReduction != 0) {
             tooltip.add(Component.translatable("item.fishingmadebetter.hook_barbed.tooltip")

@@ -22,6 +22,11 @@ import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.event.RegisterClientCommandsEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import net.minecraft.commands.Commands;
 import net.minecraftforge.client.event.RenderGuiEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
@@ -344,6 +349,32 @@ public class FishingMadeBetterForge {
     @EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.CLIENT)
     public static final class ForgeClientEvents {
         private ForgeClientEvents() {
+        }
+
+        @SubscribeEvent
+        public static void registerFishRequirementsCommand(RegisterClientCommandsEvent event) {
+            if (!ModList.get().isLoaded("jei")) {
+                return;
+            }
+            event.getDispatcher().register(Commands.literal("fmb_fish")
+                    .then(Commands.argument("id", StringArgumentType.greedyString())
+                            .executes(context -> net.theawesomegem.fishingmadebetter.compat.FishingEvolvedJeiPlugin
+                                    .openFishRequirements(StringArgumentType.getString(context, "id")) ? 1 : 0)));
+        }
+
+        @SubscribeEvent(priority = EventPriority.LOWEST)
+        public static void stripDuplicateAquacultureWeight(ItemTooltipEvent event) {
+            if (!FishStackUtil.isBetterFish(event.getItemStack())) {
+                return;
+            }
+            // The fish already has its original, unitless Weight lore line.
+            // Aquaculture's lowercase fishWeight compatibility tag can add a
+            // duplicate line in imperial units; retain that tag for integrations.
+            event.getToolTip().removeIf(line -> {
+                String value = line.getString().toLowerCase(java.util.Locale.ROOT);
+                return value.matches(".*\\b(?:lbs?|pounds?)\\b.*")
+                        && (value.contains("weight") || value.contains("重量"));
+            });
         }
 
         @SubscribeEvent

@@ -5,6 +5,8 @@ import javax.annotation.Nullable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -95,22 +97,15 @@ public class FishTrackerItem extends Item {
             }
 
             if (creative) {
-                player.displayClientMessage(Component.literal(String.format(
-                        "%s %s in %s at Y%s-%s",
-                        population.quantity(),
-                        fishData.fishId(),
-                        fishData.liquid(),
-                        fishData.minYLevel(),
-                        fishData.maxYLevel()
-                )), false);
-                player.displayClientMessage(Component.literal(String.format(
-                        "MinLine %sm, Time %s, MaxLight %s, Rain %s, Thunder %s",
-                        fishData.minDeepLevel(),
-                        fishData.timeToFish(),
-                        fishData.maxLightLevel(),
-                        fishData.rainRequired(),
-                        fishData.thunderRequired()
-                )), false);
+                player.displayClientMessage(Component.translatable(
+                        "notif.fishingmadebetter.fish_tracker.creative_fish",
+                        population.quantity(), clickableFishName(fishData.fishId()), fishData.liquid(),
+                        fishData.minYLevel(), fishData.maxYLevel()).withStyle(ChatFormatting.AQUA), false);
+                player.displayClientMessage(Component.translatable(
+                        "notif.fishingmadebetter.fish_tracker.creative_details",
+                        fishData.minDeepLevel(), fishData.timeToFish(),
+                        fishData.maxLightLevel(), fishData.rainRequired(),
+                        fishData.thunderRequired()).withStyle(ChatFormatting.GRAY), false);
                 continue;
             }
 
@@ -132,16 +127,17 @@ public class FishTrackerItem extends Item {
                 continue;
             }
 
+            // Localizator-style clickable fish name: opens the JEI requirements view.
+            MutableComponent fishLink = clickableFishName(population.fishId());
             MutableComponent detected = Component.translatable("notif.fishingmadebetter.fish_tracker.detected")
-                    .append(" ")
-                    .append(Component.literal(population.fishId()));
+                    .withStyle(ChatFormatting.GRAY).append(" ").append(fishLink);
             if (!limitInfo) {
-                detected = detected.append(", ")
-                        .append(Component.literal(fishData.description()))
-                        .append(" in ")
-                        .append(Component.translatable(quantityKey(population.quantity())));
+                detected.append(Component.literal(" — " + fishData.description() + " · ")
+                                .withStyle(ChatFormatting.GRAY))
+                        .append(Component.translatable(quantityKey(population.quantity()))
+                                .withStyle(ChatFormatting.AQUA));
             }
-            player.displayClientMessage(detected.append("."), false);
+            player.displayClientMessage(detected, false);
         }
 
         if (creative) {
@@ -167,6 +163,15 @@ public class FishTrackerItem extends Item {
                     .append(": " + hibernatingCount + "."), false);
         }
         player.displayClientMessage(Component.literal("-----"), false);
+    }
+
+    private static MutableComponent clickableFishName(String fishId) {
+        return Component.literal(fishId)
+                .withStyle(style -> style.withColor(ChatFormatting.YELLOW).withBold(true)
+                        .withUnderlined(true)
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/fmb_fish " + fishId))
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                                Component.translatable("notif.fishingmadebetter.fish_tracker.open_jei"))));
     }
 
     private static String quantityKey(int quantity) {

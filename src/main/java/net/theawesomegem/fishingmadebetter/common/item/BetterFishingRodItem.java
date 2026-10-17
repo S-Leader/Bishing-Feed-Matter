@@ -148,7 +148,7 @@ public class BetterFishingRodItem extends FishingRodItem {
         return new WaterFishingHook(player, level, stack);
     }
 
-    private void damageRodAndAttachments(ItemStack stack, int damage, Player player, InteractionHand hand) {
+    public void damageRodAndAttachments(ItemStack stack, int damage, Player player, InteractionHand hand) {
         if (damage <= 0 || player.getAbilities().instabuild || !stack.isDamageableItem()) {
             return;
         }
@@ -229,6 +229,12 @@ public class BetterFishingRodItem extends FishingRodItem {
                 .append(componentFor(bobber))
                 .withStyle(ChatFormatting.BLUE));
         tooltip.add(durabilityLine(bobber, getBobberDamage(stack)));
+        if (net.minecraft.client.gui.screens.Screen.hasShiftDown()) {
+            tooltip.add(Component.translatable("item.fishingmadebetter.bobber_heavy.tooltip")
+                    .append(": +" + bobber.getVarianceModifier()).withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("item.fishingmadebetter.bobber_lightweight.tooltip")
+                    .append(": +" + bobber.getTensioningModifier()).withStyle(ChatFormatting.GRAY));
+        }
         tooltip.add(Component.translatable("tooltip.fishingmadebetter.fishing_rod.bobber.can_fish_in")
                 .append(": ")
                 .append(Component.translatable(bobberLiquidKey(bobber)))
@@ -239,6 +245,16 @@ public class BetterFishingRodItem extends FishingRodItem {
                 .append(componentFor(hook))
                 .withStyle(ChatFormatting.BLUE));
         tooltip.add(durabilityLine(hook, getHookDamage(stack)));
+        if (net.minecraft.client.gui.screens.Screen.hasShiftDown()) {
+            tooltip.add(Component.translatable("item.fishingmadebetter.hook_barbed.tooltip")
+                    .append(": " + hook.getTuggingReduction()).withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("item.fishingmadebetter.hook_magnetic.tooltip")
+                    .append(": +" + hook.getTreasureModifier() + "%").withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("item.fishingmadebetter.hook_shiny.tooltip")
+                    .append(": +" + hook.getBiteRateModifier() + "%").withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("item.fishingmadebetter.hook_fatty.tooltip")
+                    .append(": +" + hook.getWeightModifier() + "%").withStyle(ChatFormatting.GRAY));
+        }
 
         String baitDisplayName = getBaitDisplayName(stack);
         tooltip.add(Component.translatable("tooltip.fishingmadebetter.fishing_rod.bait")

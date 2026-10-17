@@ -54,7 +54,6 @@ public class BobberItem extends Item {
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         if (craftingOnly) {
             tooltip.add(Component.translatable("item.fishingmadebetter.bobber_basic.tooltip").withStyle(ChatFormatting.DARK_RED));
-            return;
         }
         if (lavaBobber) {
             tooltip.add(Component.translatable("item.fishingmadebetter.bobber_obsidian.tooltip").withStyle(ChatFormatting.GRAY));
@@ -65,12 +64,12 @@ public class BobberItem extends Item {
         if (!lavaBobber && !voidBobber) {
             tooltip.add(Component.translatable("item.fishingmadebetter.bobber_water.tooltip").withStyle(ChatFormatting.GRAY));
         }
-        if (varianceModifier != 0) {
+        if (varianceModifier != 0 || craftingOnly) {
             tooltip.add(Component.translatable("item.fishingmadebetter.bobber_heavy.tooltip")
                     .append(": +" + varianceModifier)
                     .withStyle(ChatFormatting.GRAY));
         }
-        if (tensioningModifier != 0) {
+        if (tensioningModifier != 0 || craftingOnly) {
             tooltip.add(Component.translatable("item.fishingmadebetter.bobber_lightweight.tooltip")
                     .append(": +" + tensioningModifier)
                     .withStyle(ChatFormatting.GRAY));

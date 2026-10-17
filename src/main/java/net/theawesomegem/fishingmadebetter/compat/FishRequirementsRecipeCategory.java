@@ -45,8 +45,8 @@ public final class FishRequirementsRecipeCategory implements IRecipeCategory<Fis
     private static final ResourceLocation DIMENSION_TEXTURE = id("textures/gui/reeling_hud_fullsize.png");
     private static final ResourceLocation OVERLAYS_TEXTURE = id("textures/gui/fish_data_overlays.png");
 
-    private static final int X_OFFSET = -8;
-    private static final int Y_OFFSET = -6;
+    private static final int X_OFFSET = -7;
+    private static final int Y_OFFSET = -5;
     private static final int MINIGAME_X = 20;
     private static final int MINIGAME_Y = 5;
     private static final int MINIGAME_INNER_X = MINIGAME_X + 3;
