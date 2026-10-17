@@ -221,7 +221,7 @@ public class FishingMadeBetterForge {
     public static Item registeredItem(String path) {
         RegistryObject<Item> item = REGISTERED_ITEMS.get(path);
         if (item == null) {
-            throw new IllegalArgumentException("Unknown Fishing Evolved item: " + path);
+            throw new IllegalArgumentException("Unknown Kitchen Made Better item: " + path);
         }
         return item.get();
     }
@@ -295,7 +295,7 @@ public class FishingMadeBetterForge {
 
         private static net.minecraft.client.gui.screens.Screen openConfigScreen(net.minecraft.client.gui.screens.Screen parent) {
             if (!ModList.get().isLoaded(YACL_MOD_ID)) {
-                Constants.LOG.warn("Install YetAnotherConfigLib to open the Fishing Evolved config screen.");
+                Constants.LOG.warn("Install YetAnotherConfigLib to open the Kitchen Made Better config screen.");
                 return parent;
             }
             return FishingMadeBetterConfigScreen.create(parent);
@@ -450,7 +450,7 @@ public class FishingMadeBetterForge {
             context.enqueueWork(() -> {
                 net.minecraft.server.level.ServerPlayer sender = context.getSender();
                 if (!canEditServerConfig(sender)) {
-                    Constants.LOG.warn("Player {} tried to edit Fishing Evolved server config without permission",
+                    Constants.LOG.warn("Player {} tried to edit Kitchen Made Better server config without permission",
                             sender == null ? "<unknown>" : sender.getGameProfile().getName());
                     return;
                 }

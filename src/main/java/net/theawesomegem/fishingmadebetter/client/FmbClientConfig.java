@@ -41,7 +41,7 @@ public final class FmbClientConfig {
                 INSTANCE.showHudDistance = loaded.showHudDistance;
             }
         } catch (IOException exception) {
-            Constants.LOG.warn("Failed to load Fishing Evolved client config", exception);
+            Constants.LOG.warn("Failed to load Kitchen Made Better client config", exception);
         }
         INSTANCE.clamp();
     }
@@ -58,7 +58,7 @@ public final class FmbClientConfig {
                 GSON.toJson(INSTANCE, writer);
             }
         } catch (IOException exception) {
-            Constants.LOG.warn("Failed to save Fishing Evolved client config", exception);
+            Constants.LOG.warn("Failed to save Kitchen Made Better client config", exception);
         }
     }
 
