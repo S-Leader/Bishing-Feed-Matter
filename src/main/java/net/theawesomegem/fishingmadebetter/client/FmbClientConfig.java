@@ -2,12 +2,13 @@ package net.theawesomegem.fishingmadebetter.client;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.theawesomegem.fishingmadebetter.Constants;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import net.theawesomegem.fishingmadebetter.Constants;
 
 public final class FmbClientConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();

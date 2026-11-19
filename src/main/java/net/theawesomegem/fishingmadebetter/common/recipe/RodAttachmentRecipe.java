@@ -1,8 +1,5 @@
 package net.theawesomegem.fishingmadebetter.common.recipe;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Nullable;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
@@ -17,6 +14,10 @@ import net.theawesomegem.fishingmadebetter.common.item.attachment.BobberItem;
 import net.theawesomegem.fishingmadebetter.common.item.attachment.HookItem;
 import net.theawesomegem.fishingmadebetter.common.item.attachment.ReelItem;
 import net.theawesomegem.fishingmadebetter.registry.ModRecipeSerializers;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RodAttachmentRecipe extends CustomRecipe {
     public RodAttachmentRecipe(ResourceLocation id, CraftingBookCategory category) {

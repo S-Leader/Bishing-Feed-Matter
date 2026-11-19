@@ -45,5 +45,207 @@
     "baitItemMap": {
       "meat": []
     }
+  },
+  "Electric Eel": {
+    "fishId": "Electric Eel",
+    "itemId": "fishingmadebetter:electric_eel",
+    "description": "fish.fishingmadebetter.electric_eel.habitat",
+    "minFishTime": 2200,
+    "maxFishTime": 2800,
+    "minErrorVariance": 1,
+    "maxErrorVariance": 3,
+    "minWeight": 30,
+    "maxWeight": 70,
+    "time": "any",
+    "liquid": "water",
+    "rarity": 3,
+    "minDeepLevel": 8,
+    "maxDeepLevel": 80,
+    "minYLevel": -20,
+    "maxYLevel": 40,
+    "maxLightLevel": 15,
+    "reproductionTime": 60,
+    "eatingFrequency": 12,
+    "trackable": true,
+    "biomeBlacklist": false,
+    "biomeTagList": [
+      "#minecraft:is_deep_ocean"
+    ],
+    "dimensionBlacklist": false,
+    "dimensionList": [
+      "minecraft:overworld"
+    ],
+    "timeOutsideOfWater": 120,
+    "allowScaling": false,
+    "allowFillet": true,
+    "defaultFillet": true,
+    "filletUseWeight": true,
+    "baitItemMap": {
+      "meat": []
+    },
+    "water_column": true,
+    "structures": [
+      "minecraft:monument"
+    ]
+  },
+  "Reaver Shark": {
+    "fishId": "Reaver Shark",
+    "itemId": "fishingmadebetter:reaver_shark",
+    "description": "fish.fishingmadebetter.reaver_shark.habitat",
+    "minFishTime": 2000,
+    "maxFishTime": 2600,
+    "minErrorVariance": 1,
+    "maxErrorVariance": 3,
+    "minWeight": 100,
+    "maxWeight": 200,
+    "time": "any",
+    "liquid": "water",
+    "rarity": 3,
+    "minDeepLevel": 8,
+    "maxDeepLevel": 80,
+    "minYLevel": -20,
+    "maxYLevel": 40,
+    "maxLightLevel": 15,
+    "reproductionTime": 60,
+    "eatingFrequency": 12,
+    "trackable": true,
+    "biomeBlacklist": false,
+    "biomeTagList": [
+      "#minecraft:is_deep_ocean"
+    ],
+    "dimensionBlacklist": false,
+    "dimensionList": [
+      "minecraft:overworld"
+    ],
+    "timeOutsideOfWater": 120,
+    "allowScaling": false,
+    "allowFillet": true,
+    "defaultFillet": true,
+    "filletUseWeight": true,
+    "baitItemMap": {
+      "meat": []
+    },
+    "water_column": true,
+    "structures": []
+  },
+  "Pink Starfish": {
+    "fishId": "Pink Starfish",
+    "itemId": "fishingmadebetter:pink_starfish",
+    "description": "fish.fishingmadebetter.pink_starfish.habitat",
+    "minFishTime": 2000,
+    "maxFishTime": 2600,
+    "minErrorVariance": 1,
+    "maxErrorVariance": 3,
+    "minWeight": 5,
+    "maxWeight": 15,
+    "time": "any",
+    "liquid": "water",
+    "rarity": 2,
+    "minDeepLevel": 8,
+    "maxDeepLevel": 80,
+    "minYLevel": -20,
+    "maxYLevel": 40,
+    "maxLightLevel": 15,
+    "reproductionTime": 60,
+    "eatingFrequency": 12,
+    "trackable": true,
+    "biomeBlacklist": false,
+    "biomeTagList": [
+      "#minecraft:is_deep_ocean"
+    ],
+    "dimensionBlacklist": false,
+    "dimensionList": [
+      "minecraft:overworld"
+    ],
+    "timeOutsideOfWater": 120,
+    "allowScaling": false,
+    "allowFillet": false,
+    "defaultFillet": true,
+    "filletUseWeight": true,
+    "baitItemMap": {
+      "meat": []
+    },
+    "water_column": true,
+    "structures": []
+  },
+  "Pufferfish Bomb": {
+    "fishId": "Pufferfish Bomb",
+    "itemId": "fishingmadebetter:pufferfish_bomb",
+    "description": "fish.fishingmadebetter.pufferfish_bomb.habitat",
+    "minFishTime": 1000,
+    "maxFishTime": 1600,
+    "minErrorVariance": 1,
+    "maxErrorVariance": 3,
+    "minWeight": 5,
+    "maxWeight": 20,
+    "time": "any",
+    "liquid": "water",
+    "rarity": 25,
+    "minDeepLevel": 8,
+    "maxDeepLevel": 80,
+    "minYLevel": -20,
+    "maxYLevel": 40,
+    "maxLightLevel": 15,
+    "reproductionTime": 60,
+    "eatingFrequency": 12,
+    "trackable": true,
+    "biomeBlacklist": false,
+    "biomeTagList": [
+      "#minecraft:is_deep_ocean"
+    ],
+    "dimensionBlacklist": false,
+    "dimensionList": [
+      "minecraft:overworld"
+    ],
+    "timeOutsideOfWater": 120,
+    "allowScaling": false,
+    "allowFillet": false,
+    "defaultFillet": true,
+    "filletUseWeight": true,
+    "baitItemMap": {
+      "meat": []
+    },
+    "water_column": true,
+    "structures": []
+  },
+  "Lantern Fish": {
+    "fishId": "Lantern Fish",
+    "itemId": "fishingmadebetter:lantern_fish",
+    "description": "fish.fishingmadebetter.lantern_fish.habitat",
+    "minFishTime": 1200,
+    "maxFishTime": 1800,
+    "minErrorVariance": 1,
+    "maxErrorVariance": 3,
+    "minWeight": 2,
+    "maxWeight": 10,
+    "time": "any",
+    "liquid": "water",
+    "rarity": 30,
+    "minDeepLevel": 8,
+    "maxDeepLevel": 80,
+    "minYLevel": -20,
+    "maxYLevel": 40,
+    "maxLightLevel": 15,
+    "reproductionTime": 60,
+    "eatingFrequency": 12,
+    "trackable": true,
+    "biomeBlacklist": false,
+    "biomeTagList": [
+      "#minecraft:is_deep_ocean"
+    ],
+    "dimensionBlacklist": false,
+    "dimensionList": [
+      "minecraft:overworld"
+    ],
+    "timeOutsideOfWater": 120,
+    "allowScaling": false,
+    "allowFillet": true,
+    "defaultFillet": true,
+    "filletUseWeight": true,
+    "baitItemMap": {
+      "meat": []
+    },
+    "water_column": true,
+    "structures": []
   }
 }

@@ -1,8 +1,5 @@
 package net.theawesomegem.fishingmadebetter.common.recipe;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Nullable;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -21,6 +18,10 @@ import net.theawesomegem.fishingmadebetter.common.data.FishDataRegistry;
 import net.theawesomegem.fishingmadebetter.common.item.FishBucketItem;
 import net.theawesomegem.fishingmadebetter.common.util.FishStackUtil;
 import net.theawesomegem.fishingmadebetter.registry.ModRecipeSerializers;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FishBucketRecipe extends CustomRecipe {
     private static final ResourceLocation FISH_BUCKET_ID = new ResourceLocation(Constants.MOD_ID, "fish_bucket");

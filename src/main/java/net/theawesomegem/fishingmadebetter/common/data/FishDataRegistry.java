@@ -218,7 +218,9 @@ public final class FishDataRegistry {
                 defaultFillet,
                 filletItem,
                 filletUseWeight,
-                validBaits
+                validBaits,
+                readStringList(json, "structures", "structureList"),
+                GsonHelper.getAsBoolean(json, "water_column", false)
         );
     }
 
@@ -258,7 +260,9 @@ public final class FishDataRegistry {
                 defaultFillet,
                 filletItem,
                 filletUseWeight,
-                validBaits
+                validBaits,
+                List.of(),
+                false
         );
     }
 

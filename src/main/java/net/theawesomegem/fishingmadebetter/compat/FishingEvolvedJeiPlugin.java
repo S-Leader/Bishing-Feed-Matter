@@ -32,7 +32,9 @@ import net.theawesomegem.fishingmadebetter.common.item.attachment.BobberItem;
 import net.theawesomegem.fishingmadebetter.common.item.attachment.HookItem;
 import net.theawesomegem.fishingmadebetter.common.item.attachment.ReelItem;
 import net.theawesomegem.fishingmadebetter.common.util.FishStackUtil;
+import net.theawesomegem.fishingmadebetter.registry.ModEntities;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -53,7 +55,9 @@ public final class FishingEvolvedJeiPlugin implements IModPlugin {
         activeRuntime = null;
     }
 
-    /** Used by the Localizator-style clickable Fish Tracker entries. */
+    /**
+     * Used by the Localizator-style clickable Fish Tracker entries.
+     */
     public static boolean openFishRequirements(String fishId) {
         FishData fish = FishDataRegistry.get(fishId);
         if (fish == null || activeRuntime == null) {
@@ -62,7 +66,7 @@ public final class FishingEvolvedJeiPlugin implements IModPlugin {
         // JEI's recipe-GUI API changed between versions. Resolve the available
         // overload without introducing a hard dependency on a specific signature.
         Object recipesGui = activeRuntime.getRecipesGui();
-        for (java.lang.reflect.Method method : recipesGui.getClass().getMethods()) {
+        for (Method method : recipesGui.getClass().getMethods()) {
             if (!method.getName().equals("showRecipes") || method.getParameterCount() != 2) {
                 continue;
             }
@@ -75,7 +79,7 @@ public final class FishingEvolvedJeiPlugin implements IModPlugin {
         }
         // Versions of JEI without a per-recipe show method can at least open
         // the requirements category rather than silently ignoring the click.
-        for (java.lang.reflect.Method method : recipesGui.getClass().getMethods()) {
+        for (Method method : recipesGui.getClass().getMethods()) {
             if (method.getName().equals("showTypes") && method.getParameterCount() == 1) {
                 try {
                     method.invoke(recipesGui, List.of(FISH_REQUIREMENTS));
@@ -190,6 +194,11 @@ public final class FishingEvolvedJeiPlugin implements IModPlugin {
                 ItemStack caught = FishStackUtil.createCaughtFishStack(source, fish, 1, fish.minWeight(), 0L);
                 recipes.add(recipe("jei/fish_bucket", fishBucket.createStack(fish.fishId()), Ingredient.of(Items.WATER_BUCKET), Ingredient.of(caught)));
             }
+        }
+        for (var entity : ModEntities.FISH) {
+            Item fishItem = BuiltInRegistries.ITEM.get(entity.getId());
+            Item bucket = BuiltInRegistries.ITEM.get(entity.getId().withSuffix("_bucket"));
+            recipes.add(recipe("jei/" + entity.getId().getPath() + "_bucket", new ItemStack(bucket), Ingredient.of(Items.WATER_BUCKET), Ingredient.of(fishItem)));
         }
     }
 

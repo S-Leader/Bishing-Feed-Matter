@@ -1,23 +1,24 @@
 package net.theawesomegem.fishingmadebetter.common.data;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.function.Predicate;
-import java.util.function.ToIntFunction;
-import javax.annotation.Nullable;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.saveddata.SavedData;
+
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.function.ToIntFunction;
 
 public class FishPopulationSavedData extends SavedData {
     private static final String DATA_NAME = "fishingmadebetter_populations";
     private static final long MINUTE_TICKS = 60L * 20L;
     private final Map<Long, Map<String, PopulationData>> populationsByChunk = new LinkedHashMap<>();
+    private final Set<Long> moreFishInitialized = new HashSet<>();
 
     public static FishPopulationSavedData get(ServerLevel level) {
         return level.getDataStorage().computeIfAbsent(FishPopulationSavedData::load, FishPopulationSavedData::new, DATA_NAME);
@@ -25,6 +26,7 @@ public class FishPopulationSavedData extends SavedData {
 
     public static FishPopulationSavedData load(CompoundTag tag) {
         FishPopulationSavedData data = new FishPopulationSavedData();
+        for (long chunk : tag.getLongArray("MoreFishInitialized")) data.moreFishInitialized.add(chunk);
         ListTag chunks = tag.getList("Chunks", CompoundTag.TAG_COMPOUND);
         for (int i = 0; i < chunks.size(); i++) {
             CompoundTag chunkTag = chunks.getCompound(i);
@@ -41,9 +43,7 @@ public class FishPopulationSavedData extends SavedData {
                 );
                 populations.put(population.fishId(), population);
             }
-            if (!populations.isEmpty()) {
-                data.populationsByChunk.put(chunk, populations);
-            }
+            data.populationsByChunk.put(chunk, populations);
         }
         return data;
     }
@@ -177,7 +177,7 @@ public class FishPopulationSavedData extends SavedData {
         int totalWeight = 0;
         for (PopulationData population : populations.values()) {
             FishData fishData = FishDataRegistry.get(population.fishId());
-            if (fishData != null && population.quantity() > 0 && fishData.canExistAt(level, centerOfChunk(chunkPos, fishData)) && predicate.test(fishData)) {
+            if (fishData != null && population.quantity() > 0 && hasHabitat(level, chunkPos, fishData) && predicate.test(fishData)) {
                 int weight = Math.max(0, weightFunction.applyAsInt(fishData));
                 weights.put(population.fishId(), weight);
                 totalWeight += weight;
@@ -190,7 +190,7 @@ public class FishPopulationSavedData extends SavedData {
         int selectedWeight = level.random.nextInt(totalWeight);
         for (PopulationData population : populations.values()) {
             FishData fishData = FishDataRegistry.get(population.fishId());
-            if (fishData == null || population.quantity() <= 0 || !fishData.canExistAt(level, centerOfChunk(chunkPos, fishData)) || !predicate.test(fishData)) {
+            if (fishData == null || population.quantity() <= 0 || !hasHabitat(level, chunkPos, fishData) || !predicate.test(fishData)) {
                 continue;
             }
 
@@ -226,13 +226,25 @@ public class FishPopulationSavedData extends SavedData {
     public boolean generateInitialPopulations(ServerLevel level, ChunkPos chunkPos, long gameTime) {
         long chunkKey = chunkPos.toLong();
         if (populationsByChunk.containsKey(chunkKey)) {
+            if (moreFishInitialized.add(chunkKey)) {
+                RandomSource random = RandomSource.create(level.getSeed() ^ chunkKey);
+                Map<String, PopulationData> populations = populationsByChunk.get(chunkKey);
+                for (FishData fish : FishDataRegistry.all()) {
+                    if (fish.waterColumn() && !populations.containsKey(fish.fishId()) && hasHabitat(level, chunkPos, fish)) {
+                        int quantity = initialPopulation(random, fish);
+                        if (quantity > 0)
+                            populations.put(fish.fishId(), new PopulationData(fish.fishId(), quantity, 0, gameTime));
+                    }
+                }
+                setDirty();
+            }
             return false;
         }
 
         RandomSource random = RandomSource.create(level.getSeed() ^ chunkKey);
         Map<String, PopulationData> populations = new LinkedHashMap<>();
         for (FishData fishData : FishDataRegistry.all()) {
-            if (!fishData.canExistAt(level, centerOfChunk(chunkPos, fishData))) {
+            if (!hasHabitat(level, chunkPos, fishData)) {
                 continue;
             }
             int quantity = initialPopulation(random, fishData);
@@ -242,6 +254,7 @@ public class FishPopulationSavedData extends SavedData {
         }
 
         populationsByChunk.put(chunkKey, populations);
+        moreFishInitialized.add(chunkKey);
         setDirty();
         return !populations.isEmpty();
     }
@@ -256,14 +269,21 @@ public class FishPopulationSavedData extends SavedData {
         return new BlockPos(chunkPos.getMiddleBlockX(), y, chunkPos.getMiddleBlockZ());
     }
 
+    private static boolean hasHabitat(ServerLevel level, ChunkPos chunkPos, FishData fish) {
+        if (!fish.waterColumn()) return fish.canExistAt(level, centerOfChunk(chunkPos, fish));
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(chunkPos.getMiddleBlockX(), fish.maxYLevel(), chunkPos.getMiddleBlockZ());
+        int minY = Math.max(level.getMinBuildHeight(), fish.minYLevel());
+        for (int y = Math.min(level.getMaxBuildHeight() - 1, fish.maxYLevel()); y >= minY; y--) {
+            pos.setY(y);
+            if (level.getFluidState(pos).is(FluidTags.WATER) && fish.canExistAt(level, pos)) return true;
+        }
+        return false;
+    }
+
     @Override
     public CompoundTag save(CompoundTag tag) {
         ListTag chunks = new ListTag();
         populationsByChunk.forEach((chunk, populations) -> {
-            if (populations.isEmpty()) {
-                return;
-            }
-
             CompoundTag chunkTag = new CompoundTag();
             chunkTag.putLong("Chunk", chunk);
             ListTag fish = new ListTag();
@@ -279,6 +299,7 @@ public class FishPopulationSavedData extends SavedData {
             chunks.add(chunkTag);
         });
         tag.put("Chunks", chunks);
+        tag.putLongArray("MoreFishInitialized", moreFishInitialized.stream().mapToLong(Long::longValue).toArray());
         return tag;
     }
 

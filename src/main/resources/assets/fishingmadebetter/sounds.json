@@ -44,5 +44,15 @@
         "attenuation_distance": 80
       }
     ]
+  },
+  "electric_eel_release": {
+    "sounds": [
+      "fishingmadebetter:electric_eel_release"
+    ]
+  },
+  "electric_eel_whip": {
+    "sounds": [
+      "fishingmadebetter:electric_eel_whip"
+    ]
   }
 }

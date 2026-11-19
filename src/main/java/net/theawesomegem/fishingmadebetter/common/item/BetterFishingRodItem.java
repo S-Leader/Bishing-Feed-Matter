@@ -1,6 +1,7 @@
 package net.theawesomegem.fishingmadebetter.common.item;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -229,7 +230,7 @@ public class BetterFishingRodItem extends FishingRodItem {
                 .append(componentFor(bobber))
                 .withStyle(ChatFormatting.BLUE));
         tooltip.add(durabilityLine(bobber, getBobberDamage(stack)));
-        if (net.minecraft.client.gui.screens.Screen.hasShiftDown()) {
+        if (Screen.hasShiftDown()) {
             tooltip.add(Component.translatable("item.fishingmadebetter.bobber_heavy.tooltip")
                     .append(": +" + bobber.getVarianceModifier()).withStyle(ChatFormatting.GRAY));
             tooltip.add(Component.translatable("item.fishingmadebetter.bobber_lightweight.tooltip")
@@ -245,7 +246,7 @@ public class BetterFishingRodItem extends FishingRodItem {
                 .append(componentFor(hook))
                 .withStyle(ChatFormatting.BLUE));
         tooltip.add(durabilityLine(hook, getHookDamage(stack)));
-        if (net.minecraft.client.gui.screens.Screen.hasShiftDown()) {
+        if (Screen.hasShiftDown()) {
             tooltip.add(Component.translatable("item.fishingmadebetter.hook_barbed.tooltip")
                     .append(": " + hook.getTuggingReduction()).withStyle(ChatFormatting.GRAY));
             tooltip.add(Component.translatable("item.fishingmadebetter.hook_magnetic.tooltip")

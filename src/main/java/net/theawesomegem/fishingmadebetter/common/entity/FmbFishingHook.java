@@ -457,7 +457,9 @@ public class FmbFishingHook extends FishingHook {
         failedBiteAttempts = 0;
         activeFishId = population.fishId();
         activeFishWeight = Mth.nextInt(random, fishData.minWeight(), fishData.maxWeight());
-        int hookedFishDepth = Math.max(0, Mth.nextInt(random, fishData.minDeepLevel(), fishData.maxDeepLevel()));
+        int hookedFishDepth = Math.max(0, fishData.waterColumn()
+                ? fishData.findFishingDepth(serverLevel, blockPosition(), reelRange)
+                : Mth.nextInt(random, fishData.minDeepLevel(), fishData.maxDeepLevel()));
         // 1.12.2 stores fishDistance as progress along the reel's total range.
         // A fish starts at (reelRange - its depth), giving it a buffer before
         // fishDistance can fall to zero and begin damaging the line.
@@ -695,7 +697,12 @@ public class FmbFishingHook extends FishingHook {
 
         int fishWeight = Math.max(1, Math.round(activeFishWeight * (1.0F + weightModifier / 100.0F)));
         ItemStack catchStack = FishStackUtil.createCaughtFishStack(item, fishData, catchCountForModifier(), fishWeight, level().getGameTime());
-        spawnPulledItem(player, catchStack);
+        int remaining = catchStack.getCount();
+        while (remaining > 0) {
+            int count = Math.min(remaining, catchStack.getMaxStackSize());
+            spawnPulledItem(player, catchStack.copyWithCount(count));
+            remaining -= count;
+        }
         rollTreasure(player, serverLevel, rodStack);
         player.level().addFreshEntity(new ExperienceOrb(player.level(), player.getX(), player.getY() + 0.5D, player.getZ() + 0.5D, random.nextInt(6) + 1));
         if (catchStack.is(ItemTags.FISHES)) {
@@ -758,7 +765,7 @@ public class FmbFishingHook extends FishingHook {
         FishingLiquid liquid = fishData.liquid();
         return FishDataRegistry.resolveItem(fishData.itemId()) != null
                 && level() instanceof ServerLevel serverLevel
-                && fishData.canExistAt(serverLevel, blockPosition())
+                && fishData.canFishAt(serverLevel, blockPosition(), reelRange)
                 // 1.12.2 did not select fish whose minimum depth exceeded the
                 // equipped reel's range.
                 && fishData.minDeepLevel() <= reelRange

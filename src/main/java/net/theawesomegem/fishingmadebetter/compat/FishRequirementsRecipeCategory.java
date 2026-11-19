@@ -1,10 +1,5 @@
 package net.theawesomegem.fishingmadebetter.compat;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -32,6 +27,8 @@ import net.theawesomegem.fishingmadebetter.common.item.attachment.BobberItem;
 import net.theawesomegem.fishingmadebetter.common.item.attachment.ReelItem;
 import net.theawesomegem.fishingmadebetter.common.util.BaitUtil;
 import net.theawesomegem.fishingmadebetter.common.util.FishStackUtil;
+
+import java.util.*;
 
 /**
  * JEI's fish-catching requirements view, ported from Localizator's 1.12.2
@@ -424,10 +421,13 @@ public final class FishRequirementsRecipeCategory implements IRecipeCategory<Fis
         if (value.contains("RIVER")) return "RIVER";
         if (value.contains("MOUNTAIN") || value.contains("HILL") || value.contains("PEAK")) return "MOUNTAIN";
         if (value.contains("FOREST") || value.contains("TAIGA")) return "FOREST";
-        if (value.contains("COLD") || value.contains("FROZEN") || value.contains("SNOW") || value.contains("ICE")) return "COLD";
-        if (value.contains("DESERT") || value.contains("BADLAND") || value.contains("SAVANNA") || value.contains("SANDY")) return "SANDY";
+        if (value.contains("COLD") || value.contains("FROZEN") || value.contains("SNOW") || value.contains("ICE"))
+            return "COLD";
+        if (value.contains("DESERT") || value.contains("BADLAND") || value.contains("SAVANNA") || value.contains("SANDY"))
+            return "SANDY";
         if (value.equals("HOT") || value.equals("DRY")) return value;
-        if (value.contains("DARK") || value.contains("DEAD") || value.contains("SPOOKY") || value.contains("SOUL")) return "DEAD";
+        if (value.contains("DARK") || value.contains("DEAD") || value.contains("SPOOKY") || value.contains("SOUL"))
+            return "DEAD";
         if (value.contains("PLAINS") || value.contains("MEADOW")) return "PLAINS";
         if (value.contains("NETHER")) return "NETHER";
         if (value.contains("END")) return "END";
@@ -470,8 +470,8 @@ public final class FishRequirementsRecipeCategory implements IRecipeCategory<Fis
         String known = label.toUpperCase(Locale.ROOT);
         return switch (known) {
             case "MUSHROOM", "DEAD", "SPOOKY", "JUNGLE", "SWAMP", "HOT", "SANDY", "COLD",
-                    "MOUNTAIN", "FOREST", "PLAINS", "RIVER", "WATER", "OCEAN", "BEACH", "NETHER",
-                    "END", "DRY", "SNOWY", "UNKNOWN" -> Component.translatable("jei.fishingmadebetter.biometype." + known);
+                 "MOUNTAIN", "FOREST", "PLAINS", "RIVER", "WATER", "OCEAN", "BEACH", "NETHER",
+                 "END", "DRY", "SNOWY", "UNKNOWN" -> Component.translatable("jei.fishingmadebetter.biometype." + known);
             default -> Component.literal(label);
         };
     }

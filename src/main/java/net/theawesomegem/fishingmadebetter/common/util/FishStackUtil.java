@@ -33,7 +33,7 @@ public final class FishStackUtil {
         if (fishData.allowScaling()) {
             tag.putBoolean(FISH_SCALE, true);
         }
-        stack.setHoverName(Component.literal(fishData.fishId()).withStyle(ChatFormatting.RESET));
+        stack.setHoverName(fishData.displayName().copy().withStyle(ChatFormatting.RESET));
         setLore(stack, weight, fishData.allowScaling(), fishData.allowScaling(), false);
         return stack;
     }

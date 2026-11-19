@@ -1,7 +1,5 @@
 package net.theawesomegem.fishingmadebetter.common.util;
 
-import java.util.Locale;
-import java.util.Set;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
@@ -9,6 +7,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.theawesomegem.fishingmadebetter.common.data.FishData;
 import net.theawesomegem.fishingmadebetter.common.data.FishDataRegistry;
+
+import java.util.Locale;
+import java.util.Set;
 
 public final class BaitUtil {
     private static final Set<String> LEGACY_BAIT_GROUPS = Set.of(
@@ -91,14 +92,15 @@ public final class BaitUtil {
                     || stack.is(Items.CHICKEN)
                     || stack.is(Items.MUTTON)
                     || stack.is(Items.RABBIT);
-            case "meat", "large_predator_aqc", "largepredatoraqc", "ocean_predator_aqc", "oceanpredatoraqc" -> stack.is(ItemTags.FISHES)
-                    || stack.is(Items.SPIDER_EYE)
-                    || stack.is(Items.ROTTEN_FLESH)
-                    || stack.is(Items.BEEF)
-                    || stack.is(Items.PORKCHOP)
-                    || stack.is(Items.CHICKEN)
-                    || stack.is(Items.MUTTON)
-                    || stack.is(Items.RABBIT);
+            case "meat", "large_predator_aqc", "largepredatoraqc", "ocean_predator_aqc", "oceanpredatoraqc" ->
+                    stack.is(ItemTags.FISHES)
+                            || stack.is(Items.SPIDER_EYE)
+                            || stack.is(Items.ROTTEN_FLESH)
+                            || stack.is(Items.BEEF)
+                            || stack.is(Items.PORKCHOP)
+                            || stack.is(Items.CHICKEN)
+                            || stack.is(Items.MUTTON)
+                            || stack.is(Items.RABBIT);
             default -> false;
         };
     }

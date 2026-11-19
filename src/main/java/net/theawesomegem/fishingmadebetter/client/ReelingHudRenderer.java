@@ -11,7 +11,7 @@ import net.theawesomegem.fishingmadebetter.common.entity.FmbFishingHook;
 
 /**
  * Forge 1.20.1 rendering of the original 1.12.2 GuiReelingOverlay.
- *
+ * <p>
  * The positions, layer order, texture coordinate sizes and default anchoring
  * intentionally mirror the 1.12.2 HUD rather than using a redesigned layout.
  */

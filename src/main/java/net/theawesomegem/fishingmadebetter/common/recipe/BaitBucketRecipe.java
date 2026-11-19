@@ -1,8 +1,5 @@
 package net.theawesomegem.fishingmadebetter.common.recipe;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Nullable;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -18,6 +15,10 @@ import net.minecraft.world.level.Level;
 import net.theawesomegem.fishingmadebetter.common.item.BaitBucketItem;
 import net.theawesomegem.fishingmadebetter.common.util.BaitUtil;
 import net.theawesomegem.fishingmadebetter.registry.ModRecipeSerializers;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BaitBucketRecipe extends CustomRecipe {
     private static final int MAX_BAIT_COUNT = 64;

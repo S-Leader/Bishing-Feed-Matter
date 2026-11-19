@@ -33,7 +33,12 @@ minecraft {
                 }
             }
         }
-        client {}
+        client {
+            if (project.hasProperty('fishClientSmoke')) {
+                workingDirectory project.file('build/fish-client-smoke')
+                property 'fmb.fishClientSmoke', 'true'
+            }
+        }
         server { args '--nogui' }
     }
 }
@@ -90,6 +95,9 @@ tasks.named('processResources', ProcessResources).configure {
 }
 
 tasks.named('jar', Jar).configure {
+    from('MORE_TIDE_FISH.md') {
+        into 'META-INF'
+    }
     manifest {
         attributes([
                 'Specification-Title': mod_name,

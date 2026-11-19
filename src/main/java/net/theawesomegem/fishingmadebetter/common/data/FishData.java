@@ -1,12 +1,18 @@
 package net.theawesomegem.fishingmadebetter.common.data;
 
-import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BiomeTags;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.biome.Biome;
+
+import java.util.List;
 
 public record FishData(
         String fishId,
@@ -43,15 +49,55 @@ public record FishData(
         boolean defaultFillet,
         String filletItem,
         boolean filletUseWeight,
-        List<String> validBaits
+        List<String> validBaits,
+        List<String> structures,
+        boolean waterColumn
 ) {
+    public Component displayName() {
+        if (!waterColumn) return Component.literal(fishId);
+        ResourceLocation item = new ResourceLocation(itemId);
+        return Component.translatable("item." + item.getNamespace() + "." + item.getPath());
+    }
+
     public boolean canExistAt(ServerLevel level, BlockPos pos) {
         return isAltitudeValid(pos.getY())
                 && isLightValid(level, pos)
                 && isWeatherValid(level)
                 && isTimeValid(level)
                 && isDimensionValid(level)
-                && isBiomeValid(level, pos);
+                && isBiomeValid(level, pos)
+                && isStructureValid(level, pos);
+    }
+
+    public boolean canFishAt(ServerLevel level, BlockPos hookPos, int reelRange) {
+        if (!waterColumn) return canExistAt(level, hookPos);
+        return findFishingDepth(level, hookPos, reelRange) >= 0;
+    }
+
+    public int findFishingDepth(ServerLevel level, BlockPos hookPos, int reelRange) {
+        BlockPos.MutableBlockPos pos = hookPos.mutable();
+        int range = Math.min(reelRange, maxDeepLevel);
+        for (int depth = 0; depth <= range && pos.getY() >= level.getMinBuildHeight(); depth++, pos.move(0, -1, 0)) {
+            if (!level.getFluidState(pos).is(FluidTags.WATER)) {
+                if (depth == 0 && level.getFluidState(pos.below()).is(FluidTags.WATER)) continue;
+                break;
+            }
+            if (depth >= minDeepLevel && canExistAt(level, pos)) return depth;
+        }
+        return -1;
+    }
+
+    private boolean isStructureValid(ServerLevel level, BlockPos pos) {
+        if (structures.isEmpty()) return true;
+        var registry = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
+        return level.structureManager().startsForStructure(new ChunkPos(pos), structure -> structures.stream().anyMatch(id -> {
+            ResourceLocation location = ResourceLocation.tryParse(id);
+            return location != null && registry.getKey(structure).equals(location);
+        })).stream().anyMatch(start -> {
+            var bounds = start.getBoundingBox();
+            return pos.getX() >= bounds.minX() && pos.getX() <= bounds.maxX()
+                    && pos.getZ() >= bounds.minZ() && pos.getZ() <= bounds.maxZ();
+        });
     }
 
     public boolean isAltitudeValid(int y) {
@@ -125,6 +171,10 @@ public record FishData(
 
     public static boolean matchesBiome(Holder<Biome> biome, String entry) {
         String normalized = entry.trim().toLowerCase();
+        if (normalized.startsWith("#")) {
+            ResourceLocation tag = ResourceLocation.tryParse(normalized.substring(1));
+            return tag != null && biome.is(TagKey.create(Registries.BIOME, tag));
+        }
         String biomeId = biome.unwrapKey().map(key -> key.location().toString()).orElse("");
         String biomePath = ResourceLocation.tryParse(biomeId) != null ? ResourceLocation.tryParse(biomeId).getPath() : biomeId;
         if (normalized.equals(biomeId) || normalized.equals(biomePath)) {

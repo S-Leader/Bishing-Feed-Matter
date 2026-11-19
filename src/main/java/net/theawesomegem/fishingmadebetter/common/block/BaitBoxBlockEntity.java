@@ -1,7 +1,5 @@
 package net.theawesomegem.fishingmadebetter.common.block;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -18,6 +16,9 @@ import net.theawesomegem.fishingmadebetter.common.data.FishData;
 import net.theawesomegem.fishingmadebetter.common.data.FishPopulationSavedData;
 import net.theawesomegem.fishingmadebetter.common.util.BaitUtil;
 import net.theawesomegem.fishingmadebetter.registry.ModBlockEntities;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class BaitBoxBlockEntity extends BlockEntity {
     private static final int SLOT_COUNT = 8;

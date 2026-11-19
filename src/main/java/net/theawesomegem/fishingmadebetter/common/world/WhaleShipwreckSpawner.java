@@ -142,11 +142,7 @@ public final class WhaleShipwreckSpawner {
             return false;
         }
 
-        if (state.is(Blocks.WATER) || state.is(Blocks.KELP) || state.is(Blocks.KELP_PLANT) || state.is(Blocks.SEAGRASS) || state.is(Blocks.TALL_SEAGRASS)) {
-            return false;
-        }
-
-        return true;
+        return !state.is(Blocks.WATER) && !state.is(Blocks.KELP) && !state.is(Blocks.KELP_PLANT) && !state.is(Blocks.SEAGRASS) && !state.is(Blocks.TALL_SEAGRASS);
     }
 
     private static int findActualShipTopY(

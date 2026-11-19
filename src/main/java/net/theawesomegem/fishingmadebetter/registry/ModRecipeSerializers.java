@@ -1,16 +1,12 @@
 package net.theawesomegem.fishingmadebetter.registry;
 
-import java.util.function.Supplier;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.theawesomegem.fishingmadebetter.Constants;
-import net.theawesomegem.fishingmadebetter.common.recipe.BaitBucketRecipe;
-import net.theawesomegem.fishingmadebetter.common.recipe.BaitedRodRecipe;
-import net.theawesomegem.fishingmadebetter.common.recipe.FishScaleRecipe;
-import net.theawesomegem.fishingmadebetter.common.recipe.FishBucketRecipe;
-import net.theawesomegem.fishingmadebetter.common.recipe.FishSliceRecipe;
-import net.theawesomegem.fishingmadebetter.common.recipe.RodAttachmentRecipe;
+import net.theawesomegem.fishingmadebetter.common.recipe.*;
+
+import java.util.function.Supplier;
 
 public final class ModRecipeSerializers {
     public static final ResourceLocation ROD_ATTACHMENT_ID = new ResourceLocation(Constants.MOD_ID, "rod_attachment");

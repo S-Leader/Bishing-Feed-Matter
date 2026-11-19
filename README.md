@@ -34,3 +34,4 @@ Run `gradlew build`. The Forge jar is written to `build/libs`.
 
 - TheAwesomeGem for Fishing Made Better and its 1.12.2 compatibility data.
 - SeniorS for the Fishing Evolved codebase used as the porting base.
+- xiaofanwei (xiaofanwei123) for the five More Tide Fish creatures, their special item uses, models, textures and electric eel sounds.

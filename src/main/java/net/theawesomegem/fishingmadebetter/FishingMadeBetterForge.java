@@ -1,16 +1,17 @@
 package net.theawesomegem.fishingmadebetter;
 
+import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.entity.FishingHookRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.renderer.item.ItemPropertyFunction;
+import net.minecraft.commands.Commands;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobCategory;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -19,21 +20,14 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ConfigScreenHandler;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.client.event.RegisterClientCommandsEvent;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import com.mojang.brigadier.arguments.StringArgumentType;
-import net.minecraft.commands.Commands;
-import net.minecraftforge.client.event.RenderGuiEvent;
+import net.minecraftforge.client.event.*;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.ChunkEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -61,11 +55,6 @@ import net.theawesomegem.fishingmadebetter.common.block.BaitBoxBlockEntity;
 import net.theawesomegem.fishingmadebetter.common.config.FmbCommonConfig;
 import net.theawesomegem.fishingmadebetter.common.data.FishDataRegistry;
 import net.theawesomegem.fishingmadebetter.common.data.FishDataReloadListener;
-import net.theawesomegem.fishingmadebetter.common.entity.LavaFishingHook;
-import net.theawesomegem.fishingmadebetter.common.entity.VoidFishingHook;
-import net.theawesomegem.fishingmadebetter.common.entity.WaterFishingHook;
-import net.theawesomegem.fishingmadebetter.common.entity.WhaleEntity;
-import net.theawesomegem.fishingmadebetter.common.item.BaitBoxItem;
 import net.theawesomegem.fishingmadebetter.common.network.ReelingInput;
 import net.theawesomegem.fishingmadebetter.common.network.ReelingInputHandler;
 import net.theawesomegem.fishingmadebetter.common.util.FishStackUtil;
@@ -74,120 +63,34 @@ import net.theawesomegem.fishingmadebetter.compat.AquacultureCompat;
 import net.theawesomegem.fishingmadebetter.compat.LegacyFishConfigBootstrap;
 import net.theawesomegem.fishingmadebetter.registry.*;
 
-import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @Mod(Constants.MOD_ID)
 public class FishingMadeBetterForge {
     private static final String NETWORK_VERSION = "4";
     private static final String YACL_MOD_ID = "yet_another_config_lib_v3";
-    private static final SimpleChannel NETWORK = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(Constants.MOD_ID, "main"),
-            () -> NETWORK_VERSION,
-            NETWORK_VERSION::equals,
-            NETWORK_VERSION::equals
-    );
+    private static final SimpleChannel NETWORK = NetworkRegistry.newSimpleChannel(new ResourceLocation(Constants.MOD_ID, "main"), () -> NETWORK_VERSION, NETWORK_VERSION::equals, NETWORK_VERSION::equals);
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, Constants.MOD_ID);
-    private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Constants.MOD_ID);
-    private static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, Constants.MOD_ID);
     private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, Constants.MOD_ID);
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, Constants.MOD_ID);
-    private static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, Constants.MOD_ID);
     private static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Constants.MOD_ID);
     private static final RegistryObject<Block> BAIT_BOX = BLOCKS.register(ModBlocks.BAIT_BOX.path(), BaitBoxBlock::new);
-    private static final Map<String, RegistryObject<Item>> REGISTERED_ITEMS = new LinkedHashMap<>();
     private final java.nio.file.Path fishConfigDirectory;
 
     static {
-        ModSounds.WHALE_AMBIENT = registerSound("entity.whale.ambient");
-        ModSounds.WHALE_ANGRY = registerSound("entity.whale.angry");
-        ModSounds.WHALE_HURT = registerSound("entity.whale.hurt");
-        ModSounds.WHALE_DEATH = registerSound("entity.whale.death");
+        CREATIVE_MODE_TABS.register("main", () -> CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0).title(Component.translatable("itemGroup.fishingmadebetter")).icon(() -> new ItemStack(ModItems.FISHING_ROD_WOOD.get())).displayItems((parameters, output) -> {
+            ModItems.ITEMS.getEntries().forEach(item -> output.accept(item.get()));
+        }).build());
 
-        REGISTERED_ITEMS.put(ModBlocks.BAIT_BOX.path(), ITEMS.register(
-                ModBlocks.BAIT_BOX.path(),
-                () -> new BaitBoxItem(BAIT_BOX.get(), new Item.Properties())
-        ));
+        ModBlockEntities.BAIT_BOX = BLOCK_ENTITY_TYPES.register(ModBlocks.BAIT_BOX.path(), () -> BlockEntityType.Builder.of(BaitBoxBlockEntity::new, BAIT_BOX.get()).build(null));
 
-        ModItems.ITEMS.forEach(definition -> REGISTERED_ITEMS.put(
-                definition.path(),
-                ITEMS.register(definition.path(), () -> ModItems.create(definition.path()))
-        ));
-
-        CREATIVE_MODE_TABS.register("main", () -> CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0)
-                .title(Component.translatable("itemGroup.fishingmadebetter"))
-                .icon(() -> new ItemStack(REGISTERED_ITEMS.get("fishing_rod_wood").get()))
-                .displayItems((parameters, output) -> REGISTERED_ITEMS.values().forEach(item -> output.accept(item.get())))
-                .build());
-
-        ModBlockEntities.BAIT_BOX = BLOCK_ENTITY_TYPES.register(
-                ModBlocks.BAIT_BOX.path(),
-                () -> BlockEntityType.Builder.of(BaitBoxBlockEntity::new, BAIT_BOX.get()).build(null)
-        );
-
-        ModEntities.WATER_FISHING_HOOK = ENTITY_TYPES.register(
-                "water_fishing_hook",
-                () -> EntityType.Builder.<WaterFishingHook>of(WaterFishingHook::new, MobCategory.MISC)
-                        .noSave()
-                        .noSummon()
-                        .sized(0.25F, 0.25F)
-                        .clientTrackingRange(4)
-                        .updateInterval(5)
-                        .build("water_fishing_hook")
-        );
-        ModEntities.LAVA_FISHING_HOOK = ENTITY_TYPES.register(
-                "lava_fishing_hook",
-                () -> EntityType.Builder.<LavaFishingHook>of(LavaFishingHook::new, MobCategory.MISC)
-                        .noSave()
-                        .noSummon()
-                        .sized(0.25F, 0.25F)
-                        .clientTrackingRange(4)
-                        .updateInterval(5)
-                        .build("lava_fishing_hook")
-        );
-        ModEntities.VOID_FISHING_HOOK = ENTITY_TYPES.register(
-                "void_fishing_hook",
-                () -> EntityType.Builder.<VoidFishingHook>of(VoidFishingHook::new, MobCategory.MISC)
-                        .noSave()
-                        .noSummon()
-                        .sized(0.25F, 0.25F)
-                        .clientTrackingRange(4)
-                        .updateInterval(5)
-                        .build("void_fishing_hook")
-        );
-        ModEntities.WHALE = ENTITY_TYPES.register(
-                "whale",
-                () -> EntityType.Builder.of(WhaleEntity::new, MobCategory.WATER_CREATURE)
-                        .sized(3.60F, 3.75F)
-                        .clientTrackingRange(12)
-                        .updateInterval(2)
-                        .build("whale")
-        );
-
-        ModRecipeSerializers.ROD_ATTACHMENT = RECIPE_SERIALIZERS.register(
-                ModRecipeSerializers.ROD_ATTACHMENT_ID.getPath(),
-                ModRecipeSerializers.ROD_ATTACHMENT
-        );
-        ModRecipeSerializers.BAITED_ROD = RECIPE_SERIALIZERS.register(
-                ModRecipeSerializers.BAITED_ROD_ID.getPath(),
-                ModRecipeSerializers.BAITED_ROD
-        );
-        ModRecipeSerializers.BAIT_BUCKET = RECIPE_SERIALIZERS.register(
-                ModRecipeSerializers.BAIT_BUCKET_ID.getPath(),
-                ModRecipeSerializers.BAIT_BUCKET
-        );
-        ModRecipeSerializers.FISH_BUCKET = RECIPE_SERIALIZERS.register(
-                ModRecipeSerializers.FISH_BUCKET_ID.getPath(),
-                ModRecipeSerializers.FISH_BUCKET
-        );
-        ModRecipeSerializers.FISH_SLICE = RECIPE_SERIALIZERS.register(
-                ModRecipeSerializers.FISH_SLICE_ID.getPath(),
-                ModRecipeSerializers.FISH_SLICE
-        );
-        ModRecipeSerializers.FISH_SCALE = RECIPE_SERIALIZERS.register(
-                ModRecipeSerializers.FISH_SCALE_ID.getPath(),
-                ModRecipeSerializers.FISH_SCALE
-        );
+        ModRecipeSerializers.ROD_ATTACHMENT = RECIPE_SERIALIZERS.register(ModRecipeSerializers.ROD_ATTACHMENT_ID.getPath(), ModRecipeSerializers.ROD_ATTACHMENT);
+        ModRecipeSerializers.BAITED_ROD = RECIPE_SERIALIZERS.register(ModRecipeSerializers.BAITED_ROD_ID.getPath(), ModRecipeSerializers.BAITED_ROD);
+        ModRecipeSerializers.BAIT_BUCKET = RECIPE_SERIALIZERS.register(ModRecipeSerializers.BAIT_BUCKET_ID.getPath(), ModRecipeSerializers.BAIT_BUCKET);
+        ModRecipeSerializers.FISH_BUCKET = RECIPE_SERIALIZERS.register(ModRecipeSerializers.FISH_BUCKET_ID.getPath(), ModRecipeSerializers.FISH_BUCKET);
+        ModRecipeSerializers.FISH_SLICE = RECIPE_SERIALIZERS.register(ModRecipeSerializers.FISH_SLICE_ID.getPath(), ModRecipeSerializers.FISH_SLICE);
+        ModRecipeSerializers.FISH_SCALE = RECIPE_SERIALIZERS.register(ModRecipeSerializers.FISH_SCALE_ID.getPath(), ModRecipeSerializers.FISH_SCALE);
     }
 
     public FishingMadeBetterForge() {
@@ -195,13 +98,15 @@ public class FishingMadeBetterForge {
         FmbCommonConfig.register();
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         BLOCKS.register(modBus);
-        ITEMS.register(modBus);
-        ENTITY_TYPES.register(modBus);
+        ModItems.register(modBus);
+        ModEntities.register(modBus);
         BLOCK_ENTITY_TYPES.register(modBus);
         RECIPE_SERIALIZERS.register(modBus);
-        SOUND_EVENTS.register(modBus);
+        ModSounds.register(modBus);
         CREATIVE_MODE_TABS.register(modBus);
         ModLootEntries.LOOT_ENTRIES.register(modBus);
+        ModEffects.register(modBus);
+        ModParticles.register(modBus);
         modBus.addListener(AquacultureCompat::hideCreativeItems);
         modBus.addListener(this::commonSetup);
         FishDataRegistry.init();
@@ -213,9 +118,6 @@ public class FishingMadeBetterForge {
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
-        // JEI builds its synthetic fish-processing recipes on the physical client.
-        // Dedicated-server datapack reloads do not populate this client-side static registry,
-        // so preload the local legacy fish configs once registries are ready.
         event.enqueueWork(() -> FishDataRegistry.reload(Map.of(), fishConfigDirectory));
     }
 
@@ -224,27 +126,7 @@ public class FishingMadeBetterForge {
     }
 
     public static Item registeredItem(String path) {
-        RegistryObject<Item> item = REGISTERED_ITEMS.get(path);
-        if (item == null) {
-            throw new IllegalArgumentException("Unknown Kitchen Made Better item: " + path);
-        }
-        return item.get();
-    }
-
-    private static RegistryObject<SoundEvent> registerSound(String path) {
-        ResourceLocation id = new ResourceLocation(Constants.MOD_ID, path);
-        return SOUND_EVENTS.register(path, () -> SoundEvent.createVariableRangeEvent(id));
-    }
-
-    @EventBusSubscriber(modid = Constants.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
-    public static final class CommonModEvents {
-        private CommonModEvents() {
-        }
-
-        @SubscribeEvent
-        public static void registerAttributes(EntityAttributeCreationEvent event) {
-            event.put(ModEntities.WHALE.get(), WhaleEntity.createAttributes().build());
-        }
+        return ModItems.get(path);
     }
 
     @EventBusSubscriber(modid = Constants.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -253,10 +135,7 @@ public class FishingMadeBetterForge {
         }
 
         private static void registerConfigScreen() {
-            ModLoadingContext.get().registerExtensionPoint(
-                    ConfigScreenHandler.ConfigScreenFactory.class,
-                    () -> new ConfigScreenHandler.ConfigScreenFactory((minecraft, parent) -> openConfigScreen(parent))
-            );
+            ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () -> new ConfigScreenHandler.ConfigScreenFactory((minecraft, parent) -> openConfigScreen(parent)));
         }
 
         @SubscribeEvent
@@ -298,7 +177,7 @@ public class FishingMadeBetterForge {
             ItemProperties.register(item, id, function);
         }
 
-        private static net.minecraft.client.gui.screens.Screen openConfigScreen(net.minecraft.client.gui.screens.Screen parent) {
+        private static Screen openConfigScreen(Screen parent) {
             if (!ModList.get().isLoaded(YACL_MOD_ID)) {
                 Constants.LOG.warn("Install YetAnotherConfigLib to open the Kitchen Made Better config screen.");
                 return parent;
@@ -356,10 +235,7 @@ public class FishingMadeBetterForge {
             if (!ModList.get().isLoaded("jei")) {
                 return;
             }
-            event.getDispatcher().register(Commands.literal("fmb_fish")
-                    .then(Commands.argument("id", StringArgumentType.greedyString())
-                            .executes(context -> net.theawesomegem.fishingmadebetter.compat.FishingEvolvedJeiPlugin
-                                    .openFishRequirements(StringArgumentType.getString(context, "id")) ? 1 : 0)));
+            event.getDispatcher().register(Commands.literal("fmb_fish").then(Commands.argument("id", StringArgumentType.greedyString()).executes(context -> net.theawesomegem.fishingmadebetter.compat.FishingEvolvedJeiPlugin.openFishRequirements(StringArgumentType.getString(context, "id")) ? 1 : 0)));
         }
 
         @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -371,9 +247,8 @@ public class FishingMadeBetterForge {
             // Aquaculture's lowercase fishWeight compatibility tag can add a
             // duplicate line in imperial units; retain that tag for integrations.
             event.getToolTip().removeIf(line -> {
-                String value = line.getString().toLowerCase(java.util.Locale.ROOT);
-                return value.matches(".*\\b(?:lbs?|pounds?)\\b.*")
-                        && (value.contains("weight") || value.contains("重量"));
+                String value = line.getString().toLowerCase(Locale.ROOT);
+                return value.matches(".*\\b(?:lbs?|pounds?)\\b.*") && (value.contains("weight") || value.contains("重量"));
             });
         }
 
@@ -403,45 +278,18 @@ public class FishingMadeBetterForge {
         NETWORK.sendToServer(new ServerConfigUpdateMessage(whaleBreaksBlocks, whaleDropsEnabled, whaleSpawnChancePercent));
     }
 
-    private static boolean canEditServerConfig(net.minecraft.server.level.ServerPlayer player) {
-        return player != null && (player.hasPermissions(2)
-                || player.getServer() != null && player.getServer().isSingleplayerOwner(player.getGameProfile()));
+    private static boolean canEditServerConfig(ServerPlayer player) {
+        return player != null && (player.hasPermissions(2) || player.getServer() != null && player.getServer().isSingleplayerOwner(player.getGameProfile()));
     }
 
-    private static void sendServerConfigSnapshot(net.minecraft.server.level.ServerPlayer player) {
-        NETWORK.send(
-                PacketDistributor.PLAYER.with(() -> player),
-                new ServerConfigSnapshotMessage(
-                        FmbCommonConfig.whaleBreaksBlocks(),
-                        FmbCommonConfig.whaleDropsEnabled(),
-                        FmbCommonConfig.whaleSpawnChancePercent(),
-                        canEditServerConfig(player)
-                )
-        );
+    private static void sendServerConfigSnapshot(ServerPlayer player) {
+        NETWORK.send(PacketDistributor.PLAYER.with(() -> player), new ServerConfigSnapshotMessage(FmbCommonConfig.whaleBreaksBlocks(), FmbCommonConfig.whaleDropsEnabled(), FmbCommonConfig.whaleSpawnChancePercent(), canEditServerConfig(player)));
     }
 
     private static void registerNetworkMessages() {
-        NETWORK.registerMessage(
-                0,
-                ReelingInputMessage.class,
-                ReelingInputMessage::encode,
-                ReelingInputMessage::decode,
-                ReelingInputMessage::handle
-        );
-        NETWORK.registerMessage(
-                1,
-                ServerConfigUpdateMessage.class,
-                ServerConfigUpdateMessage::encode,
-                ServerConfigUpdateMessage::decode,
-                ServerConfigUpdateMessage::handle
-        );
-        NETWORK.registerMessage(
-                2,
-                ServerConfigSnapshotMessage.class,
-                ServerConfigSnapshotMessage::encode,
-                ServerConfigSnapshotMessage::decode,
-                ServerConfigSnapshotMessage::handle
-        );
+        NETWORK.registerMessage(0, ReelingInputMessage.class, ReelingInputMessage::encode, ReelingInputMessage::decode, ReelingInputMessage::handle);
+        NETWORK.registerMessage(1, ServerConfigUpdateMessage.class, ServerConfigUpdateMessage::encode, ServerConfigUpdateMessage::decode, ServerConfigUpdateMessage::handle);
+        NETWORK.registerMessage(2, ServerConfigSnapshotMessage.class, ServerConfigSnapshotMessage::encode, ServerConfigSnapshotMessage::decode, ServerConfigSnapshotMessage::handle);
     }
 
     private record ReelingInputMessage(ReelingInput input) {
@@ -469,26 +317,21 @@ public class FishingMadeBetterForge {
         }
 
         private static ServerConfigUpdateMessage decode(FriendlyByteBuf buffer) {
-            return new ServerConfigUpdateMessage(
-                    buffer.readBoolean(),
-                    buffer.readBoolean(),
-                    buffer.readVarInt()
-            );
+            return new ServerConfigUpdateMessage(buffer.readBoolean(), buffer.readBoolean(), buffer.readVarInt());
         }
 
         private static void handle(ServerConfigUpdateMessage message, java.util.function.Supplier<NetworkEvent.Context> contextSupplier) {
             NetworkEvent.Context context = contextSupplier.get();
             context.enqueueWork(() -> {
-                net.minecraft.server.level.ServerPlayer sender = context.getSender();
+                ServerPlayer sender = context.getSender();
                 if (!canEditServerConfig(sender)) {
-                    Constants.LOG.warn("Player {} tried to edit Kitchen Made Better server config without permission",
-                            sender == null ? "<unknown>" : sender.getGameProfile().getName());
+                    Constants.LOG.warn("Player {} tried to edit Kitchen Made Better server config without permission", sender == null ? "<unknown>" : sender.getGameProfile().getName());
                     return;
                 }
 
                 FmbCommonConfig.applyServerEdit(message.whaleBreaksBlocks, message.whaleDropsEnabled, message.whaleSpawnChancePercent);
                 if (sender != null && sender.getServer() != null) {
-                    for (net.minecraft.server.level.ServerPlayer player : sender.getServer().getPlayerList().getPlayers()) {
+                    for (ServerPlayer player : sender.getServer().getPlayerList().getPlayers()) {
                         sendServerConfigSnapshot(player);
                     }
                 }
@@ -497,12 +340,8 @@ public class FishingMadeBetterForge {
         }
     }
 
-    private record ServerConfigSnapshotMessage(
-            boolean whaleBreaksBlocks,
-            boolean whaleDropsEnabled,
-            int whaleSpawnChancePercent,
-            boolean canEdit
-    ) {
+    private record ServerConfigSnapshotMessage(boolean whaleBreaksBlocks, boolean whaleDropsEnabled,
+                                               int whaleSpawnChancePercent, boolean canEdit) {
         private static void encode(ServerConfigSnapshotMessage message, FriendlyByteBuf buffer) {
             buffer.writeBoolean(message.whaleBreaksBlocks);
             buffer.writeBoolean(message.whaleDropsEnabled);
@@ -511,25 +350,12 @@ public class FishingMadeBetterForge {
         }
 
         private static ServerConfigSnapshotMessage decode(FriendlyByteBuf buffer) {
-            return new ServerConfigSnapshotMessage(
-                    buffer.readBoolean(),
-                    buffer.readBoolean(),
-                    buffer.readVarInt(),
-                    buffer.readBoolean()
-            );
+            return new ServerConfigSnapshotMessage(buffer.readBoolean(), buffer.readBoolean(), buffer.readVarInt(), buffer.readBoolean());
         }
 
         private static void handle(ServerConfigSnapshotMessage message, java.util.function.Supplier<NetworkEvent.Context> contextSupplier) {
             NetworkEvent.Context context = contextSupplier.get();
-            context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(
-                    Dist.CLIENT,
-                    () -> () -> ServerConfigClientState.update(
-                            message.whaleBreaksBlocks,
-                            message.whaleDropsEnabled,
-                            message.whaleSpawnChancePercent,
-                            message.canEdit
-                    )
-            ));
+            context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ServerConfigClientState.update(message.whaleBreaksBlocks, message.whaleDropsEnabled, message.whaleSpawnChancePercent, message.canEdit)));
             context.setPacketHandled(true);
         }
     }

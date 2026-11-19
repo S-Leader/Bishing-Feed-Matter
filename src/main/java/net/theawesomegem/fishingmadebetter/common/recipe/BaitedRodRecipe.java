@@ -1,6 +1,5 @@
 package net.theawesomegem.fishingmadebetter.common.recipe;
 
-import javax.annotation.Nullable;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -13,6 +12,8 @@ import net.minecraft.world.level.Level;
 import net.theawesomegem.fishingmadebetter.common.item.BetterFishingRodItem;
 import net.theawesomegem.fishingmadebetter.common.util.BaitUtil;
 import net.theawesomegem.fishingmadebetter.registry.ModRecipeSerializers;
+
+import javax.annotation.Nullable;
 
 public class BaitedRodRecipe extends CustomRecipe {
     public BaitedRodRecipe(ResourceLocation id, CraftingBookCategory category) {

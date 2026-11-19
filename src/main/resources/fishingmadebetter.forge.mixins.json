@@ -14,7 +14,10 @@
     "aquaculture.AquacultureStorageSlotMixin",
     "aquaculture.AquacultureTackleBoxHandlerMixin"
   ],
-  "client": [],
+  "client": [
+    "client.LanternFishLightMixin",
+    "client.EelWhipItemMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

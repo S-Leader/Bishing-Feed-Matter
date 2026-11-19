@@ -20,6 +20,7 @@ public final class LegacyFishConfigBootstrap {
             copyIfMissing(fishDataDirectory, "advancedfishing.json");
             copyIfMissing(fishDataDirectory, "aquaculture.json");
             copyIfMissing(fishDataDirectory, "netherdepths.json");
+            copyIfMissing(fishDataDirectory, "moretidefish.json");
         } catch (IOException exception) {
             Constants.LOG.warn("Unable to install legacy-style fish configuration files: {}", exception.getMessage());
         }

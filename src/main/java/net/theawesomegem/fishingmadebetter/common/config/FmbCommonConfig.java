@@ -9,6 +9,7 @@ public final class FmbCommonConfig {
     private static final ForgeConfigSpec.BooleanValue WHALE_BREAKS_BLOCKS;
     private static final ForgeConfigSpec.BooleanValue WHALE_DROPS_ENABLED;
     private static final ForgeConfigSpec.IntValue WHALE_SPAWN_CHANCE_PERCENT;
+    private static final ForgeConfigSpec.IntValue ELECTRIC_EEL_MONUMENT_SPAWN_CHANCE_PERCENT;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -32,6 +33,15 @@ public final class FmbCommonConfig {
                         "0 disables shipwreck whale spawning; 100 makes every qualifying wreck pass the roll."
                 )
                 .defineInRange("spawnChancePercent", 3, 0, 100);
+        builder.pop();
+        builder.push("electricEel");
+        ELECTRIC_EEL_MONUMENT_SPAWN_CHANCE_PERCENT = builder
+                .comment(
+                        "Chance that an ocean monument spawns one electric eel in nearby water.",
+                        "Each monument is rolled once; reloading its chunks does not roll again.",
+                        "0 disables monument electric eel spawning; 100 makes every monument pass the roll."
+                )
+                .defineInRange("monumentSpawnChancePercent", 20, 0, 100);
         builder.pop();
         SPEC = builder.build();
     }
@@ -59,6 +69,10 @@ public final class FmbCommonConfig {
 
     public static double whaleSpawnChance() {
         return whaleSpawnChancePercent() / 100.0D;
+    }
+
+    public static int electricEelMonumentSpawnChancePercent() {
+        return SPEC.isLoaded() ? ELECTRIC_EEL_MONUMENT_SPAWN_CHANCE_PERCENT.get() : 20;
     }
 
     /**

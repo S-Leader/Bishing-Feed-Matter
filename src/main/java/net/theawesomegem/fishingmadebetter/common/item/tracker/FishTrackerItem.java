@@ -1,16 +1,15 @@
 package net.theawesomegem.fishingmadebetter.common.item.tracker;
 
-import java.util.List;
-import javax.annotation.Nullable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -19,13 +18,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.theawesomegem.fishingmadebetter.common.data.FishData;
 import net.theawesomegem.fishingmadebetter.common.data.FishData.FishingLiquid;
 import net.theawesomegem.fishingmadebetter.common.data.FishDataRegistry;
 import net.theawesomegem.fishingmadebetter.common.data.FishPopulationSavedData;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 public class FishTrackerItem extends Item {
     private final TrackingVision trackingVision;
@@ -132,7 +133,9 @@ public class FishTrackerItem extends Item {
             MutableComponent detected = Component.translatable("notif.fishingmadebetter.fish_tracker.detected")
                     .withStyle(ChatFormatting.GRAY).append(" ").append(fishLink);
             if (!limitInfo) {
-                detected.append(Component.literal(" — " + fishData.description() + " · ")
+                detected.append(Component.literal(" — ")
+                                .append(fishData.waterColumn() ? Component.translatable(fishData.description()) : Component.literal(fishData.description()))
+                                .append(" · ")
                                 .withStyle(ChatFormatting.GRAY))
                         .append(Component.translatable(quantityKey(population.quantity()))
                                 .withStyle(ChatFormatting.AQUA));
