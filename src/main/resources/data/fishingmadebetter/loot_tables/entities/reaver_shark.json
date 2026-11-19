@@ -6,28 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "fishingmadebetter:reaver_shark",
-          "conditions": [
-            {
-              "condition": "minecraft:killed_by_player"
-            }
-          ],
-          "functions": [
-            {
-              "function": "minecraft:furnace_smelt",
-              "conditions": [
-                {
-                  "condition": "minecraft:entity_properties",
-                  "entity": "this",
-                  "predicate": {
-                    "flags": {
-                      "is_on_fire": true
-                    }
-                  }
-                }
-              ]
-            }
-          ]
+          "name": "fishingmadebetter:fish_slice"
         }
       ]
     }

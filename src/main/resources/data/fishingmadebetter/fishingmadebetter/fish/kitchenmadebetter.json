@@ -76,7 +76,8 @@
       "minecraft:overworld"
     ],
     "timeOutsideOfWater": 120,
-    "allowScaling": false,
+    "allowScaling": true,
+    "scalingItem": "minecraft:glowstone_dust",
     "allowFillet": true,
     "defaultFillet": true,
     "filletUseWeight": true,
@@ -118,7 +119,8 @@
       "minecraft:overworld"
     ],
     "timeOutsideOfWater": 120,
-    "allowScaling": false,
+    "allowScaling": true,
+    "scalingItem": "minecraft:diamond",
     "allowFillet": true,
     "defaultFillet": true,
     "filletUseWeight": true,
@@ -198,7 +200,8 @@
       "minecraft:overworld"
     ],
     "timeOutsideOfWater": 120,
-    "allowScaling": false,
+    "allowScaling": true,
+    "scalingItem": "minecraft:gunpowder",
     "allowFillet": false,
     "defaultFillet": true,
     "filletUseWeight": true,
@@ -238,7 +241,8 @@
       "minecraft:overworld"
     ],
     "timeOutsideOfWater": 120,
-    "allowScaling": false,
+    "allowScaling": true,
+    "scalingItem": "minecraft:glowstone_dust",
     "allowFillet": true,
     "defaultFillet": true,
     "filletUseWeight": true,
