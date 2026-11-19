@@ -32,7 +32,6 @@ import net.theawesomegem.fishingmadebetter.common.item.attachment.BobberItem;
 import net.theawesomegem.fishingmadebetter.common.item.attachment.HookItem;
 import net.theawesomegem.fishingmadebetter.common.item.attachment.ReelItem;
 import net.theawesomegem.fishingmadebetter.common.util.FishStackUtil;
-import net.theawesomegem.fishingmadebetter.registry.ModEntities;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -194,11 +193,6 @@ public final class FishingEvolvedJeiPlugin implements IModPlugin {
                 ItemStack caught = FishStackUtil.createCaughtFishStack(source, fish, 1, fish.minWeight(), 0L);
                 recipes.add(recipe("jei/fish_bucket", fishBucket.createStack(fish.fishId()), Ingredient.of(Items.WATER_BUCKET), Ingredient.of(caught)));
             }
-        }
-        for (var entity : ModEntities.FISH) {
-            Item fishItem = BuiltInRegistries.ITEM.get(entity.getId());
-            Item bucket = BuiltInRegistries.ITEM.get(entity.getId().withSuffix("_bucket"));
-            recipes.add(recipe("jei/" + entity.getId().getPath() + "_bucket", new ItemStack(bucket), Ingredient.of(Items.WATER_BUCKET), Ingredient.of(fishItem)));
         }
     }
 

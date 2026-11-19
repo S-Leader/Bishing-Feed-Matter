@@ -49,7 +49,7 @@
   "Electric Eel": {
     "fishId": "Electric Eel",
     "itemId": "fishingmadebetter:electric_eel",
-    "description": "fish.fishingmadebetter.electric_eel.habitat",
+    "description": "A slender green eel that releases electric arcs and can be wielded as a whip.",
     "minFishTime": 2200,
     "maxFishTime": 2800,
     "minErrorVariance": 1,
@@ -91,7 +91,7 @@
   "Reaver Shark": {
     "fishId": "Reaver Shark",
     "itemId": "fishingmadebetter:reaver_shark",
-    "description": "fish.fishingmadebetter.reaver_shark.habitat",
+    "description": "A gray shark with a pointed snout and a tough head that can be used as a pickaxe.",
     "minFishTime": 2000,
     "maxFishTime": 2600,
     "minErrorVariance": 1,
@@ -131,7 +131,7 @@
   "Pink Starfish": {
     "fishId": "Pink Starfish",
     "itemId": "fishingmadebetter:pink_starfish",
-    "description": "fish.fishingmadebetter.pink_starfish.habitat",
+    "description": "A pink, five-armed starfish that spins through the air, trails bubbles and pierces creatures when thrown.",
     "minFishTime": 2000,
     "maxFishTime": 2600,
     "minErrorVariance": 1,
@@ -171,7 +171,7 @@
   "Pufferfish Bomb": {
     "fishId": "Pufferfish Bomb",
     "itemId": "fishingmadebetter:pufferfish_bomb",
-    "description": "fish.fishingmadebetter.pufferfish_bomb.habitat",
+    "description": "A gray pufferfish with red markings that swells when threatened and bursts in a powerful explosion.",
     "minFishTime": 1000,
     "maxFishTime": 1600,
     "minErrorVariance": 1,
@@ -211,7 +211,7 @@
   "Lantern Fish": {
     "fishId": "Lantern Fish",
     "itemId": "fishingmadebetter:lantern_fish",
-    "description": "fish.fishingmadebetter.lantern_fish.habitat",
+    "description": "A dark anglerfish with a glowing lure and a toothy mouth. It can be worn as a living headlamp, but its bite reduces the wearer's maximum health.",
     "minFishTime": 1200,
     "maxFishTime": 1800,
     "minErrorVariance": 1,
