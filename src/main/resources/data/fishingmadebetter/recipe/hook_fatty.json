@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " S ",
+    "IHI",
+    " I "
+  ],
+  "key": {
+    "S": "minecraft:iron_nugget",
+    "I": "minecraft:cooked_beef",
+    "H": "fishingmadebetter:hook_basic"
+  },
+  "result": {
+    "id": "fishingmadebetter:hook_fatty"
+  }
+}

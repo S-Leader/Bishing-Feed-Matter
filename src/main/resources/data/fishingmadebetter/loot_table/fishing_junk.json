@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:fishing",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "weight": 10,
+          "quality": -1,
+          "value": "minecraft:gameplay/fishing/junk"
+        },
+        {
+          "type": "fishingmadebetter:optional_mod_loot_table",
+          "modid": "aquaculture",
+          "name": "aquaculture:gameplay/fishing/junk",
+          "weight": 10
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+{
+  "parent": "fishingmadebetter:item/template_spawn_egg",
+  "gui_light": "front"
+}

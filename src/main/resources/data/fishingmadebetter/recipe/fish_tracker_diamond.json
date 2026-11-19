@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " F ",
+    "IGI",
+    "III"
+  ],
+  "key": {
+    "F": "minecraft:redstone",
+    "I": "minecraft:diamond",
+    "G": "minecraft:glass_pane"
+  },
+  "result": {
+    "id": "fishingmadebetter:fish_tracker_diamond"
+  }
+}

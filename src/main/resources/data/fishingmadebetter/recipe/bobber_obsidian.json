@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "OSO",
+    "OBO",
+    "OSO"
+  ],
+  "key": {
+    "S": "minecraft:string",
+    "O": "minecraft:obsidian",
+    "B": "fishingmadebetter:bobber_basic"
+  },
+  "result": {
+    "id": "fishingmadebetter:bobber_obsidian"
+  }
+}

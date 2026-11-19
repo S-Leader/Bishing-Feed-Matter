@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "food",
+  "ingredient": "fishingmadebetter:whale_steak",
+  "result": {
+    "id": "fishingmadebetter:whale_steak_cooked"
+  },
+  "experience": 0.3,
+  "cookingtime": 200
+}

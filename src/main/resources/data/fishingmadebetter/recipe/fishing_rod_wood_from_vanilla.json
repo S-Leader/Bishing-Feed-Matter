@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:fishing_rod",
+    "fishingmadebetter:bobber_basic",
+    "fishingmadebetter:reel_basic",
+    "fishingmadebetter:hook_basic"
+  ],
+  "result": {
+    "id": "fishingmadebetter:fishing_rod_wood"
+  }
+}

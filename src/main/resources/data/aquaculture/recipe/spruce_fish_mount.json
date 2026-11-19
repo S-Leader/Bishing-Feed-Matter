@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "fish_mount",
+  "pattern": [
+    "BHB",
+    "BBB"
+  ],
+  "key": {
+    "B": "minecraft:spruce_button",
+    "H": "fishingmadebetter:hook_basic"
+  },
+  "result": {
+    "id": "aquaculture:spruce_fish_mount"
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "aquaculture"
+    }
+  ]
+}

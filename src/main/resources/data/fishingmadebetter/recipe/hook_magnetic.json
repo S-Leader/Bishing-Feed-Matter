@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " S ",
+    "IHI",
+    "R B"
+  ],
+  "key": {
+    "S": "minecraft:iron_nugget",
+    "I": "minecraft:iron_ingot",
+    "H": "fishingmadebetter:hook_barbed",
+    "B": "minecraft:lapis_lazuli",
+    "R": "minecraft:red_dye"
+  },
+  "result": {
+    "id": "fishingmadebetter:hook_magnetic"
+  }
+}

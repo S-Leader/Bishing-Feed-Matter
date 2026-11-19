@@ -1,0 +1,54 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="MIT; More Tide Fish content: All Rights Reserved."
+
+[[mods]]
+modId="fishingmadebetter"
+version="${mod_version}"
+displayName="Kitchen Made Better"
+authors="TheAwesomeGem, keletu, xiaofanwei, SeniorS"
+credits="Original Fishing Made Better by TheAwesomeGem; Fishing Evolved by SeniorS; More Tide Fish creatures, models, textures and sounds by xiaofanwei (xiaofanwei123)."
+description="Active fishing, modular fishing rods, fish populations and ocean creatures, with Aquaculture and Advanced Fishing integration."
+
+[[mixins]]
+config="fishingmadebetter.neoforge.mixins.json"
+
+[[dependencies.fishingmadebetter]]
+modId="minecraft"
+type="required"
+versionRange="[26.1.2]"
+side="BOTH"
+
+[[dependencies.fishingmadebetter]]
+modId="neoforge"
+type="required"
+versionRange="[26.1.2.126,26.2)"
+side="BOTH"
+
+[[dependencies.fishingmadebetter]]
+modId="aquaculture"
+type="optional"
+versionRange="[2.9.4,3)"
+ordering="AFTER"
+side="BOTH"
+
+[[dependencies.fishingmadebetter]]
+modId="advanced_fishing"
+type="optional"
+versionRange="[1.6.4,2)"
+ordering="AFTER"
+side="BOTH"
+
+[[dependencies.fishingmadebetter]]
+modId="jei"
+type="optional"
+versionRange="[29,30)"
+ordering="AFTER"
+side="CLIENT"
+
+[[dependencies.fishingmadebetter]]
+modId="yet_another_config_lib_v3"
+type="optional"
+versionRange="[3.9,4)"
+ordering="AFTER"
+side="CLIENT"

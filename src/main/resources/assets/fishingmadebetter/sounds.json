@@ -1,0 +1,58 @@
+{
+  "reeling": {
+    "category": "player",
+    "subtitle": "fishingmadebetter.subtitle.reeling",
+    "sounds": [
+      "fishingmadebetter:reeling"
+    ]
+  },
+  "fishsplashing": {
+    "category": "player",
+    "subtitle": "fishingmadebetter.subtitle.fishsplashing",
+    "sounds": [
+      "fishingmadebetter:fishsplashing"
+    ]
+  },
+  "entity.whale.ambient": {
+    "sounds": [
+      {
+        "name": "fishingmadebetter:entity/whale/ambient",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "entity.whale.angry": {
+    "sounds": [
+      {
+        "name": "fishingmadebetter:entity/whale/angry",
+        "attenuation_distance": 72
+      }
+    ]
+  },
+  "entity.whale.hurt": {
+    "sounds": [
+      {
+        "name": "fishingmadebetter:entity/whale/hurt",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "entity.whale.death": {
+    "sounds": [
+      {
+        "name": "fishingmadebetter:entity/whale/death",
+        "attenuation_distance": 80
+      }
+    ]
+  },
+  "electric_eel_release": {
+    "sounds": [
+      "fishingmadebetter:electric_eel_release"
+    ]
+  },
+  "electric_eel_whip": {
+    "sounds": [
+      "fishingmadebetter:electric_eel_whip"
+    ]
+  }
+}

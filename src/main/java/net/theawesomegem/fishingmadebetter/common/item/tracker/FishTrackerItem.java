@@ -1,0 +1,433 @@
+package net.theawesomegem.fishingmadebetter.common.item.tracker;
+
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.theawesomegem.fishingmadebetter.common.data.FishData;
+import net.theawesomegem.fishingmadebetter.common.data.FishData.FishingLiquid;
+import net.theawesomegem.fishingmadebetter.common.data.FishDataRegistry;
+import net.theawesomegem.fishingmadebetter.common.data.FishPopulationSavedData;
+import net.theawesomegem.fishingmadebetter.common.util.PlayerMessages;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
+public class FishTrackerItem extends Item {
+    private final TrackingVision trackingVision;
+    private final TrackingLiquid trackingLiquid;
+    private final int maxDepth;
+
+    public FishTrackerItem(
+            TrackingVision trackingVision,
+            TrackingLiquid trackingLiquid,
+            int maxDepth,
+            Item.Properties properties) {
+        super(properties.stacksTo(1));
+        this.trackingVision = trackingVision;
+        this.trackingLiquid = trackingLiquid;
+        this.maxDepth = maxDepth;
+    }
+
+    public TrackingVision getTrackingVision() {
+        return trackingVision;
+    }
+
+    public TrackingLiquid getTrackingLiquid() {
+        return trackingLiquid;
+    }
+
+    public int getMaxDepth() {
+        return maxDepth;
+    }
+
+    @Override
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (level.isClientSide()) {
+            return InteractionResult.SUCCESS;
+        }
+
+        BlockHitResult hit = getPlayerPOVHitResult(level, player, ClipContext.Fluid.ANY);
+        if (hit.getType() != HitResult.Type.BLOCK) {
+            return InteractionResult.PASS;
+        }
+
+        BlockPos pos = hit.getBlockPos();
+        FluidState fluidState = level.getFluidState(pos);
+        if (!canProbe(level, pos, fluidState, player)) {
+            return InteractionResult.FAIL;
+        }
+
+        PlayerMessages.send(
+                player,
+                Component.translatable("notif.fishingmadebetter.fish_tracker.tracking_start"),
+                false);
+        if (level instanceof ServerLevel serverLevel) {
+            reportPopulations(serverLevel, pos, player);
+        }
+        return InteractionResult.SUCCESS;
+    }
+
+    private void reportPopulations(ServerLevel level, BlockPos pos, Player player) {
+        boolean limitInfo = !player.isShiftKeyDown();
+        boolean creative = player.isCreative();
+        boolean fishFound = false;
+        int underYCount = 0;
+        int trackerQualityCount = 0;
+        int hibernatingCount = 0;
+
+        PlayerMessages.send(player, Component.literal("-----"), false);
+        List<FishPopulationSavedData.PopulationData> populations =
+                FishPopulationSavedData.get(level)
+                        .getOrCreatePopulations(
+                                level, level.getChunk(pos).getPos(), level.getGameTime())
+                        .stream()
+                        .toList();
+
+        for (FishPopulationSavedData.PopulationData population : populations) {
+            FishData fishData = FishDataRegistry.get(population.fishId());
+            if (fishData == null) {
+                continue;
+            }
+
+            if (creative) {
+                PlayerMessages.send(
+                        player,
+                        Component.translatable(
+                                        "notif.fishingmadebetter.fish_tracker.creative_fish",
+                                        population.quantity(),
+                                        clickableFishName(fishData.fishId()),
+                                        fishData.liquid().name(),
+                                        fishData.minYLevel(),
+                                        fishData.maxYLevel())
+                                .withStyle(ChatFormatting.AQUA),
+                        false);
+                PlayerMessages.send(
+                        player,
+                        Component.translatable(
+                                        "notif.fishingmadebetter.fish_tracker.creative_details",
+                                        fishData.minDeepLevel(),
+                                        fishData.timeToFish().name(),
+                                        fishData.maxLightLevel(),
+                                        Boolean.toString(fishData.rainRequired()),
+                                        Boolean.toString(fishData.thunderRequired()))
+                                .withStyle(ChatFormatting.GRAY),
+                        false);
+                continue;
+            }
+
+            if (!fishData.trackable()
+                    || !canTrackLiquid(fishData.liquid())
+                    || fishData.minYLevel() > pos.getY()) {
+                continue;
+            }
+
+            fishFound = true;
+            if (fishData.maxYLevel() < pos.getY()) {
+                underYCount++;
+                continue;
+            }
+            if (fishData.minDeepLevel() > maxDepth
+                    || fishData.rarity() < trackingVision.minRarity()) {
+                trackerQualityCount++;
+                continue;
+            }
+            if (!isFeedingNow(level, pos, fishData)) {
+                hibernatingCount++;
+                continue;
+            }
+
+            // Localizator-style clickable fish name: opens the JEI requirements view.
+            MutableComponent fishLink = clickableFishName(population.fishId());
+            MutableComponent detected =
+                    Component.translatable("notif.fishingmadebetter.fish_tracker.detected")
+                            .withStyle(ChatFormatting.GRAY)
+                            .append(" ")
+                            .append(fishLink);
+            if (!limitInfo) {
+                detected.append(
+                                Component.literal(" — ")
+                                        .append(
+                                                fishData.waterColumn()
+                                                        ? Component.translatable(
+                                                        fishData.description())
+                                                        : Component.literal(fishData.description()))
+                                        .append(" · ")
+                                        .withStyle(ChatFormatting.GRAY))
+                        .append(
+                                Component.translatable(quantityKey(population.quantity()))
+                                        .withStyle(ChatFormatting.AQUA));
+            }
+            PlayerMessages.send(player, detected, false);
+        }
+
+        if (creative) {
+            PlayerMessages.send(player, Component.literal("-----"), false);
+            return;
+        }
+        if (!fishFound) {
+            PlayerMessages.send(
+                    player,
+                    Component.translatable("notif.fishingmadebetter.fish_tracker.found_none"),
+                    false);
+            PlayerMessages.send(player, Component.literal("-----"), false);
+            return;
+        }
+
+        if (underYCount > 0) {
+            PlayerMessages.send(
+                    player,
+                    Component.translatable("notif.fishingmadebetter.fish_tracker.found_under_y")
+                            .append(": " + underYCount + "."),
+                    false);
+        }
+        if (trackerQualityCount > 0) {
+            PlayerMessages.send(
+                    player,
+                    Component.translatable(
+                                    "notif.fishingmadebetter.fish_tracker.found_outside_quality")
+                            .append(": " + trackerQualityCount + "."),
+                    false);
+        }
+        if (hibernatingCount > 0) {
+            PlayerMessages.send(
+                    player,
+                    Component.translatable("notif.fishingmadebetter.fish_tracker.found_hibernating")
+                            .append(": " + hibernatingCount + "."),
+                    false);
+        }
+        PlayerMessages.send(player, Component.literal("-----"), false);
+    }
+
+    private static MutableComponent clickableFishName(String fishId) {
+        return Component.literal(fishId)
+                .withStyle(
+                        style ->
+                                style.withColor(ChatFormatting.YELLOW)
+                                        .withBold(true)
+                                        .withUnderlined(true)
+                                        .withClickEvent(
+                                                new ClickEvent.RunCommand("/fmb_fish " + fishId))
+                                        .withHoverEvent(
+                                                new HoverEvent.ShowText(
+                                                        Component.translatable(
+                                                                "notif.fishingmadebetter.fish_tracker.open_jei"))));
+    }
+
+    private static String quantityKey(int quantity) {
+        if (quantity > 50) {
+            return "notif.fishingmadebetter.fish_tracker.quantity_immense";
+        }
+        if (quantity > 40) {
+            return "notif.fishingmadebetter.fish_tracker.quantity_abundant";
+        }
+        if (quantity > 30) {
+            return "notif.fishingmadebetter.fish_tracker.quantity_ample";
+        }
+        if (quantity > 20) {
+            return "notif.fishingmadebetter.fish_tracker.quantity_substantial";
+        }
+        if (quantity > 10) {
+            return "notif.fishingmadebetter.fish_tracker.quantity_numerous";
+        }
+        if (quantity > 3) {
+            return "notif.fishingmadebetter.fish_tracker.quantity_light";
+        }
+        if (quantity > 1) {
+            return "notif.fishingmadebetter.fish_tracker.quantity_sparse";
+        }
+        return "notif.fishingmadebetter.fish_tracker.quantity_meager";
+    }
+
+    private boolean canTrackLiquid(FishingLiquid fishLiquid) {
+        return fishLiquid == FishingLiquid.ANY
+                || (fishLiquid == FishingLiquid.WATER && trackingLiquid == TrackingLiquid.WATER)
+                || (fishLiquid == FishingLiquid.LAVA && trackingLiquid == TrackingLiquid.LAVA)
+                || (fishLiquid == FishingLiquid.VOID && trackingLiquid == TrackingLiquid.VOID);
+    }
+
+    private static boolean isFeedingNow(ServerLevel level, BlockPos pos, FishData fishData) {
+        long dayTime = level.getOverworldClockTime() % 24000L;
+        if (fishData.timeToFish() == FishData.TimeToFish.DAY && dayTime >= 12000L) {
+            return false;
+        }
+        if (fishData.timeToFish() == FishData.TimeToFish.NIGHT && dayTime < 12000L) {
+            return false;
+        }
+        if (level.getMaxLocalRawBrightness(pos) > fishData.maxLightLevel()) {
+            return false;
+        }
+        if (fishData.rainRequired() && !level.isRaining()) {
+            return false;
+        }
+        if (fishData.thunderRequired() && !level.isThundering()) {
+            return false;
+        }
+        if (!isDimensionValid(level, fishData)) {
+            return false;
+        }
+        return isBiomeValid(level, pos, fishData);
+    }
+
+    private static boolean isDimensionValid(ServerLevel level, FishData fishData) {
+        if (fishData.dimensionList().isEmpty()) {
+            return true;
+        }
+        boolean contains =
+                fishData.dimensionList().stream()
+                        .anyMatch(entry -> FishData.matchesDimension(level, entry));
+        return fishData.dimensionListBlacklist() != contains;
+    }
+
+    private static boolean isBiomeValid(ServerLevel level, BlockPos pos, FishData fishData) {
+        if (fishData.biomeList().isEmpty()) {
+            return true;
+        }
+        boolean contains =
+                fishData.biomeList().stream()
+                        .anyMatch(entry -> FishData.matchesBiome(level.getBiome(pos), entry));
+        return fishData.biomeListBlacklist() != contains;
+    }
+
+    private boolean canProbe(Level level, BlockPos pos, FluidState fluidState, Player player) {
+        if (trackingLiquid == TrackingLiquid.VOID) {
+            if (pos.getY() > level.getMinY() + 3) {
+                PlayerMessages.send(
+                        player,
+                        Component.translatable("notif.fishingmadebetter.fish_tracker.only_void"),
+                        false);
+                return false;
+            }
+            return true;
+        }
+
+        Fluid expectedFluid = trackingLiquid == TrackingLiquid.LAVA ? Fluids.LAVA : Fluids.WATER;
+        if (!fluidState.is(expectedFluid)) {
+            PlayerMessages.send(
+                    player,
+                    Component.translatable(
+                            trackingLiquid == TrackingLiquid.LAVA
+                                    ? "notif.fishingmadebetter.fish_tracker.only_lava"
+                                    : "notif.fishingmadebetter.fish_tracker.only_water"),
+                    false);
+            return false;
+        }
+
+        if (countNearbyFluid(level, pos, expectedFluid) < 25) {
+            PlayerMessages.send(
+                    player,
+                    Component.translatable("notif.fishingmadebetter.fish_tracker.too_shallow"),
+                    false);
+            return false;
+        }
+
+        return true;
+    }
+
+    private static int countNearbyFluid(Level level, BlockPos origin, Fluid fluid) {
+        int count = 0;
+        for (BlockPos pos :
+                BlockPos.betweenClosed(origin.offset(-2, -3, -2), origin.offset(2, 0, 2))) {
+            if (level.getFluidState(pos).is(fluid)) {
+                count++;
+                if (count >= 25) {
+                    return count;
+                }
+            }
+        }
+        return count;
+    }
+
+    @Override
+    public void appendHoverText(
+            ItemStack stack,
+            TooltipContext context,
+            TooltipDisplay display,
+            Consumer<Component> output,
+            TooltipFlag flag) {
+        List<Component> tooltip = new ArrayList<>();
+        try {
+            tooltip.add(
+                    Component.translatable("item.fishingmadebetter.fish_tracker.tooltip.max_depth")
+                            .append(": " + maxDepth)
+                            .withStyle(ChatFormatting.GRAY));
+            tooltip.add(
+                    Component.translatable(trackingVision.tooltipKey())
+                            .withStyle(ChatFormatting.GRAY));
+            tooltip.add(
+                    Component.translatable(trackingLiquid.tooltipKey())
+                            .withStyle(ChatFormatting.GRAY));
+            tooltip.add(
+                    Component.translatable(
+                                    "item.fishingmadebetter.fish_tracker.tooltip.right_click")
+                            .withStyle(ChatFormatting.GRAY));
+            tooltip.add(
+                    Component.translatable("item.fishingmadebetter.fish_tracker.tooltip.info.1")
+                            .append(" Shift ")
+                            .append(
+                                    Component.translatable(
+                                            "item.fishingmadebetter.fish_tracker.tooltip.info.2"))
+                            .withStyle(ChatFormatting.GRAY));
+
+        } finally {
+            tooltip.forEach(output);
+        }
+    }
+
+    public enum TrackingVision {
+        BAD("item.fishingmadebetter.fish_tracker.tooltip.vision_bad", 40),
+        NORMAL("item.fishingmadebetter.fish_tracker.tooltip.vision_normal", 20),
+        BEST("item.fishingmadebetter.fish_tracker.tooltip.vision_best", 0);
+
+        private final String tooltipKey;
+        private final int minRarity;
+
+        TrackingVision(String tooltipKey, int minRarity) {
+            this.tooltipKey = tooltipKey;
+            this.minRarity = minRarity;
+        }
+
+        public String tooltipKey() {
+            return tooltipKey;
+        }
+
+        public int minRarity() {
+            return minRarity;
+        }
+    }
+
+    public enum TrackingLiquid {
+        WATER("item.fishingmadebetter.fish_tracker.tooltip.probe_water"),
+        LAVA("item.fishingmadebetter.fish_tracker.tooltip.probe_lava"),
+        VOID("item.fishingmadebetter.fish_tracker.tooltip.probe_void");
+
+        private final String tooltipKey;
+
+        TrackingLiquid(String tooltipKey) {
+            this.tooltipKey = tooltipKey;
+        }
+
+        public String tooltipKey() {
+            return tooltipKey;
+        }
+    }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SES",
+    "EBE",
+    "SES"
+  ],
+  "key": {
+    "S": "minecraft:wheat_seeds",
+    "E": "minecraft:spider_eye",
+    "B": "minecraft:bucket"
+  },
+  "result": {
+    "id": "fishingmadebetter:bait_bucket"
+  }
+}

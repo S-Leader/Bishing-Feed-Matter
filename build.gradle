@@ -1,0 +1,48 @@
+import net.neoforged.nfrtgradle.NeoFormRuntimeTask
+
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+
+group = project.mod_group
+version = project.mod_version
+base { archivesName = 'kitchenmadebetter-26.1.2-neoforge' }
+java { toolchain.languageVersion = JavaLanguageVersion.of(25); withSourcesJar() }
+
+neoForge {
+    version = project.neo_version
+    mods { fishingmadebetter { sourceSet sourceSets.main } }
+    runs {
+        client { client(); gameDirectory = file('run/client') }
+        server { server(); programArgument '--nogui'; gameDirectory = file('run/server') }
+    }
+}
+
+dependencies {
+    compileOnly files('libs/Aquaculture-26.1.2-2.9.4.jar')
+    compileOnly files('libs/Advanced-Fishing-26.1-1.6.4.jar')
+    compileOnly files('libs/jei-26.1.2-neoforge-29.53.0.115.jar')
+    compileOnly files('libs/yet_another_config_lib_v3-3.9.7+26.1-neoforge.jar')
+    runtimeOnly fileTree(dir: 'libs', include: '*.jar')
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ['-proc:none', '-Xmaxerrs', '2000']
+}
+
+tasks.named('processResources') {
+    inputs.property 'mod_version', project.version
+    filesMatching('META-INF/neoforge.mods.toml') { expand(mod_version: project.version) }
+}
+
+tasks.named('jar') {
+    from('README.md') { into 'META-INF' }
+    manifest { attributes 'Implementation-Version': project.version, 'MixinConfigs': 'fishingmadebetter.neoforge.mixins.json' }
+}
+
+tasks.withType(NeoFormRuntimeTask).configureEach {
+    javaExecutable = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(25) }.map { it.executablePath.asFile.absolutePath }
+}

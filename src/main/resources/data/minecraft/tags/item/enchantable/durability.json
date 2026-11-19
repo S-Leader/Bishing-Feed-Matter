@@ -1,0 +1,23 @@
+{
+  "replace": false,
+  "values": [
+    "fishingmadebetter:fishing_rod_wood",
+    "fishingmadebetter:fishing_rod_iron",
+    "fishingmadebetter:fishing_rod_diamond",
+    "fishingmadebetter:fishing_rod_steel",
+    "fishingmadebetter:fishing_rod_netherite",
+    "fishingmadebetter:electric_eel",
+    "fishingmadebetter:lantern_fish",
+    "fishingmadebetter:reaver_shark",
+    "fishingmadebetter:fillet_knife_wood",
+    "fishingmadebetter:fillet_knife_iron",
+    "fishingmadebetter:fillet_knife_diamond",
+    "fishingmadebetter:fillet_knife_steel",
+    "fishingmadebetter:fillet_knife_netherite",
+    "fishingmadebetter:scaling_knife_wood",
+    "fishingmadebetter:scaling_knife_iron",
+    "fishingmadebetter:scaling_knife_diamond",
+    "fishingmadebetter:scaling_knife_steel",
+    "fishingmadebetter:scaling_knife_netherite"
+  ]
+}

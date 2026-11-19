@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": "fishingmadebetter:fish_slice_raw",
+  "result": {
+    "id": "fishingmadebetter:fish_slice_cooked"
+  },
+  "experience": 0.35,
+  "cookingtime": 200
+}

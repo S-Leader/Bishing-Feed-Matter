@@ -1,0 +1,23 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "net.theawesomegem.fishingmadebetter.mixins",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "aquaculture.AquacultureBaitSlotMixin",
+    "aquaculture.AquacultureBobberSlotMixin",
+    "aquaculture.AquacultureHookSlotMixin",
+    "aquaculture.AquacultureReelSlotMixin",
+    "aquaculture.AquacultureRodSlotMixin",
+    "aquaculture.AquacultureStorageSlotMixin",
+    "aquaculture.AquacultureTackleBoxHandlerMixin",
+    "aquaculture.AquacultureRodContainerMixin"
+  ],
+  "client": [
+    "client.LanternFishLightMixin",
+    "client.EelWhipItemMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

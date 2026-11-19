@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SIS",
+    "IWI",
+    "SIS"
+  ],
+  "key": {
+    "S": "minecraft:string",
+    "I": "minecraft:iron_ingot",
+    "W": "minecraft:stick"
+  },
+  "result": {
+    "id": "fishingmadebetter:reel_basic"
+  }
+}

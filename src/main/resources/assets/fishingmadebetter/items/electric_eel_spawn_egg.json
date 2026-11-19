@@ -1,0 +1,16 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "fishingmadebetter:item/electric_eel_spawn_egg",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 1887362
+      },
+      {
+        "type": "minecraft:constant",
+        "value": 7337415
+      }
+    ]
+  }
+}

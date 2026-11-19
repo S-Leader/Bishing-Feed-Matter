@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "fishingmadebetter:fishing_rod_wood",
+    "fishingmadebetter:fishing_rod_iron",
+    "fishingmadebetter:fishing_rod_diamond",
+    "fishingmadebetter:fishing_rod_steel",
+    "fishingmadebetter:fishing_rod_netherite"
+  ]
+}

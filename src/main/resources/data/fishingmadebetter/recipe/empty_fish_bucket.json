@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "fishingmadebetter:fish_bucket"
+  ],
+  "result": {
+    "id": "minecraft:bucket"
+  }
+}

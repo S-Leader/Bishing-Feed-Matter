@@ -1,0 +1,12 @@
+{
+    "parent": "minecraft:block/cube",
+    "textures": {
+        "particle": "fishingmadebetter:block/baitbox_side",
+        "down": "fishingmadebetter:block/baitbox_side",
+        "up": "fishingmadebetter:block/baitbox_side",
+        "north": "fishingmadebetter:block/baitbox_front",
+        "east": "fishingmadebetter:block/baitbox_side",
+        "south": "fishingmadebetter:block/baitbox_front",
+        "west": "fishingmadebetter:block/baitbox_side"
+    }
+}
