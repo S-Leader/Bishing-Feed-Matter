@@ -1,7 +1,6 @@
 package net.theawesomegem.fishingmadebetter.client.renderer.fish;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -22,9 +21,7 @@ public class StarfishProjectileRenderer extends EntityRenderer<PinkStarfishProje
     @Override
     public void render(PinkStarfishProjectile fish, float yaw, float partialTick, PoseStack pose, MultiBufferSource buffers, int light) {
         pose.pushPose();
-        pose.mulPose(Axis.YP.rotationDegrees(yaw - 90));
-        pose.mulPose(Axis.XP.rotationDegrees(90));
-        if (!fish.isInGround()) pose.mulPose(Axis.ZP.rotationDegrees((fish.tickCount + partialTick) * 45));
+        pose.mulPose(fish.getRenderRotation(partialTick));
         pose.scale(0.5F, 0.5F, 0.5F);
         context.getItemRenderer().renderStatic(fish.getItem(), ItemDisplayContext.FIXED, light, OverlayTexture.NO_OVERLAY, pose, buffers, fish.level(), fish.getId());
         pose.popPose();

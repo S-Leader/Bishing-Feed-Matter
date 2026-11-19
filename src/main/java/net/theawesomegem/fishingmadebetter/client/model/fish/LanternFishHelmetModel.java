@@ -1,21 +1,11 @@
 package net.theawesomegem.fishingmadebetter.client.model.fish;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
-import net.theawesomegem.fishingmadebetter.Constants;
 
 public class LanternFishHelmetModel extends HumanoidModel<LivingEntity> {
-    private static final ResourceLocation GLOW = new ResourceLocation(Constants.MOD_ID, "textures/entity/fish/lantern_fish_helmet_glowmask.png");
-
     public LanternFishHelmetModel() {
         super(createLayer().bakeRoot());
     }
@@ -58,12 +48,5 @@ public class LanternFishHelmetModel extends HumanoidModel<LivingEntity> {
         body.addOrReplaceChild("cube1", CubeListBuilder.create().texOffs(22, 0).addBox(-1.0000000F, -2.0000000F, -1.0000000F, 0.0000000F, 2.0000000F, 2.0000000F, new CubeDeformation(0.0000000F)), PartPose.offsetAndRotation(-0.6000000F, -1.7000000F, 0.0000000F, 0.0000000F, 0.0000000F, -0.3926991F));
         body.addOrReplaceChild("cube2", CubeListBuilder.create().texOffs(22, 4).addBox(-1.0000000F, -2.0000000F, -1.0000000F, 0.0000000F, 2.0000000F, 2.0000000F, new CubeDeformation(0.0000000F)), PartPose.offsetAndRotation(2.3000000F, -1.0000000F, 0.0000000F, 0.0000000F, 0.0000000F, 0.3926991F));
         return LayerDefinition.create(mesh, 32, 32);
-    }
-
-    @Override
-    public void renderToBuffer(PoseStack pose, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
-        super.renderToBuffer(pose, vertices, light, overlay, red, green, blue, alpha);
-        VertexConsumer glow = Minecraft.getInstance().renderBuffers().bufferSource().getBuffer(RenderType.eyes(GLOW));
-        super.renderToBuffer(pose, glow, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 1, 1, 1, alpha);
     }
 }

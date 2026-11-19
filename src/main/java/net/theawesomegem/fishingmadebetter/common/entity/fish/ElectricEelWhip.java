@@ -7,6 +7,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -19,14 +20,18 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkHooks;
-import net.theawesomegem.fishingmadebetter.common.item.fish.ElectricEelItem;
 import net.theawesomegem.fishingmadebetter.registry.ModEntities;
+import net.theawesomegem.fishingmadebetter.registry.ModParticles;
 import net.theawesomegem.fishingmadebetter.registry.ModSounds;
+
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ElectricEelWhip extends Entity {
     private static final EntityDataAccessor<Integer> OWNER = SynchedEntityData.defineId(ElectricEelWhip.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> FOIL = SynchedEntityData.defineId(ElectricEelWhip.class, EntityDataSerializers.BOOLEAN);
     private ItemStack weapon = ItemStack.EMPTY;
+    private final Queue<Vec3> pendingSparkPositions = new ConcurrentLinkedQueue<>();
 
     public ElectricEelWhip(EntityType<? extends ElectricEelWhip> type, Level level) {
         super(type, level);
@@ -61,6 +66,30 @@ public class ElectricEelWhip extends Entity {
         return 12;
     }
 
+    public RandomSource getRandom() {
+        return random;
+    }
+
+    public void queueSparkPosition(Vec3 position) {
+        pendingSparkPositions.add(position);
+    }
+
+    private void spawnQueuedSparks() {
+        Vec3 position;
+        while ((position = pendingSparkPositions.poll()) != null) {
+            if (tickCount < getLifespan() / 2 || random.nextFloat() >= 0.5F) {
+                continue;
+            }
+            int count = random.nextInt(3) + 1;
+            for (int i = 0; i < count; i++) {
+                level().addParticle(ModParticles.SPARK.get(), position.x, position.y, position.z,
+                        (random.nextDouble() - 0.5) * 0.1,
+                        (random.nextDouble() - 0.5) * 0.1,
+                        (random.nextDouble() - 0.5) * 0.1);
+            }
+        }
+    }
+
     @Override
     protected void defineSynchedData() {
         entityData.define(OWNER, -1);
@@ -72,7 +101,10 @@ public class ElectricEelWhip extends Entity {
         super.tick();
         Player player = getOwner();
         if (player != null) setPos(player.getEyePosition());
-        if (level().isClientSide) return;
+        if (level().isClientSide) {
+            spawnQueuedSparks();
+            return;
+        }
         if (player == null || !player.isAlive() || !player.getMainHandItem().is(weapon.getItem()) || tickCount >= getLifespan()) {
             discard();
             return;

@@ -1,5 +1,11 @@
 package net.theawesomegem.fishingmadebetter.client;
 
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
@@ -11,6 +17,7 @@ import net.theawesomegem.fishingmadebetter.client.particle.AirBubbleParticle;
 import net.theawesomegem.fishingmadebetter.client.particle.SparkParticle;
 import net.theawesomegem.fishingmadebetter.client.particle.ZapParticle;
 import net.theawesomegem.fishingmadebetter.client.renderer.fish.EelWhipRenderer;
+import net.theawesomegem.fishingmadebetter.client.renderer.fish.LanternFishHelmetGlowLayer;
 import net.theawesomegem.fishingmadebetter.client.renderer.fish.PortedFishRenderer;
 import net.theawesomegem.fishingmadebetter.client.renderer.fish.StarfishProjectileRenderer;
 import net.theawesomegem.fishingmadebetter.registry.ModEntities;
@@ -26,6 +33,32 @@ public final class MoreFishClient {
         event.registerSpriteSet(ModParticles.ZAP.get(), ZapParticle.Provider::new);
         event.registerSpriteSet(ModParticles.SPARK.get(), SparkParticle.Provider::new);
         event.registerSpriteSet(ModParticles.AIR_BUBBLE.get(), AirBubbleParticle.Provider::new);
+    }
+
+    @SubscribeEvent
+    public static void armorLayers(EntityRenderersEvent.AddLayers event) {
+        for (String skin : event.getSkins()) {
+            PlayerRenderer renderer = event.getSkin(skin);
+            addHelmetGlow(renderer);
+        }
+        addHelmetGlow(event.getRenderer(EntityType.ARMOR_STAND));
+        addHelmetGlow(event.getRenderer(EntityType.ZOMBIE));
+        addHelmetGlow(event.getRenderer(EntityType.ZOMBIE_VILLAGER));
+        addHelmetGlow(event.getRenderer(EntityType.HUSK));
+        addHelmetGlow(event.getRenderer(EntityType.DROWNED));
+        addHelmetGlow(event.getRenderer(EntityType.GIANT));
+        addHelmetGlow(event.getRenderer(EntityType.SKELETON));
+        addHelmetGlow(event.getRenderer(EntityType.STRAY));
+        addHelmetGlow(event.getRenderer(EntityType.WITHER_SKELETON));
+        addHelmetGlow(event.getRenderer(EntityType.PIGLIN));
+        addHelmetGlow(event.getRenderer(EntityType.PIGLIN_BRUTE));
+        addHelmetGlow(event.getRenderer(EntityType.ZOMBIFIED_PIGLIN));
+    }
+
+    private static <T extends LivingEntity, M extends EntityModel<T>> void addHelmetGlow(LivingEntityRenderer<T, M> renderer) {
+        if (renderer != null && renderer.getModel() instanceof HumanoidModel<?>) {
+            renderer.addLayer(new LanternFishHelmetGlowLayer<>(renderer));
+        }
     }
 
     @SubscribeEvent
