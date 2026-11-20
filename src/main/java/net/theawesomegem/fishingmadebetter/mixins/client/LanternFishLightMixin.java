@@ -12,8 +12,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LevelRenderer.class)
 public abstract class LanternFishLightMixin {
+
     @Inject(method = "getLightColor(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)I", at = @At("RETURN"), cancellable = true)
     private static void lanternLight(BlockAndTintGetter level, BlockState state, BlockPos pos, CallbackInfoReturnable<Integer> callback) {
-        callback.setReturnValue(LanternFishLighting.light(pos, callback.getReturnValue()));
+        int original = callback.getReturnValue();
+        int lit = LanternFishLighting.light(pos, original);
+        if (lit != original) {
+            callback.setReturnValue(lit);
+        }
     }
 }
