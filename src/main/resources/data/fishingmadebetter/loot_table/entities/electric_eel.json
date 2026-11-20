@@ -5,25 +5,50 @@
       "rolls": 1,
       "entries": [
         {
-          "type": "minecraft:item",
-          "name": "fishingmadebetter:fish_slice_raw",
-          "functions": [
+          "type": "minecraft:alternatives",
+          "children": [
             {
-              "function": "minecraft:set_count",
-              "count": {
-                "type": "minecraft:uniform",
-                "min": 2.0,
-                "max": 5.0
-              }
+              "type": "minecraft:item",
+              "name": "fishingmadebetter:electric_eel",
+              "functions": [
+                {
+                  "function": "minecraft:set_damage",
+                  "damage": {
+                    "type": "minecraft:uniform",
+                    "min": 0.1,
+                    "max": 0.9
+                  }
+                }
+              ],
+              "conditions": [
+                {
+                  "condition": "minecraft:random_chance",
+                  "chance": 0.1
+                }
+              ]
             },
             {
-              "function": "minecraft:enchanted_count_increase",
-              "count": {
-                "type": "minecraft:uniform",
-                "min": 0.0,
-                "max": 1.0
-              },
-              "enchantment": "minecraft:looting"
+              "type": "minecraft:item",
+              "name": "fishingmadebetter:fish_slice_raw",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "type": "minecraft:uniform",
+                    "min": 2.0,
+                    "max": 5.0
+                  }
+                },
+                {
+                  "function": "minecraft:enchanted_count_increase",
+                  "count": {
+                    "type": "minecraft:uniform",
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "enchantment": "minecraft:looting"
+                }
+              ]
             }
           ]
         }
