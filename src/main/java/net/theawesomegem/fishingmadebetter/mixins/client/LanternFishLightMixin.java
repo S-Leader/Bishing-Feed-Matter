@@ -12,17 +12,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LevelRenderer.class)
 public abstract class LanternFishLightMixin {
-    @Inject(
-            method =
-                    "getLightCoords(Lnet/minecraft/client/renderer/LevelRenderer$BrightnessGetter;Lnet/minecraft/world/level/BlockAndLightGetter;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)I",
-            at = @At("RETURN"),
-            cancellable = true)
-    private static void lanternLight(
-            LevelRenderer.BrightnessGetter brightness,
-            BlockAndLightGetter level,
-            BlockState state,
-            BlockPos pos,
-            CallbackInfoReturnable<Integer> callback) {
-        callback.setReturnValue(LanternFishLighting.light(pos, callback.getReturnValue()));
+    @Inject(method = "getLightCoords(Lnet/minecraft/client/renderer/LevelRenderer$BrightnessGetter;Lnet/minecraft/world/level/BlockAndLightGetter;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)I", at = @At("RETURN"), cancellable = true)
+    private static void lanternLight(LevelRenderer.BrightnessGetter brightness, BlockAndLightGetter level, BlockState state, BlockPos pos, CallbackInfoReturnable<Integer> callback) {
+        int original = callback.getReturnValue();
+        int lit = LanternFishLighting.light(pos, original);
+        if (lit != original) {
+            callback.setReturnValue(lit);
+        }
     }
 }
