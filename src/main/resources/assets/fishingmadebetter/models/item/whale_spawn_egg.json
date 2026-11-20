@@ -1,4 +1,7 @@
 {
-  "parent": "fishingmadebetter:item/template_spawn_egg",
-  "gui_light": "front"
+  "parent": "minecraft:item/generated",
+  "gui_light": "front",
+  "textures": {
+    "layer0": "fishingmadebetter:item/whale_spawn_egg"
+  }
 }

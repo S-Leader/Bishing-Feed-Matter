@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "gui_light": "front",
-  "textures": {
-    "layer0": "fishingmadebetter:item/template_spawn_egg",
-    "layer1": "fishingmadebetter:item/template_spawn_egg_overlay"
-  }
-}
