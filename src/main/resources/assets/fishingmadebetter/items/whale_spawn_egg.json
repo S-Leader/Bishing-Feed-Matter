@@ -1,16 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "fishingmadebetter:item/whale_spawn_egg",
-    "tints": [
-      {
-        "type": "minecraft:constant",
-        "value": 5467276
-      },
-      {
-        "type": "minecraft:constant",
-        "value": 12109785
-      }
-    ]
+    "model": "fishingmadebetter:item/whale_spawn_egg"
   }
 }

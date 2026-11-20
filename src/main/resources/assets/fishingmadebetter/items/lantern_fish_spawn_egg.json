@@ -1,16 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "fishingmadebetter:item/lantern_fish_spawn_egg",
-    "tints": [
-      {
-        "type": "minecraft:constant",
-        "value": 3688536
-      },
-      {
-        "type": "minecraft:constant",
-        "value": 16578487
-      }
-    ]
+    "model": "fishingmadebetter:item/lantern_fish_spawn_egg"
   }
 }

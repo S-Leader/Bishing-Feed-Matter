@@ -1,16 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "fishingmadebetter:item/pink_starfish_spawn_egg",
-    "tints": [
-      {
-        "type": "minecraft:constant",
-        "value": 16084857
-      },
-      {
-        "type": "minecraft:constant",
-        "value": 16579836
-      }
-    ]
+    "model": "fishingmadebetter:item/pink_starfish_spawn_egg"
   }
 }

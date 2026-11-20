@@ -1,16 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "fishingmadebetter:item/reaver_shark_spawn_egg",
-    "tints": [
-      {
-        "type": "minecraft:constant",
-        "value": 3025474
-      },
-      {
-        "type": "minecraft:constant",
-        "value": 15461628
-      }
-    ]
+    "model": "fishingmadebetter:item/reaver_shark_spawn_egg"
   }
 }
